@@ -1,0 +1,21 @@
+# Archivos sueltos / basura
+Untitled
+**/Untitled
+
+# Secretos y entorno (solo se versionan los *.example)
+.env
+.env.*
+!.env.example
+!.env.local.example
+appsettings.*.local.json
+*.pfx
+*.key
+*.pem
+secrets.json
+
+# Sistema / IDE
+.DS_Store
+Thumbs.db
+.vs/
+.idea/
+.claude/settings.local.json
