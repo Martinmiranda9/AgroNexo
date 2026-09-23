@@ -45,7 +45,7 @@ import * as sharedHooks from '@/shared/hooks';
 import { ROUTES } from '@/shared/constants';
 import * as commonTypes from '@/shared/types';
 
-describe('AgroConnect Path Alias & Layer Resolution Empirical Verification', () => {
+describe('AgroNexo Path Alias & Layer Resolution Empirical Verification', () => {
   describe('@/app/* alias resolution', () => {
     it('successfully imports and executes app route components', () => {
       expect(RootLayout).toBeDefined();

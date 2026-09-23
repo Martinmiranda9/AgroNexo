@@ -116,7 +116,7 @@ describe('Empirical Toolchain & Configuration Challenge', () => {
   });
 
   describe('Task 1.2: Tailwind CSS Token Definitions & PostCSS Configuration', () => {
-    it('verifies all required AgroConnect color palette tokens in tailwind.config.ts', () => {
+    it('verifies all required AgroNexo color palette tokens in tailwind.config.ts', () => {
       const colors = (tailwindConfig.theme?.extend as any)?.colors;
       expect(colors).toBeDefined();
 

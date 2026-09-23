@@ -25,7 +25,7 @@ export default function OnboardingHeroPanel() {
       <div className="relative z-10 mb-10 flex items-center gap-2 p-6 md:mb-16 md:p-12">
         <Plant weight="fill" size={20} className="text-[#99A474]" aria-hidden="true" />
         <span className="text-base font-semibold tracking-tight text-white/90">
-          AgroConnect
+          AgroNexo
         </span>
       </div>
 

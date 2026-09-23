@@ -1,8 +1,8 @@
-# Project: AgroConnect Frontend Workspace
+# Project: AgroNexo Frontend Workspace
 
 ## Architecture
 - Framework: Next.js 15 (App Router) + React 19 + TypeScript 5
-- Styling: Tailwind CSS v4 with custom AgroConnect design tokens
+- Styling: Tailwind CSS v4 with custom AgroNexo design tokens
 - State & Data: @tanstack/react-query v5, Zustand
 - Forms & Validation: React Hook Form + Zod + @hookform/resolvers
 - Env Management: @t3-oss/env-nextjs + Zod
@@ -33,7 +33,7 @@
 | 3 | Verification & Gate Pass | AC Verification (npm run build, npm run lint, test suite run, git status check, forensic audit) | M2 | DONE |
 
 ## Code Layout
-- Root: `c:\Users\miran\OneDrive\Documentos\agroconnect\frontend\`
+- Root: `c:\Users\miran\OneDrive\Documentos\agronexo\frontend\`
 - `src/app/`: Next.js App Router route segments and root layout/error/loading/not-found
 - `src/features/`: Feature modules (auth, profile, match-discovery, matches)
 - `src/ui/`: UI components and layouts

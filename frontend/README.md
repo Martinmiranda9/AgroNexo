@@ -1,6 +1,6 @@
-# AgroConnect — Frontend
+# AgroNexo — Frontend
 
-AgroConnect is a multi-tenant agricultural platform connecting producers and agronomic professionals/teams. This repository contains the frontend application built with **Next.js 15 (App Router)**, **React 19**, **TypeScript 5**, and **Tailwind CSS 4**.
+AgroNexo is a multi-tenant agricultural platform connecting producers and agronomic professionals/teams. This repository contains the frontend application built with **Next.js 15 (App Router)**, **React 19**, **TypeScript 5**, and **Tailwind CSS 4**.
 
 ---
 
@@ -9,7 +9,7 @@ AgroConnect is a multi-tenant agricultural platform connecting producers and agr
 | Layer | Technology |
 |---|---|
 | **Framework** | Next.js 15 (App Router) + React 19 + TypeScript 5 (strict mode) |
-| **Styling** | Tailwind CSS 4 with custom AgroConnect design tokens |
+| **Styling** | Tailwind CSS 4 with custom AgroNexo design tokens |
 | **Authentication** | Auth0 (`@auth0/nextjs-auth0`) with edge session management |
 | **Server State** | TanStack Query v5 (mutations and client fetching) |
 | **Client State** | Zustand (filters, client selections) |

@@ -1,4 +1,4 @@
-# AgroConnect — Frontend: Plan de Implementación (v3)
+# AgroNexo — Frontend: Plan de Implementación (v3)
 
 ## Decisiones
 

@@ -22,8 +22,8 @@ import { Sprout } from "lucide-react";
 import { registerProducer } from "@/core/services/identity.service";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AGROCONNECT BRAND SYSTEM — PINE & BEIGE PALETTE (60-30-10)
-// Reutiliza los mismos tokens que /login (AgroConnectAuthModal):
+// AGRONEXO BRAND SYSTEM — PINE & BEIGE PALETTE (60-30-10)
+// Reutiliza los mismos tokens que /login (AgroNexoAuthModal):
 // Canvas Beige #fef7e5 · Card Ivory #FFFBF0 · Pine #00311e · Olive #4D694E · Sage #978A56
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -449,7 +449,7 @@ const STEP_META = [
   },
   {
     headline: "Asegurá\ntu cuenta",
-    subtitle: "Tu punto de acceso a la red AgroConnect.",
+    subtitle: "Tu punto de acceso a la red AgroNexo.",
   },
 ];
 
@@ -534,7 +534,7 @@ export default function OnboardingForm() {
           <Link
             href="/"
             className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#00311e]/15 bg-[#FFFBF0] shadow-2xs transition-colors hover:border-[#00311e]/35"
-            aria-label="AgroConnect — Inicio"
+            aria-label="AgroNexo — Inicio"
           >
             <Sprout className="h-7 w-7 text-[#4D694E]" strokeWidth={1.75} />
           </Link>

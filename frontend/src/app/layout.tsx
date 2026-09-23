@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'AgroConnect',
-    template: '%s | AgroConnect',
+    default: 'AgroNexo',
+    template: '%s | AgroNexo',
   },
   description: 'Plataforma Agro Multi-tenant — conectá productores con profesionales del campo.',
   icons: {

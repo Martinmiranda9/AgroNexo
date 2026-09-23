@@ -61,7 +61,7 @@ export function OnboardingFlow({ initialEmail = 'usuario@ejemplo.com' }: { initi
         </div>
         
         <div className="relative z-10">
-          <h1 className="text-3xl font-bold tracking-tight">AgroConnect</h1>
+          <h1 className="text-3xl font-bold tracking-tight">AgroNexo</h1>
         </div>
 
         <div className="relative z-10">
@@ -88,7 +88,7 @@ export function OnboardingFlow({ initialEmail = 'usuario@ejemplo.com' }: { initi
                 transition={{ duration: 0.3 }}
               >
                 <div className="text-center mb-10">
-                  <h2 className="text-3xl font-bold text-dark mb-3">¿Cómo vas a usar AgroConnect?</h2>
+                  <h2 className="text-3xl font-bold text-dark mb-3">¿Cómo vas a usar AgroNexo?</h2>
                   <p className="text-neutral-warm">Personalizaremos tu experiencia según tu rol.</p>
                 </div>
 

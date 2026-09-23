@@ -1,7 +1,7 @@
-— AgroConnect Platform (Backend API)
+— AgroNexo Platform (Backend API)
 
 ## 1. Rol y Objetivo
-Desarrollador backend senior en .NET, especializado en Clean Architecture, multi-tenant y APIs REST productivas. Objetivo de esta etapa: construir la API del módulo **Match Productor ↔ Profesional**, primera pieza funcional de AgroConnect. Solo backend; frontend (Angular/Next) se aborda después.
+Desarrollador backend senior en .NET, especializado en Clean Architecture, multi-tenant y APIs REST productivas. Objetivo de esta etapa: construir la API del módulo **Match Productor ↔ Profesional**, primera pieza funcional de AgroNexo. Solo backend; frontend (Angular/Next) se aborda después.
 
 ## 2. Contexto del negocio
 Plataforma multi-tenant donde un **equipo** (agrónomo + contador + inversor + otros profesionales) gestiona uno o más **productores/campos**. El productor carga datos por WhatsApp; el equipo colabora sobre esos datos en un dashboard compartido. **Alcance de esta fase:** el Match — vínculo entre productor y profesional/equipo, base sobre la que se construye todo lo demás. Fuera de alcance: bot de WhatsApp, liquidación de impuestos, inversión patrimonial, compra colectiva de insumos.
@@ -15,7 +15,7 @@ El proyecto usa **Taste Skill** (`npx skills add Leonxlnx/taste-skill`) como fra
 - Aplicar siempre los tres diales: `DESIGN_VARIANCE`, `MOTION_INTENSITY`, `VISUAL_DENSITY`.
 - Usar `motion/react` (Framer Motion) para animaciones — nunca `useState` para valores continuos.
 - Nunca usar Inter, Lucide por defecto, sombras `shadow-md/lg`, ni gradientes AI-purple genéricos.
-- Paleta AgroConnect (verde oliva + crema) se mantiene — NO reemplazar por paletas estándar.
+- Paleta AgroNexo (verde oliva + crema) se mantiene — NO reemplazar por paletas estándar.
 - Tipografía: Usar EXCLUSIVAMENTE fuente sans-serif (Geist). NUNCA usar fuentes Serif (como Instrument Serif).
 - Componentes de referencia: `reactbits.dev`, `ui.aceternity.com` para inspiración de componentes premium.
 
@@ -27,10 +27,10 @@ El proyecto usa **Taste Skill** (`npx skills add Leonxlnx/taste-skill`) como fra
 ## 5. Arquitectura (Clean Architecture)
 ```
 src/
-├── AgroConnect.Domain/          # Entidades, Value Objects, interfaces de dominio. Sin dependencias externas.
-├── AgroConnect.Application/     # Casos de uso, DTOs, interfaces de repositorio, validadores.
-├── AgroConnect.Infrastructure/  # EF Core, repositorios concretos, Auth0, servicios externos.
-└── AgroConnect.API/             # Controladores, middlewares, inyección de dependencias, filtros globales.
+├── AgroNexo.Domain/          # Entidades, Value Objects, interfaces de dominio. Sin dependencias externas.
+├── AgroNexo.Application/     # Casos de uso, DTOs, interfaces de repositorio, validadores.
+├── AgroNexo.Infrastructure/  # EF Core, repositorios concretos, Auth0, servicios externos.
+└── AgroNexo.API/             # Controladores, middlewares, inyección de dependencias, filtros globales.
 ```
 Dependencia: **API → Application → Domain**. Infrastructure implementa interfaces definidas arriba, nunca al revés. Domain no conoce a nadie.
 
@@ -79,8 +79,8 @@ Unitarios sobre Application (use cases). Primero vamos con la estructura de la a
 Estructura sugerida:
 ```
 tests/
-├── AgroConnect.UnitTests/         # Casos de uso de Application, validadores, reglas de dominio
-└── AgroConnect.IntegrationTests/  # Endpoints, EF Core, aislamiento de tenant
+├── AgroNexo.UnitTests/         # Casos de uso de Application, validadores, reglas de dominio
+└── AgroNexo.IntegrationTests/  # Endpoints, EF Core, aislamiento de tenant
 ```
 Nombres de tests en inglés, formato `MethodName_Scenario_ExpectedResult` (ej: `CreateMatch_DuplicateProducerAndProfessional_ReturnsConflict`).
 

@@ -137,7 +137,7 @@ export function OnboardingRolePanel({
                 ¿Cuál es tu rol?
               </h1>
               <p className="mt-1.5 text-sm text-[#978A56]">
-                Personalizamos tu experiencia en AgroConnect.
+                Personalizamos tu experiencia en AgroNexo.
               </p>
             </div>
 

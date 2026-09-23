@@ -9,7 +9,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 /**
- * Botón base del Design System AgroConnect.
+ * Botón base del Design System AgroNexo.
  * Variantes:
  *  - primary: Pine (#00311e) fondo + Beige (#fef7e5) texto — CTA principal de alto contraste
  *  - pine: alias de primary (explícito para contextos de branding)

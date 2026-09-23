@@ -127,7 +127,7 @@ export default function LoginFormPanel({ showLogo = true }: LoginFormPanelProps)
             <Sprout className="h-6 w-6 text-white" strokeWidth={1.5} />
           </div>
           <h2 className="mt-3 text-[21px] font-bold tracking-tight text-stone-900">
-            AgroConnect
+            AgroNexo
           </h2>
           <p className="mt-0.5 text-[11px] font-medium tracking-wide text-stone-400">
             Connect. Cultivate. Thrive.

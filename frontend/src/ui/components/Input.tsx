@@ -11,7 +11,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 /**
- * Input base del Design System AgroConnect.
+ * Input base del Design System AgroNexo.
  * Soporta icono izquierdo/derecho, mensaje de error y hint.
  * Usa Pine (#00311e) como color de texto y focus, Beige (#fef7e5) como fondo.
  */

@@ -1,4 +1,4 @@
-# AgroConnect — Módulo Match Productor ↔ Profesional (v4)
+# AgroNexo — Módulo Match Productor ↔ Profesional (v4)
 
 Plan de arquitectura y desarrollo de la API REST para el sistema de matching, incluyendo registro público (Producer/Professional) y motor de recomendaciones geoespacial.
 
