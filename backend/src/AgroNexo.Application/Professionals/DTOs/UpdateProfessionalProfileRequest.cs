@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using AgroNexo.Application.Common.DTOs;
+using AgroNexo.Domain.Common;
 using AgroNexo.Domain.Enums;
 
 namespace AgroNexo.Application.Professionals.DTOs;
@@ -19,6 +20,14 @@ public class UpdateProfessionalProfileRequest
 
     [StringLength(50, ErrorMessage = "El número de documento no puede superar los 50 caracteres.")]
     public string? DocumentNumber { get; set; }
+
+    [Required(ErrorMessage = "El WhatsApp es obligatorio.")]
+    [RegularExpression(PhoneNumberRules.Pattern, ErrorMessage = PhoneNumberRules.ErrorMessage)]
+    public string PhoneNumber { get; set; } = string.Empty;
+
+    /// <summary>Matrícula profesional (solo el número). Obligatoria para Agronomist, Accountant y Lawyer.</summary>
+    [StringLength(50, ErrorMessage = "La matrícula no puede superar los 50 caracteres.")]
+    public string? LicenseNumber { get; set; }
 
     [Required(ErrorMessage = "El rol profesional es obligatorio.")]
     public ProfessionalRole Role { get; set; } = ProfessionalRole.Agronomist;

@@ -1,9 +1,7 @@
-import type { RegisterProducerRequest, RegisterUserResponse } from '@/core/models/producer.model';
+import type { RegisterUserRequest, RegisterUserResponse } from '@/core/models/identity.model';
+import { USER_TYPE } from '@/core/models/identity.model';
 
-// ─── Configuración base ───────────────────────────────────────────────────────
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
-
-// ─── Tipos de error ───────────────────────────────────────────────────────────
 
 export class ApiError extends Error {
   constructor(
@@ -16,50 +14,35 @@ export class ApiError extends Error {
   }
 }
 
-// ─── Helper interno ───────────────────────────────────────────────────────────
+const STATUS_MESSAGES: Record<number, string> = {
+  400: 'Los datos enviados no son válidos. Revisá el formulario.',
+  401: 'Sesión expirada. Volvé a iniciar sesión.',
+  403: 'No tenés permisos para realizar esta acción.',
+  409: 'Ya existe una cuenta registrada con estos datos.',
+  500: 'Ocurrió un error en el servidor. Intentá de nuevo más tarde.',
+};
 
 async function handleResponse<T>(response: Response): Promise<T> {
-  if (response.ok) {
-    return response.json() as Promise<T>;
-  }
+  if (response.ok) return response.json() as Promise<T>;
 
   let detail: string | undefined;
   try {
     const problem = await response.json();
-    detail = problem?.detail ?? problem?.title;
+    const fieldErrors = problem?.errors ? Object.values<string[]>(problem.errors).flat() : [];
+    detail = fieldErrors[0] ?? problem?.detail ?? problem?.title;
   } catch {
-    // respuesta sin body JSON — ignorar
+    // respuesta sin body JSON
   }
 
-  // Mensajes de error en español para el usuario final
-  const messages: Record<number, string> = {
-    400: 'Los datos enviados no son válidos. Revisá el formulario.',
-    401: 'Sesión expirada. Volvé a iniciar sesión.',
-    403: 'No tenés permisos para realizar esta acción.',
-    409: 'Ya existe una cuenta registrada con estos datos.',
-    500: 'Ocurrió un error en el servidor. Intentá de nuevo más tarde.',
-  };
-
-  throw new ApiError(
-    response.status,
-    messages[response.status] ?? 'Ocurrió un error inesperado.',
-    detail,
-  );
+  throw new ApiError(response.status, STATUS_MESSAGES[response.status] ?? 'Ocurrió un error inesperado.', detail);
 }
 
-// ─── Identity Service ─────────────────────────────────────────────────────────
-
-/**
- * Obtiene un token JWT de desarrollo desde el backend para pruebas locales sin Auth0.
- */
-export async function getDevToken(role = 'Producer', userId?: string): Promise<string> {
-  const uid = userId ?? `auth0|dev_producer_${Date.now()}`;
+/** Token JWT de desarrollo (solo entornos no productivos, hasta integrar Auth0). */
+export async function getDevToken(role: 'Producer' | 'Professional', userId: string): Promise<string> {
+  const query = new URLSearchParams({ role, userId });
   try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/dev/token?role=${encodeURIComponent(role)}&userId=${encodeURIComponent(uid)}`);
-    if (res.ok) {
-      const data = await res.json();
-      return data.accessToken ?? '';
-    }
+    const res = await fetch(`${API_BASE_URL}/api/v1/dev/token?${query}`);
+    if (res.ok) return (await res.json()).accessToken ?? '';
   } catch (err) {
     console.warn('No se pudo obtener el dev token:', err);
   }
@@ -67,31 +50,23 @@ export async function getDevToken(role = 'Producer', userId?: string): Promise<s
 }
 
 /**
- * Registra un nuevo productor.
- * En desarrollo, si no se proporciona token, obtiene automáticamente uno de prueba.
+ * Registra un productor o profesional. En desarrollo, sin token de Auth0,
+ * pide uno de prueba con un usuario único por registro.
  */
-export async function registerProducer(
-  data: RegisterProducerRequest,
-  token?: string,
-): Promise<RegisterUserResponse> {
+export async function registerUser(data: RegisterUserRequest, token?: string): Promise<RegisterUserResponse> {
   let authToken = token;
 
-  // En modo desarrollo, si no viene token de Auth0, obtenemos automáticamente uno de prueba
   if (!authToken && process.env.NODE_ENV !== 'production') {
-    authToken = await getDevToken('Producer');
-  }
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-
-  if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
+    const role = data.userType === USER_TYPE.Producer ? 'Producer' : 'Professional';
+    authToken = await getDevToken(role, `auth0|dev_${role.toLowerCase()}_${crypto.randomUUID()}`);
   }
 
   const response = await fetch(`${API_BASE_URL}/api/v1/identity/register`, {
     method: 'POST',
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    },
     body: JSON.stringify(data),
   });
 

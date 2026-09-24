@@ -65,3 +65,23 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Deriva lenta del fondo animado del login (solo transform: barato y sin layout) */
+@keyframes agro-drift {
+  from {
+    transform: translate3d(-2.5%, 1.5%, 0) scale(1.03);
+  }
+  to {
+    transform: translate3d(2.5%, -1.5%, 0) scale(1.08);
+  }
+}
+
+.agro-drift {
+  animation: agro-drift 18s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agro-drift {
+    animation: none;
+  }
+}

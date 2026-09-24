@@ -3,6 +3,7 @@ using System;
 using AgroNexo.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AgroNexo.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AgroNexoDbContext))]
-    partial class AgroNexoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260923204804_AddContactAndCredentialFields")]
+    partial class AddContactAndCredentialFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

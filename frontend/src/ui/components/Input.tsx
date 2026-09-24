@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/shared/utils/cn';
+import { controlClass } from './field-styles';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -37,7 +38,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium text-[#00311e]"
+            className="text-sm font-medium text-pine"
           >
             {label}
           </label>
@@ -45,7 +46,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         <div className="relative flex items-center">
           {leftIcon && (
-            <span className="pointer-events-none absolute left-3.5 text-[#978A56]">
+            <span className="pointer-events-none absolute left-3.5 text-neutral-warm">
               {leftIcon}
             </span>
           )}
@@ -54,12 +55,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={cn(
-              'w-full rounded-[12px] border bg-[#fef7e5] py-2.5 text-sm text-[#00311e] placeholder:text-[#978A56]',
-              'transition-all duration-200 outline-none',
-              'focus:border-[#00311e] focus:ring-2 focus:ring-[#00311e]/15',
-              error
-                ? 'border-[#8C4A34] focus:border-[#8C4A34] focus:ring-[#8C4A34]/20'
-                : 'border-[#978A56]/50 hover:border-[#00311e]/40',
+              controlClass(!!error),
+              'py-2.5',
               leftIcon ? 'pl-11' : 'pl-4',
               rightIcon ? 'pr-11' : 'pr-4',
               className,
@@ -71,7 +68,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <button
               type="button"
               onClick={onRightIconClick}
-              className="absolute right-3.5 text-[#978A56] transition-colors hover:text-[#00311e] focus:outline-none"
+              className="absolute right-3.5 text-neutral-warm transition-colors hover:text-pine focus:outline-none"
               tabIndex={-1}
             >
               {rightIcon}
@@ -80,13 +77,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         </div>
 
         {error && (
-          <p className="flex items-center gap-1 text-xs text-[#8C4A34]">
+          <p className="flex items-center gap-1 text-xs text-danger">
             <span>{error}</span>
           </p>
         )}
 
         {hint && !error && (
-          <p className="text-xs text-[#978A56]">{hint}</p>
+          <p className="text-xs text-neutral-warm">{hint}</p>
         )}
       </div>
     );

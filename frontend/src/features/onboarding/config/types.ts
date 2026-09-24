@@ -1,0 +1,83 @@
+export type RegistrationKind = 'producer' | 'agronomist' | 'accountant' | 'lawyer' | 'investor';
+
+/** Valores del formulario: todo string; se convierte al armar el request. */
+export type FormValues = Record<string, string>;
+
+export type PreviewIcon = 'map' | 'briefcase' | 'clock' | 'users' | 'leaf' | 'compass' | 'phone' | 'badge' | 'search';
+
+export interface FieldOption {
+  value: string;
+  label: string;
+  description?: string;
+}
+
+interface BaseField {
+  name: string;
+  label: string;
+  required?: boolean;
+  hint?: string;
+}
+
+export interface TextField extends BaseField {
+  kind: 'text' | 'number';
+  /** Reglas de validación y normalización específicas. */
+  format?: 'phone' | 'document';
+  inputMode?: 'text' | 'tel' | 'numeric';
+  placeholder?: string;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+  autoComplete?: string;
+}
+
+export interface SelectField extends BaseField {
+  kind: 'select';
+  placeholder?: string;
+  options: FieldOption[];
+}
+
+/** Opción única (cards) o múltiple (chips). En modo múltiple el valor se guarda separado por comas. */
+export interface ChoiceField extends BaseField {
+  kind: 'choice';
+  multiple?: boolean;
+  options: FieldOption[];
+}
+
+/** Cascada país → provincia → ciudad. Guarda country/countryCode/province/provinceCode/city. */
+export interface LocationField {
+  kind: 'location';
+  levels: ('country' | 'province' | 'city')[];
+  required?: boolean;
+}
+
+export type FieldDef = TextField | SelectField | ChoiceField | LocationField;
+
+/** Línea de información de la card de vista previa; `text` vacío = esqueleto. */
+export interface PreviewRow {
+  icon: PreviewIcon;
+  text?: string;
+}
+
+export interface PreviewData {
+  name?: string;
+  badge: string;
+  rows: PreviewRow[];
+}
+
+export interface StepDef {
+  id: string;
+  title: string;
+  subtitle: string;
+  /** Texto al pie del panel derecho mientras el usuario está en este paso. */
+  aside: string;
+  fields: FieldDef[];
+}
+
+export interface RegistrationFlow {
+  kind: RegistrationKind;
+  roleLabel: string;
+  steps: StepDef[];
+  initialValues: FormValues;
+  submitLabel: string;
+  preview: (values: FormValues, stepIndex: number) => PreviewData;
+}

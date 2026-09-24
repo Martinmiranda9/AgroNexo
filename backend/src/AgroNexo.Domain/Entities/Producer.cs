@@ -22,6 +22,15 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
     public string? Province { get; private set; }
     public string? City { get; private set; }
 
+    /// <summary>WhatsApp en formato internacional (E.164), ej: +5493511234567.</summary>
+    public string PhoneNumber { get; private set; } = string.Empty;
+
+    /// <summary>Rango de hectáreas que maneja el productor.</summary>
+    public HectaresRange? HectaresRange { get; private set; }
+
+    /// <summary>Tipos de profesional que el productor está buscando (sin duplicados, nunca Other).</summary>
+    public List<ProfessionalRole> LookingFor { get; private set; } = new();
+
     public bool IsActive { get; private set; } = true;
 
     /// <summary>
@@ -55,7 +64,10 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
         ProducerType? producerType = null,
         string? country = null,
         string? province = null,
-        string? city = null)
+        string? city = null,
+        string? phoneNumber = null,
+        HectaresRange? hectaresRange = null,
+        IEnumerable<ProfessionalRole>? lookingFor = null)
     {
         if (tenantId == Guid.Empty)
             throw new DomainValidationException(nameof(TenantId), "El TenantId es obligatorio.");
@@ -79,11 +91,14 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
         Country = string.IsNullOrWhiteSpace(country) ? null : country.Trim();
         Province = string.IsNullOrWhiteSpace(province) ? null : province.Trim();
         City = string.IsNullOrWhiteSpace(city) ? null : city.Trim();
+        PhoneNumber = ValidatePhone(phoneNumber);
+        HectaresRange = ValidateHectares(hectaresRange);
+        LookingFor = NormalizeLookingFor(lookingFor);
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
     }
 
-    public void UpdateProfile(string firstName, string lastName, string documentNumber, ProducerType? producerType = null, string? country = null, string? province = null, string? city = null)
+    public void UpdateProfile(string firstName, string lastName, string documentNumber, ProducerType? producerType = null, string? country = null, string? province = null, string? city = null, string? phoneNumber = null, HectaresRange? hectaresRange = null, IEnumerable<ProfessionalRole>? lookingFor = null)
     {
         if (string.IsNullOrWhiteSpace(firstName))
             throw new DomainValidationException(nameof(FirstName), "El nombre del productor no puede estar vacío.");
@@ -98,7 +113,51 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
         Country = string.IsNullOrWhiteSpace(country) ? null : country.Trim();
         Province = string.IsNullOrWhiteSpace(province) ? null : province.Trim();
         City = string.IsNullOrWhiteSpace(city) ? null : city.Trim();
+        PhoneNumber = ValidatePhone(phoneNumber);
+        HectaresRange = ValidateHectares(hectaresRange);
+        LookingFor = NormalizeLookingFor(lookingFor);
         MarkUpdated();
+    }
+
+    /// <summary>
+    /// Null conserva el valor actual (registros legacy sin teléfono); un valor informado debe respetar el formato E.164.
+    /// La obligatoriedad se exige en la capa Application.
+    /// </summary>
+    private string ValidatePhone(string? phoneNumber)
+    {
+        if (phoneNumber == null)
+            return PhoneNumber;
+
+        if (!PhoneNumberRules.IsValid(phoneNumber))
+            throw new DomainValidationException(nameof(PhoneNumber), PhoneNumberRules.ErrorMessage);
+        return phoneNumber.Trim();
+    }
+
+    private static HectaresRange? ValidateHectares(HectaresRange? value)
+    {
+        if (value.HasValue && !Enum.IsDefined(value.Value))
+            throw new DomainValidationException(nameof(HectaresRange), "El rango de hectáreas no es válido.");
+        return value;
+    }
+
+    private static List<ProfessionalRole> NormalizeLookingFor(IEnumerable<ProfessionalRole>? roles)
+    {
+        var result = new List<ProfessionalRole>();
+        if (roles == null)
+            return result;
+
+        foreach (var role in roles)
+        {
+            if (role is not (ProfessionalRole.Agronomist or ProfessionalRole.Accountant
+                or ProfessionalRole.Lawyer or ProfessionalRole.Investor))
+                throw new DomainValidationException(nameof(LookingFor),
+                    "El tipo de profesional buscado debe ser Agrónomo, Contador, Abogado o Inversor.");
+
+            if (!result.Contains(role))
+                result.Add(role);
+        }
+
+        return result;
     }
 
     public void Deactivate()

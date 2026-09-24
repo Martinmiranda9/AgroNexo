@@ -1,3 +1,5 @@
+using AgroNexo.Domain.Enums;
+
 namespace AgroNexo.Application.Producers.DTOs;
 
 /// <summary>
@@ -15,7 +17,10 @@ public class ProducerProfileResponse
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string DocumentNumber { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
     public string? ProducerType { get; set; }
+    public HectaresRange? HectaresRange { get; set; }
+    public List<ProfessionalRole> LookingFor { get; set; } = new();
     public string? Country { get; set; }
     public string? Province { get; set; }
     public string? City { get; set; }

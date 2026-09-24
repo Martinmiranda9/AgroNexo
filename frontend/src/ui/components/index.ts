@@ -1,6 +1,10 @@
-// TODO: implementar
 export { default as Button } from './Button';
 export { default as Input } from './Input';
+export { default as Select } from './Select';
+export { default as ChoiceGroup } from './ChoiceGroup';
+export { default as StepProgress } from './StepProgress';
+export { default as OptionCard } from './OptionCard';
+export { default as BrandLogo } from './BrandLogo';
 export { default as Card } from './Card';
 export { default as Modal } from './Modal';
 export { default as Badge } from './Badge';

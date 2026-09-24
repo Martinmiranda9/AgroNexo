@@ -1,4 +1,5 @@
 using AgroNexo.Application.Common.Helpers;
+using AgroNexo.Application.Identity.UseCases;
 using AgroNexo.Application.Professionals.DTOs;
 using AgroNexo.Domain.Exceptions;
 using AgroNexo.Domain.Interfaces;
@@ -36,6 +37,9 @@ public class UpdateProfessionalProfileUseCase : IUpdateProfessionalProfileUseCas
         if (professional == null)
             throw new EntityNotFoundException("Profesional", auth0UserId);
 
+        RegisterUserUseCase.EnsurePhoneNumber(request.PhoneNumber);
+        RegisterUserUseCase.EnsureLicenseNumber(request.Role, request.LicenseNumber);
+
         var coveragePolygon = request.CoverageAreaCoordinates != null
             ? GeometryHelper.CreatePolygon(request.CoverageAreaCoordinates)
             : professional.CoverageArea;
@@ -48,7 +52,9 @@ public class UpdateProfessionalProfileUseCase : IUpdateProfessionalProfileUseCas
             request.Specialty ?? string.Empty,
             request.YearsExperience,
             request.MaxCapacity,
-            coveragePolygon);
+            coveragePolygon,
+            request.PhoneNumber,
+            request.LicenseNumber);
 
         await _professionalRepository.UpdateAsync(professional, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -61,6 +67,8 @@ public class UpdateProfessionalProfileUseCase : IUpdateProfessionalProfileUseCas
             FirstName = professional.FirstName,
             LastName = professional.LastName,
             DocumentNumber = professional.DocumentNumber,
+            PhoneNumber = professional.PhoneNumber,
+            LicenseNumber = professional.LicenseNumber,
             Role = professional.Role,
             Specialty = professional.Specialty,
             YearsExperience = professional.YearsExperience,

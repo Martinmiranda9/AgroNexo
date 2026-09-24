@@ -38,6 +38,14 @@ public class ProfessionalConfiguration : IEntityTypeConfiguration<Professional>
             .IsRequired()
             .HasMaxLength(100);
 
+        builder.Property(p => p.PhoneNumber)
+            .IsRequired()
+            .HasMaxLength(20)
+            .HasDefaultValue(string.Empty);
+
+        builder.Property(p => p.LicenseNumber)
+            .HasMaxLength(50);
+
         builder.Property(p => p.CoverageArea)
             .HasColumnType("geometry");
 

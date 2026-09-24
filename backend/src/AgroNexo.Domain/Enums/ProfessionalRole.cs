@@ -8,5 +8,6 @@ public enum ProfessionalRole
     Agronomist = 1,
     Accountant = 2,
     Investor = 3,
-    Other = 4
+    Other = 4,
+    Lawyer = 5
 }

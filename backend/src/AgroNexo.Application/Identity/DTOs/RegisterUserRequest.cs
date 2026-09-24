@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using AgroNexo.Application.Common.DTOs;
+using AgroNexo.Domain.Common;
 using AgroNexo.Domain.Enums;
 
 namespace AgroNexo.Application.Identity.DTOs;
@@ -24,8 +25,19 @@ public class RegisterUserRequest
     [StringLength(50, ErrorMessage = "El número de documento no puede superar los 50 caracteres.")]
     public string? DocumentNumber { get; set; }
 
+    /// <summary>WhatsApp en formato internacional (E.164).</summary>
+    [Required(ErrorMessage = "El WhatsApp es obligatorio.")]
+    [RegularExpression(PhoneNumberRules.Pattern, ErrorMessage = PhoneNumberRules.ErrorMessage)]
+    public string PhoneNumber { get; set; } = string.Empty;
+
     // Producer-specific attributes (ignorado cuando UserType == Professional)
     public ProducerType? ProducerType { get; set; }
+
+    /// <summary>Rango de hectáreas del productor (solo productores).</summary>
+    public HectaresRange? HectaresRange { get; set; }
+
+    /// <summary>Tipos de profesional que busca el productor (Agronomist, Accountant, Lawyer, Investor).</summary>
+    public List<ProfessionalRole>? LookingFor { get; set; }
 
     [StringLength(100, ErrorMessage = "El país no puede superar los 100 caracteres.")]
     public string? Country { get; set; }
@@ -38,6 +50,10 @@ public class RegisterUserRequest
 
     // Professional-specific attributes (ignored when UserType == Producer)
     public ProfessionalRole? Role { get; set; }
+
+    /// <summary>Matrícula profesional (solo el número). Obligatoria para Agronomist, Accountant y Lawyer.</summary>
+    [StringLength(50, ErrorMessage = "La matrícula no puede superar los 50 caracteres.")]
+    public string? LicenseNumber { get; set; }
 
     [StringLength(150, ErrorMessage = "La especialidad no puede superar los 150 caracteres.")]
     public string? Specialty { get; set; }

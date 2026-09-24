@@ -1,4 +1,5 @@
 using AgroNexo.Application.Common.Helpers;
+using AgroNexo.Domain.Common;
 using AgroNexo.Application.Identity.DTOs;
 using AgroNexo.Domain.Entities;
 using AgroNexo.Domain.Enums;
@@ -41,6 +42,8 @@ public class RegisterUserUseCase : IRegisterUserUseCase
         if (string.IsNullOrWhiteSpace(auth0UserId))
             throw new DomainValidationException(nameof(auth0UserId), "El identificador de autenticación Auth0 es obligatorio.");
 
+        EnsurePhoneNumber(request.PhoneNumber);
+
         // Check if user already exists
         var existingProducer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
         if (existingProducer != null)
@@ -56,8 +59,11 @@ public class RegisterUserUseCase : IRegisterUserUseCase
         await _tenantRepository.AddAsync(tenant, cancellationToken);
 
         Guid userId;
+        Func<long> getPublicId;
         string? roleStr = null;
         string? specialtyStr = null;
+        Producer? createdProducer = null;
+        Professional? createdProfessional = null;
 
         // 2. Create the entity according to selected UserType
         if (request.UserType == UserType.Producer)
@@ -71,14 +77,20 @@ public class RegisterUserUseCase : IRegisterUserUseCase
                 request.ProducerType,
                 request.Country,
                 request.Province,
-                request.City);
+                request.City,
+                request.PhoneNumber,
+                request.HectaresRange,
+                request.LookingFor);
 
             await _producerRepository.AddAsync(producer, cancellationToken);
             userId = producer.Id;
+            createdProducer = producer;
+            getPublicId = () => producer.PublicId;
         }
         else if (request.UserType == UserType.Professional)
         {
             var role = request.Role ?? ProfessionalRole.Agronomist;
+            EnsureLicenseNumber(role, request.LicenseNumber);
             var coveragePolygon = GeometryHelper.CreatePolygon(request.CoverageAreaCoordinates);
 
             var professional = new Professional(
@@ -91,10 +103,14 @@ public class RegisterUserUseCase : IRegisterUserUseCase
                 request.Specialty ?? string.Empty,
                 request.YearsExperience,
                 request.MaxCapacity,
-                coveragePolygon);
+                coveragePolygon,
+                phoneNumber: request.PhoneNumber,
+                licenseNumber: request.LicenseNumber);
 
             await _professionalRepository.AddAsync(professional, cancellationToken);
             userId = professional.Id;
+            createdProfessional = professional;
+            getPublicId = () => professional.PublicId;
             roleStr = role.ToString();
             specialtyStr = professional.Specialty;
         }
@@ -106,10 +122,8 @@ public class RegisterUserUseCase : IRegisterUserUseCase
         // 3. Persist transaction
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Retrieve the assigned PublicId after save
-        long publicId = request.UserType == UserType.Producer
-            ? (await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken))?.PublicId ?? 0
-            : (await _professionalRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken))?.PublicId ?? 0;
+        // El PublicId lo asigna la capa de infraestructura al guardar y queda en la entidad rastreada.
+        long publicId = getPublicId();
 
         return new RegisterUserResponse
         {
@@ -122,7 +136,11 @@ public class RegisterUserUseCase : IRegisterUserUseCase
             FirstName = request.FirstName.Trim(),
             LastName = request.LastName.Trim(),
             DocumentNumber = request.DocumentNumber?.Trim() ?? string.Empty,
+            PhoneNumber = (createdProducer?.PhoneNumber ?? createdProfessional?.PhoneNumber) ?? string.Empty,
+            LicenseNumber = createdProfessional?.LicenseNumber,
             ProducerType = request.ProducerType?.ToString(),
+            HectaresRange = createdProducer?.HectaresRange,
+            LookingFor = createdProducer?.LookingFor.ToList() ?? new List<ProfessionalRole>(),
             Country = request.Country?.Trim(),
             Province = request.Province?.Trim(),
             City = request.City?.Trim(),
@@ -130,5 +148,27 @@ public class RegisterUserUseCase : IRegisterUserUseCase
             Specialty = specialtyStr,
             CreatedAt = DateTime.UtcNow
         };
+    }
+
+    /// <summary>
+    /// Regla de negocio: el WhatsApp es obligatorio y debe estar en formato internacional.
+    /// </summary>
+    public static void EnsurePhoneNumber(string? phoneNumber)
+    {
+        if (!PhoneNumberRules.IsValid(phoneNumber))
+            throw new DomainValidationException("PhoneNumber", PhoneNumberRules.ErrorMessage);
+    }
+
+    /// <summary>
+    /// Regla de negocio: la matrícula es obligatoria para Agronomist, Accountant y Lawyer.
+    /// </summary>
+    public static void EnsureLicenseNumber(ProfessionalRole role, string? licenseNumber)
+    {
+        bool requiresLicense = role is ProfessionalRole.Agronomist
+            or ProfessionalRole.Accountant
+            or ProfessionalRole.Lawyer;
+
+        if (requiresLicense && string.IsNullOrWhiteSpace(licenseNumber))
+            throw new DomainValidationException("LicenseNumber", "La matrícula es obligatoria para este tipo de profesional.");
     }
 }

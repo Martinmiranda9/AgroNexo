@@ -99,6 +99,7 @@ public class AgroNexoDbContext : DbContext
                 ProfessionalRole.Agronomist => PublicIdGenerator.AgronomistPrefix,
                 ProfessionalRole.Accountant => PublicIdGenerator.AccountantPrefix,
                 ProfessionalRole.Investor   => PublicIdGenerator.InvestorPrefix,
+                ProfessionalRole.Lawyer     => PublicIdGenerator.LawyerPrefix,
                 _                           => PublicIdGenerator.OtherPrefix
             };
 

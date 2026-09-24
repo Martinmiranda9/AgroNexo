@@ -18,6 +18,8 @@ public class ProfessionalProfileResponse
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string DocumentNumber { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
+    public string? LicenseNumber { get; set; }
     public ProfessionalRole Role { get; set; }
     public string Specialty { get; set; } = string.Empty;
     public int YearsExperience { get; set; }

@@ -30,6 +30,18 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Producer>
         builder.Property(p => p.DocumentNumber)
             .HasMaxLength(50);
 
+        builder.Property(p => p.PhoneNumber)
+            .IsRequired()
+            .HasMaxLength(20)
+            .HasDefaultValue(string.Empty);
+
+        builder.Property(p => p.HectaresRange)
+            .HasConversion<int?>();
+
+        builder.Property(p => p.LookingFor)
+            .HasColumnType("integer[]")
+            .IsRequired();
+
         builder.Property(p => p.IsActive)
             .IsRequired()
             .HasDefaultValue(true);

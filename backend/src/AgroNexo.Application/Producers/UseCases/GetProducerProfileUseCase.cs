@@ -45,6 +45,13 @@ public class GetProducerProfileUseCase : IGetProducerProfileUseCase
             FirstName = producer.FirstName,
             LastName = producer.LastName,
             DocumentNumber = producer.DocumentNumber,
+            PhoneNumber = producer.PhoneNumber,
+            ProducerType = producer.ProducerType?.ToString(),
+            Country = producer.Country,
+            Province = producer.Province,
+            City = producer.City,
+            HectaresRange = producer.HectaresRange,
+            LookingFor = producer.LookingFor.ToList(),
             IsActive = producer.IsActive,
             CreatedAt = producer.CreatedAt,
             UpdatedAt = producer.UpdatedAt

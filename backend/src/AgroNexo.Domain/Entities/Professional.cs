@@ -17,6 +17,12 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
     public string DocumentNumber { get; private set; } = string.Empty;
     public ProfessionalRole Role { get; private set; } = ProfessionalRole.Agronomist;
     public string Specialty { get; private set; } = string.Empty;
+
+    /// <summary>WhatsApp en formato internacional (E.164), ej: +5493511234567.</summary>
+    public string PhoneNumber { get; private set; } = string.Empty;
+
+    /// <summary>Número de matrícula profesional (solo el número). Opcional según el rol.</summary>
+    public string? LicenseNumber { get; private set; }
     public Geometry? CoverageArea { get; private set; }
     public int YearsExperience { get; private set; }
     public int MaxCapacity { get; private set; } = 20;
@@ -25,7 +31,7 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
 
     /// <summary>
     /// Human-readable numeric public identifier shown to the user.
-    /// Prefix depends on Role: 12 = Agronomist, 14 = Accountant, 16 = Investor, 19 = Other.
+    /// Prefix depends on Role: 12 = Agronomist, 14 = Accountant, 16 = Investor, 18 = Lawyer, 19 = Other.
     /// Assigned by the infrastructure layer on first save.
     /// </summary>
     public long PublicId { get; private set; }
@@ -51,7 +57,9 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
         int yearsExperience = 0,
         int maxCapacity = 20,
         Geometry? coverageArea = null,
-        bool isVerified = false)
+        bool isVerified = false,
+        string? phoneNumber = null,
+        string? licenseNumber = null)
     {
         if (tenantId == Guid.Empty)
             throw new DomainValidationException(nameof(TenantId), "El TenantId es obligatorio.");
@@ -83,6 +91,8 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
         MaxCapacity = maxCapacity;
         CoverageArea = coverageArea;
         IsVerified = isVerified;
+        PhoneNumber = ValidatePhone(phoneNumber);
+        LicenseNumber = NormalizeLicense(licenseNumber);
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
     }
@@ -95,7 +105,9 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
         string specialty,
         int yearsExperience,
         int maxCapacity,
-        Geometry? coverageArea = null)
+        Geometry? coverageArea = null,
+        string? phoneNumber = null,
+        string? licenseNumber = null)
     {
         if (string.IsNullOrWhiteSpace(firstName))
             throw new DomainValidationException(nameof(FirstName), "El nombre del profesional no puede estar vacío.");
@@ -121,7 +133,34 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
             CoverageArea = coverageArea;
         }
 
+        PhoneNumber = ValidatePhone(phoneNumber);
+        LicenseNumber = NormalizeLicense(licenseNumber);
         MarkUpdated();
+    }
+
+    /// <summary>
+    /// Null conserva el valor actual (registros legacy sin teléfono); un valor informado debe respetar el formato E.164.
+    /// La obligatoriedad se exige en la capa Application.
+    /// </summary>
+    private string ValidatePhone(string? phoneNumber)
+    {
+        if (phoneNumber == null)
+            return PhoneNumber;
+
+        if (!PhoneNumberRules.IsValid(phoneNumber))
+            throw new DomainValidationException(nameof(PhoneNumber), PhoneNumberRules.ErrorMessage);
+        return phoneNumber.Trim();
+    }
+
+    private static string? NormalizeLicense(string? licenseNumber)
+    {
+        if (string.IsNullOrWhiteSpace(licenseNumber))
+            return null;
+
+        var value = licenseNumber.Trim();
+        if (value.Length > 50)
+            throw new DomainValidationException(nameof(LicenseNumber), "La matrícula no puede superar los 50 caracteres.");
+        return value;
     }
 
     public void SetCoverageArea(Geometry coverageArea)

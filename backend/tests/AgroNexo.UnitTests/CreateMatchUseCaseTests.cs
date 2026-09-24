@@ -1,3 +1,4 @@
+using AgroNexo.Application.Common.Interfaces;
 using AgroNexo.Application.Matching.DTOs;
 using AgroNexo.Application.Matching.UseCases;
 using AgroNexo.Domain.Entities;
@@ -17,6 +18,7 @@ public class CreateMatchUseCaseTests
     private readonly Mock<IProducerRepository> _producerRepoMock = new();
     private readonly Mock<IProfessionalRepository> _professionalRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+    private readonly Mock<IOwnershipValidator> _ownershipValidatorMock = new();
 
     private readonly CreateMatchUseCase _useCase;
 
@@ -26,7 +28,15 @@ public class CreateMatchUseCaseTests
             _matchRepoMock.Object,
             _producerRepoMock.Object,
             _professionalRepoMock.Object,
-            _unitOfWorkMock.Object);
+            _unitOfWorkMock.Object,
+            _ownershipValidatorMock.Object);
+
+        // El validador de ownership delega en el repositorio mockeado de productores.
+        _ownershipValidatorMock
+            .Setup(v => v.GetOwnedProducerOrThrowAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(async (Guid id, string auth0UserId, CancellationToken ct) =>
+                (await _producerRepoMock.Object.GetByIdAsync(id, ct))
+                ?? throw new CrossTenantAccessException("Productor no encontrado"));
     }
 
     [Fact]
@@ -56,7 +66,7 @@ public class CreateMatchUseCaseTests
         };
 
         // Act
-        Func<Task> act = async () => await _useCase.ExecuteAsync(request, producerId);
+        Func<Task> act = async () => await _useCase.ExecuteAsync(request, producerId, "auth0|prod");
 
         // Assert
         var exception = await act.Should().ThrowAsync<DuplicateMatchException>();
@@ -103,10 +113,10 @@ public class CreateMatchUseCaseTests
             .ReturnsAsync(1);
 
         // Act 1: Create match with Professional 1
-        var response1 = await _useCase.ExecuteAsync(new CreateMatchRequest { ProfessionalId = prof1Id }, producerId);
+        var response1 = await _useCase.ExecuteAsync(new CreateMatchRequest { ProfessionalId = prof1Id }, producerId, "auth0|prod");
 
         // Act 2: Create match with Professional 2
-        var response2 = await _useCase.ExecuteAsync(new CreateMatchRequest { ProfessionalId = prof2Id }, producerId);
+        var response2 = await _useCase.ExecuteAsync(new CreateMatchRequest { ProfessionalId = prof2Id }, producerId, "auth0|prod");
 
         // Assert
         response1.Should().NotBeNull();
@@ -141,7 +151,7 @@ public class CreateMatchUseCaseTests
             .ReturnsAsync((Professional?)null);
 
         // Act
-        Func<Task> act = async () => await _useCase.ExecuteAsync(new CreateMatchRequest { ProfessionalId = profId }, producerId);
+        Func<Task> act = async () => await _useCase.ExecuteAsync(new CreateMatchRequest { ProfessionalId = profId }, producerId, "auth0|prod");
 
         // Assert
         await act.Should().ThrowAsync<EntityNotFoundException>()

@@ -54,7 +54,8 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
             UserType = UserType.Producer,
             FirstName = firstName,
             LastName = lastName,
-            DocumentNumber = docNumber
+            DocumentNumber = docNumber,
+            PhoneNumber = "+5493511234567"
         };
 
         var response = await client.PostAsJsonAsync("/api/v1/identity/register", request, JsonOptions);
@@ -84,7 +85,9 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
             Role = role,
             Specialty = specialty,
             YearsExperience = experience,
-            MaxCapacity = maxCapacity
+            MaxCapacity = maxCapacity,
+            PhoneNumber = "+5493511234567",
+            LicenseNumber = "MP-12345"
         };
 
         var response = await client.PostAsJsonAsync("/api/v1/identity/register", request, JsonOptions);

@@ -46,6 +46,8 @@ public class GetProfessionalProfileUseCase : IGetProfessionalProfileUseCase
             FirstName = professional.FirstName,
             LastName = professional.LastName,
             DocumentNumber = professional.DocumentNumber,
+            PhoneNumber = professional.PhoneNumber,
+            LicenseNumber = professional.LicenseNumber,
             Role = professional.Role,
             Specialty = professional.Specialty,
             YearsExperience = professional.YearsExperience,

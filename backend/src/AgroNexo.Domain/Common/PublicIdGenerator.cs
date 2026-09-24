@@ -21,6 +21,7 @@ public static class PublicIdGenerator
     public const long AgronomistPrefix = 12;
     public const long AccountantPrefix = 14;
     public const long InvestorPrefix   = 16;
+    public const long LawyerPrefix     = 18;
     public const long OtherPrefix      = 19;
     public const long FarmPrefix       = 20;
 
