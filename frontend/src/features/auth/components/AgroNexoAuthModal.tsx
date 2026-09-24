@@ -1,18 +1,11 @@
 'use client';
 
-import { useState, useEffect, useId } from 'react';
+import { useId, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import {
-  Eye,
-  EyeSlash,
-  ArrowRight,
-  CircleNotch,
-  EnvelopeSimple,
-  LockSimple,
-} from '@phosphor-icons/react';
+import { CircleNotch, EnvelopeSimple, Eye, EyeSlash, LockSimple, WarningCircle } from '@phosphor-icons/react';
 import { Sprout } from 'lucide-react';
+import { AUTH_CONTINUE_PATH, buildAuthUrl } from '@/core/auth/config';
+import BrandShowcasePanel from './BrandShowcasePanel';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AGRONEXO BRAND SYSTEM — PINE & BEIGE PALETTE (60-30-10)
@@ -21,9 +14,35 @@ import { Sprout } from 'lucide-react';
 // 10% Accents & Details: Olive (#4D694E) & Sage (#728141)
 // ─────────────────────────────────────────────────────────────────────────────
 
+export type AuthMode = 'login' | 'signup';
+
+const COPY: Record<AuthMode, { title: string; subtitle: string; emailCta: string; footerText: string; footerLink: string; footerHref: string }> = {
+  login: {
+    title: 'Bienvenido a AgroNexo',
+    subtitle: 'Iniciá sesión para gestionar tus establecimientos y asesoramientos.',
+    emailCta: 'Iniciar sesión',
+    footerText: '¿Todavía no tenés una cuenta?',
+    footerLink: 'Crear una',
+    footerHref: '/onboarding',
+  },
+  signup: {
+    title: 'Empezá con AgroNexo',
+    subtitle: 'Creá tu cuenta con tu correo o con Google. Después te pedimos los datos de tu campo o de tu perfil profesional.',
+    emailCta: 'Crear cuenta',
+    footerText: '¿Ya tenés una cuenta?',
+    footerLink: 'Iniciá sesión',
+    footerHref: '/login',
+  },
+};
+
+const ERROR_MESSAGES: Record<string, string> = {
+  auth_not_configured: 'El acceso todavía no está configurado en este entorno.',
+  access_denied: 'No pudimos completar el acceso. Probá de nuevo.',
+};
+
 function GoogleIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
       <path
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
         fill="#4285F4"
@@ -44,231 +63,163 @@ function GoogleIcon() {
   );
 }
 
-// ─── Input con label flotante (double-bezel, sin placeholder-as-label) ────────
-interface FloatingFieldProps {
-  label: string;
-  type: string;
-  value: string;
-  onChange: (value: string) => void;
-  icon: React.ReactNode;
-  rightSlot?: React.ReactNode;
-  autoComplete?: string;
-}
-
-function FloatingField({ label, type, value, onChange, icon, rightSlot, autoComplete }: FloatingFieldProps) {
-  const id = useId();
-  const [focused, setFocused] = useState(false);
-  const active = focused || value.length > 0;
-
-  return (
-    <div className="relative">
-      <div className="pointer-events-none absolute left-3.5 top-0 flex h-full items-center text-[#978A56]">
-        {icon}
-      </div>
-      <input
-        id={id}
-        type={type}
-        required
-        autoComplete={autoComplete}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        className="h-[52px] w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pb-1.5 pl-9 pr-10 pt-[18px] text-[13.5px] text-[#00311e] outline-none transition-colors focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
-      />
-      <label
-        htmlFor={id}
-        className={`pointer-events-none absolute left-9 origin-left transition-all duration-200 ${
-          active
-            ? 'top-[9px] text-[10px] font-semibold uppercase tracking-wider text-[#4D694E]'
-            : 'top-1/2 -translate-y-1/2 text-[13.5px] text-[#978A56]'
-        }`}
-      >
-        {label}
-      </label>
-      {rightSlot && <div className="absolute right-3 top-0 flex h-full items-center">{rightSlot}</div>}
-    </div>
-  );
-}
-
-const BRAND_SLIDES = [
-  {
-    title: 'Trazabilidad de campo',
-    description: 'Registrá labores, insumos y rindes por lote, todo en un mismo lugar.',
-  },
-  {
-    title: 'Match con profesionales',
-    description: 'Conectá tu establecimiento con agrónomos, contadores e inversores verificados.',
-  },
-  {
-    title: 'Decisiones con datos',
-    description: 'Visualizá el estado de tus campos y actuá con información real, no supuestos.',
-  },
-];
-
-export default function AgroNexoAuthModal() {
+/**
+ * Entrada única de acceso, todo en la primera pantalla:
+ *  - Correo y contraseña: se validan contra Auth0 desde nuestro servidor (la contraseña no se guarda).
+ *  - Google: abre directo la ventana de Google para elegir la cuenta y vuelve a la app ya logueado.
+ */
+export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: AuthMode; error?: string }) {
+  const emailId = useId();
+  const passwordId = useId();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<'quick' | 'credentials'>('quick');
-  const [activeSlide, setActiveSlide] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string>();
+  const copy = COPY[mode];
+  const signup = mode === 'signup';
+  const errorMessage =
+    formError ?? (error ? (ERROR_MESSAGES[error] ?? 'Ocurrió un error al ingresar. Probá de nuevo.') : undefined);
 
-  const reduce = useReducedMotion();
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % BRAND_SLIDES.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
+    setSubmitting(true);
+    setFormError(undefined);
+    try {
+      const res = await fetch(`/api/auth/password/${signup ? 'signup' : 'login'}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { next?: string; message?: string };
+      if (!res.ok) {
+        setFormError(body.message ?? 'No pudimos completar el acceso. Probá de nuevo.');
+        setSubmitting(false);
+        return;
+      }
+      // Navegación completa: las páginas del servidor leen la cookie de sesión recién creada.
+      window.location.assign(body.next ?? AUTH_CONTINUE_PATH);
+    } catch {
+      setFormError('No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.');
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div className="flex min-h-[100dvh] w-full flex-col md:flex-row bg-[#FFFBF0] text-[#00311e]">
-      {/* ══════════════════════════════════════════════════════════════════════
-          PANEL IZQUIERDO — Acceso (46% desktop / 100% mobile)
-          Fondo Card Ivory (#FFFBF0)
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section className="flex w-full flex-col justify-center border-b border-[#00311e]/10 p-8 sm:p-12 md:w-[46%] md:border-b-0 md:border-r md:p-14 lg:p-20">
-        {/* Contenedor central de acceso */}
-        <div className="mx-auto w-full max-w-[360px] py-12 text-center md:py-8">
-          <div className="mb-8 flex flex-col items-center">
+    <div className="flex min-h-[100dvh] w-full flex-col bg-[#FFFBF0] text-[#00311e] md:flex-row">
+      <section className="flex min-h-[100dvh] w-full flex-col px-8 pb-8 pt-10 sm:px-12 md:w-[46%] md:px-14 lg:px-20">
+        <div className="mx-auto flex w-full max-w-[380px] flex-1 flex-col justify-center text-center">
+          <div className="mb-8 flex flex-col items-center text-center">
             <Link
               href="/"
-              className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#00311e]/15 bg-[#fef7e5] shadow-2xs transition-colors hover:border-[#00311e]/35"
+              className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#00311e]/15 bg-[#fef7e5] shadow-2xs transition-colors hover:border-[#00311e]/35"
               aria-label="AgroNexo — Inicio"
             >
               <Sprout className="h-7 w-7 text-[#4D694E]" strokeWidth={1.75} />
             </Link>
-            <h1 className="text-2xl font-semibold leading-tight tracking-tight text-[#00311e] sm:text-[28px]">
-              {mode === 'quick' ? 'Bienvenido a AgroNexo' : 'Acceso con contraseña'}
+            <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-[#00311e] sm:text-[32px]">
+              {copy.title}
             </h1>
-            <p className="mt-2 text-[13px] leading-relaxed text-[#4D694E]">
-              {mode === 'quick'
-                ? 'Iniciá sesión para gestionar tus establecimientos y asesoramientos.'
-                : 'Ingresá tu correo electrónico y contraseña registrados.'}
-            </p>
+            <p className="mt-2 text-[14px] leading-relaxed text-[#4D694E]">{copy.subtitle}</p>
           </div>
 
-          {/* Botones de acceso rápido */}
-          {mode === 'quick' && (
-            <div className="flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={() => setMode('credentials')}
-                className="group relative flex h-12 w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#00311e] text-[13.5px] font-medium text-[#fef7e5] shadow-sm transition-colors hover:bg-[#002617] active:scale-[0.985] cursor-pointer"
-              >
-                <span className="relative z-10">Continuar con email</span>
-                <span className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-[#fef7e5]/15 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-[#fef7e5]/25">
-                  <ArrowRight className="h-3.5 w-3.5" weight="bold" />
-                </span>
-                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/12 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-              </button>
-
-              <a
-                href="/api/auth/login?connection=google-oauth2"
-                className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl border border-[#00311e]/20 bg-[#fef7e5] text-[13.5px] font-medium text-[#00311e] shadow-2xs transition-all hover:border-[#00311e]/35 hover:bg-[#f5ead4] active:scale-[0.985]"
-              >
-                <GoogleIcon />
-                <span>Continuar con Google</span>
-              </a>
-            </div>
+          {errorMessage && (
+            <p
+              role="alert"
+              className="mb-4 flex items-start gap-2 rounded-xl border border-[#8C4A34]/30 bg-[#8C4A34]/5 px-3.5 py-3 text-[13px] text-[#8C4A34]"
+            >
+              <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
+              {errorMessage}
+            </p>
           )}
 
-          {/* Formulario de credenciales */}
-          <AnimatePresence mode="wait">
-            {mode === 'credentials' && (
-              <motion.div
-                initial={reduce ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <form onSubmit={handleCredentialsSubmit} className="flex flex-col gap-3.5 text-left">
-                  <FloatingField
-                    label="Correo electrónico"
-                    type="email"
-                    value={email}
-                    onChange={setEmail}
-                    autoComplete="email"
-                    icon={<EnvelopeSimple className="h-4 w-4" weight="regular" />}
-                  />
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 text-left">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor={emailId} className="text-[13px] font-medium text-[#00311e]">
+                Correo
+              </label>
+              <div className="relative">
+                <EnvelopeSimple
+                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#978A56]"
+                  weight="regular"
+                />
+                <input
+                  id={emailId}
+                  type="email"
+                  required
+                  autoComplete="email"
+                  inputMode="email"
+                  placeholder="tu@correo.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-10 pr-4 text-[14px] text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
+                />
+              </div>
+            </div>
 
-                  <FloatingField
-                    label="Contraseña"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={setPassword}
-                    autoComplete="current-password"
-                    icon={<LockSimple className="h-4 w-4" weight="regular" />}
-                    rightSlot={
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((v) => !v)}
-                        className="text-[#978A56] transition-colors hover:text-[#00311e] cursor-pointer"
-                        aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                      >
-                        {showPassword ? <EyeSlash className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    }
-                  />
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor={passwordId} className="text-[13px] font-medium text-[#00311e]">
+                Contraseña
+              </label>
+              <div className="relative">
+                <LockSimple
+                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#978A56]"
+                  weight="regular"
+                />
+                <input
+                  id={passwordId}
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  minLength={signup ? 8 : undefined}
+                  autoComplete={signup ? 'new-password' : 'current-password'}
+                  placeholder={signup ? 'Mínimo 8 caracteres' : 'Tu contraseña'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-10 pr-11 text-[14px] text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#978A56] transition-colors hover:text-[#00311e]"
+                >
+                  {showPassword ? <EyeSlash className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {!signup && (
+                <Link
+                  href="/forgot-password"
+                  className="self-end text-[12.5px] font-medium text-[#4D694E] transition-colors hover:text-[#00311e]"
+                >
+                  Olvidé mi contraseña
+                </Link>
+              )}
+            </div>
 
-                  <div className="flex items-center justify-between pt-1">
-                    <label className="flex cursor-pointer items-center gap-2 text-[12px] text-[#4D694E]">
-                      <input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        className="h-3.5 w-3.5 rounded border-[#00311e]/30 accent-[#00311e]"
-                      />
-                      Recordar este equipo
-                    </label>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-1 flex h-12 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-[#00311e] text-[14px] font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {submitting ? <CircleNotch className="h-4 w-4 animate-spin" weight="bold" aria-label="Cargando" /> : copy.emailCta}
+            </button>
+          </form>
 
-                    <Link
-                      href="/forgot-password"
-                      className="text-[11.5px] font-medium text-[#4D694E] transition-colors hover:text-[#00311e]"
-                    >
-                      ¿Olvidaste tu clave?
-                    </Link>
-                  </div>
+          <div className="my-6 flex items-center gap-3" aria-hidden="true">
+            <div className="h-px flex-1 bg-[#00311e]/10" />
+            <span className="text-[12px] font-medium uppercase tracking-widest text-[#978A56]">o</span>
+            <div className="h-px flex-1 bg-[#00311e]/10" />
+          </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#00311e] text-[13.5px] font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985] disabled:opacity-50 cursor-pointer"
-                  >
-                    {loading ? (
-                      <span className="flex items-center gap-2">
-                        <CircleNotch className="h-4 w-4 animate-spin" weight="bold" />
-                        Iniciando sesión...
-                      </span>
-                    ) : (
-                      'Entrar al sistema'
-                    )}
-                  </button>
+          <a
+            href={buildAuthUrl({ connection: 'google', signup })}
+            className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[#00311e] text-[14px] font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985]"
+          >
+            <GoogleIcon />
+            Continuar con Google
+          </a>
 
-                  <button
-                    type="button"
-                    onClick={() => setMode('quick')}
-                    className="mt-1 text-center text-[11.5px] text-[#4D694E] transition-colors hover:text-[#00311e] cursor-pointer"
-                  >
-                    Volver a opciones rápidas
-                  </button>
-                </form>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Aviso legal */}
-          <p className="mt-8 text-center text-[11px] leading-relaxed text-[#978A56]">
+          <p className="mt-8 text-[11.5px] leading-relaxed text-[#978A56]">
             Al continuar aceptás la{' '}
             <Link href="/privacy" className="text-[#4D694E] underline underline-offset-2 transition-colors hover:text-[#00311e]">
               Política de Privacidad
@@ -281,107 +232,20 @@ export default function AgroNexoAuthModal() {
           </p>
         </div>
 
-        {/* Footer / Enlace a registro */}
-        <footer className="border-t border-[#00311e]/10 pt-4 text-center">
-          <p className="text-[12.5px] text-[#4D694E]">
-            ¿No tenés una cuenta?{' '}
+        <footer className="mt-auto pt-8 text-center">
+          <p className="text-[13px] text-[#4D694E]">
+            {copy.footerText}{' '}
             <Link
-              href="/onboarding"
+              href={copy.footerHref}
               className="font-semibold text-[#00311e] underline underline-offset-4 transition-colors hover:text-[#4D694E]"
             >
-              Registrate como productor o profesional
+              {copy.footerLink}
             </Link>
           </p>
         </footer>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          PANEL DERECHO — Showcase de marca (54% desktop)
-          Fondo Beige → Beige-deeper con el isotipo 3D flotando (sin fotografía)
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section className="relative hidden md:flex md:w-[54%] flex-col items-center justify-center overflow-hidden rounded-l-[2.5rem] bg-gradient-to-b from-[#FFF3D5] to-[#ede0c4] p-12 xl:p-16 xl:rounded-l-[3.5rem]">
-        {/* Anillos concéntricos — motivo sutil "sensor de campo" */}
-        <div className="pointer-events-none absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2">
-          <div className="h-[620px] w-[620px] rounded-full border border-[#00311e]/[0.05]" />
-          <div className="absolute inset-[70px] rounded-full border border-[#00311e]/[0.06]" />
-          <div className="absolute inset-[140px] rounded-full border border-[#00311e]/[0.08]" />
-        </div>
-
-        {/* Halo cálido detrás del objeto */}
-        <div className="pointer-events-none absolute left-1/2 top-[40%] h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#99A474]/20 blur-[100px]" />
-
-        {/* Grano sutil — le da textura al fondo plano */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.035] mix-blend-multiply"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-          }}
-        />
-
-        {/* Borde interior — remate double-bezel contra el formulario */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-px bg-white/50" />
-
-        <div className="relative flex flex-col items-center text-center">
-          {/* Isotipo 3D flotante */}
-          <motion.div
-            animate={reduce ? {} : { y: [0, -12, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-            className="relative h-[300px] w-[300px] sm:h-[340px] sm:w-[340px] xl:h-[400px] xl:w-[400px]"
-          >
-            <Image
-              src="/agro-3d-icon.png"
-              alt="Isotipo AgroNexo en render 3D"
-              fill
-              className="object-contain"
-              sizes="400px"
-              priority
-            />
-          </motion.div>
-
-          {/* Textos del pilar de valor en transición */}
-          <div className="mt-4 min-h-[96px] max-w-sm">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSlide}
-                initial={reduce ? false : { opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col items-center"
-              >
-                <h2 className="text-[20px] font-semibold tracking-tight text-[#00311e]">
-                  {BRAND_SLIDES[activeSlide].title}
-                </h2>
-                <p className="mt-2 text-[13px] leading-relaxed text-[#4D694E]">
-                  {BRAND_SLIDES[activeSlide].description}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Paginador minimalista */}
-          <div className="mt-6 flex items-center justify-center gap-1.5">
-            {BRAND_SLIDES.map((_, index) => {
-              const isActive = index === activeSlide;
-              return (
-                <button
-                  key={index}
-                  onClick={() => setActiveSlide(index)}
-                  className="group cursor-pointer p-1"
-                  aria-label={`Ir a pilar ${index + 1}`}
-                >
-                  <span
-                    className={`block h-1 rounded-full transition-all duration-300 ${
-                      isActive ? 'w-5 bg-[#00311e]' : 'w-1.5 bg-[#978A56]/40 group-hover:bg-[#4D694E]'
-                    }`}
-                  />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <BrandShowcasePanel />
     </div>
   );
 }

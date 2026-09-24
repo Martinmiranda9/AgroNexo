@@ -3,6 +3,15 @@ export type RegistrationKind = 'producer' | 'agronomist' | 'accountant' | 'lawye
 /** Valores del formulario: todo string; se convierte al armar el request. */
 export type FormValues = Record<string, string>;
 
+/** Cuenta ya autenticada (Google o email) con la que se completa el registro. */
+export interface RegistrationAccount {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  /** `google-oauth2` si entró con Google. */
+  provider: string;
+}
+
 export type PreviewIcon = 'map' | 'briefcase' | 'clock' | 'users' | 'leaf' | 'compass' | 'phone' | 'badge' | 'search';
 
 export interface FieldOption {

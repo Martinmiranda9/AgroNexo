@@ -60,7 +60,7 @@ public class ApiControllerTests
         mockUseCase.Setup(u => u.ExecuteAsync(request, "auth0|user1", It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResponse);
 
-        var controller = new IdentityController(mockUseCase.Object);
+        var controller = new IdentityController(mockUseCase.Object, new Mock<IGetCurrentUserUseCase>().Object);
         SetUserContext(controller, "auth0|user1");
 
         // Act

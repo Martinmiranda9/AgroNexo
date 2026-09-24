@@ -1,7 +1,7 @@
 import type { RegisterUserRequest, RegisterUserResponse } from '@/core/models/identity.model';
 import { USER_TYPE } from '@/core/models/identity.model';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
+import { API_ORIGIN as API_BASE_URL } from '@/core/config/api';
 
 export class ApiError extends Error {
   constructor(
@@ -67,6 +67,17 @@ export async function registerUser(data: RegisterUserRequest, token?: string): P
       'Content-Type': 'application/json',
       ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
     },
+    body: JSON.stringify(data),
+  });
+
+  return handleResponse<RegisterUserResponse>(response);
+}
+
+/** Registro con la sesión de Auth0 (el token lo agrega el proxy del servidor de Next). */
+export async function registerWithSession(data: RegisterUserRequest): Promise<RegisterUserResponse> {
+  const response = await fetch('/api/identity/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
 

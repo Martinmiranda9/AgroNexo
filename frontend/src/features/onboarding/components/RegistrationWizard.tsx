@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, CaretLeft, WarningCircle } from '@phosphor-icons/react';
+import { ArrowRight, CaretLeft, CheckCircle, WarningCircle } from '@phosphor-icons/react';
 import { Button } from '@/ui/components';
-import type { RegistrationKind } from '../config/types';
+import type { RegistrationAccount, RegistrationKind } from '../config/types';
 import { useRegistrationWizard } from '../hooks/useRegistrationWizard';
 import OnboardingHeader from './OnboardingHeader';
 import PreviewPanel from './PreviewPanel';
@@ -18,7 +18,14 @@ const TITLE_ID = 'onboarding-step-title';
  * Registro multipaso. El paso 1 es la elección de rol; el resto sale de `config/flows.ts`,
  * por lo que todos los roles comparten UI y lógica. El encabezado es fijo; cambian título y contenido.
  */
-export default function RegistrationWizard({ initialKind }: { initialKind?: RegistrationKind }) {
+export default function RegistrationWizard({
+  initialKind,
+  account,
+}: {
+  initialKind?: RegistrationKind;
+  /** Cuenta ya autenticada: prellena nombre y apellido y registra con su sesión. */
+  account?: RegistrationAccount;
+}) {
   const reduce = useReducedMotion();
   const {
     kind,
@@ -37,7 +44,7 @@ export default function RegistrationWizard({ initialKind }: { initialKind?: Regi
     updateValues,
     next,
     back,
-  } = useRegistrationWizard(initialKind);
+  } = useRegistrationWizard(initialKind, account);
 
   return (
     <div className="bg-bg-card text-pine flex min-h-[100dvh] w-full flex-col md:flex-row">
@@ -47,6 +54,22 @@ export default function RegistrationWizard({ initialKind }: { initialKind?: Regi
         <div className="mx-auto flex w-full max-w-[480px] flex-1 flex-col justify-center">
           <div className="flex flex-col md:min-h-[670px]">
             <OnboardingHeader current={stepIndex} total={totalSteps} />
+
+            {account?.email && (
+              <p className="border-pine/10 bg-beige text-primary mt-6 flex flex-wrap items-center gap-x-1.5 rounded-xl border px-3.5 py-2.5 text-[12.5px]">
+                <CheckCircle size={16} weight="fill" className="text-primary shrink-0" />
+                <span>
+                  Cuenta {account.provider === 'google-oauth2' ? 'de Google' : ''}{' '}
+                  <strong className="text-pine font-semibold">{account.email}</strong>
+                </span>
+                <a
+                  href={`/api/auth/logout?returnTo=${encodeURIComponent('/onboarding')}`}
+                  className="text-pine ml-auto font-semibold underline underline-offset-4"
+                >
+                  Cambiar
+                </a>
+              </p>
+            )}
 
             <div className="mt-8 flex flex-1 flex-col lg:mt-10">
               <AnimatePresence mode="wait" initial={false}>

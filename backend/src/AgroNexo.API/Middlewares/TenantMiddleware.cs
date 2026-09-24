@@ -43,7 +43,9 @@ public class TenantMiddleware
                 ?? user.FindFirst("https://agroconnect.com/roles")?.Value;
 
             var path = context.Request.Path.Value ?? string.Empty;
-            bool isRegistration = path.StartsWith("/api/v1/identity/register", StringComparison.OrdinalIgnoreCase);
+            // Un usuario recién autenticado todavía no tiene tenant: solo puede consultar su estado y registrarse.
+            bool isRegistration = path.StartsWith("/api/v1/identity/register", StringComparison.OrdinalIgnoreCase)
+                || path.StartsWith("/api/v1/identity/me", StringComparison.OrdinalIgnoreCase);
 
             var tenantClaim = user.FindFirst("tenant_id")?.Value
                 ?? user.FindFirst("https://agroconnect.com/tenant_id")?.Value;

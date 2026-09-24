@@ -2,10 +2,10 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { registerUser, ApiError } from '@/core/services/identity.service';
+import { registerUser, registerWithSession, ApiError } from '@/core/services/identity.service';
 import { REGISTRATION_FLOWS } from '../config/flows';
 import { ROLE_STEP } from '../config/roles';
-import type { FormValues, PreviewData, RegistrationKind } from '../config/types';
+import type { FormValues, PreviewData, RegistrationAccount, RegistrationKind } from '../config/types';
 import { buildRegisterRequest } from '../lib/build-request';
 import { validateStep, type FieldErrors } from '../lib/validation';
 
@@ -19,11 +19,22 @@ const EMPTY_PREVIEW: PreviewData = {
  * Estado y transiciones del registro multipaso. El paso 0 es la elección de rol;
  * los siguientes salen del flujo del rol elegido (`flow.steps[stepIndex - 1]`).
  */
-export function useRegistrationWizard(initialKind?: RegistrationKind) {
+export function useRegistrationWizard(initialKind?: RegistrationKind, account?: RegistrationAccount) {
   const router = useRouter();
 
+  // Nombre y apellido que ya conoce Google: quedan cargados (y editables) sin importar el rol elegido.
+  const prefill = useMemo<FormValues>(
+    () => ({
+      ...(account?.firstName ? { firstName: account.firstName } : {}),
+      ...(account?.lastName ? { lastName: account.lastName } : {}),
+    }),
+    [account?.firstName, account?.lastName],
+  );
+
   const [kind, setKind] = useState<RegistrationKind | undefined>(initialKind);
-  const [values, setValues] = useState<FormValues>(initialKind ? REGISTRATION_FLOWS[initialKind].initialValues : {});
+  const [values, setValues] = useState<FormValues>(
+    initialKind ? { ...REGISTRATION_FLOWS[initialKind].initialValues, ...prefill } : { ...prefill },
+  );
   // Con el rol ya definido por URL se salta directo al primer paso del formulario.
   const [stepIndex, setStepIndex] = useState(initialKind ? 1 : 0);
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -48,11 +59,12 @@ export function useRegistrationWizard(initialKind?: RegistrationKind) {
     (next: RegistrationKind) => {
       if (next === kind) return;
       setKind(next);
-      setValues(REGISTRATION_FLOWS[next].initialValues);
+      // Cambiar de rol reinicia el formulario, pero conserva lo que vino de Google.
+      setValues({ ...REGISTRATION_FLOWS[next].initialValues, ...prefill });
       setErrors({});
       setSubmitError(undefined);
     },
-    [kind],
+    [kind, prefill],
   );
 
   const updateValues = useCallback((patch: FormValues) => {
@@ -74,7 +86,9 @@ export function useRegistrationWizard(initialKind?: RegistrationKind) {
     setSubmitting(true);
     setSubmitError(undefined);
     try {
-      const response = await registerUser(buildRegisterRequest(kind, values));
+      const request = buildRegisterRequest(kind, values);
+      // Con sesión de Auth0 el token lo agrega el servidor; sin ella (dev local) se usa el token de prueba.
+      const response = account ? await registerWithSession(request) : await registerUser(request);
       const query = new URLSearchParams({ name: response.firstName, publicId: String(response.publicId) });
       router.push(`/welcome?${query}`);
     } catch (err) {
@@ -83,7 +97,7 @@ export function useRegistrationWizard(initialKind?: RegistrationKind) {
       );
       setSubmitting(false);
     }
-  }, [kind, values, router]);
+  }, [kind, values, account, router]);
 
   const next = useCallback(() => {
     if (isRoleStep) {

@@ -12,10 +12,39 @@ namespace AgroNexo.API.Controllers;
 public class IdentityController : ApiControllerBase
 {
     private readonly IRegisterUserUseCase _registerUserUseCase;
+    private readonly IGetCurrentUserUseCase _getCurrentUserUseCase;
 
-    public IdentityController(IRegisterUserUseCase registerUserUseCase)
+    public IdentityController(
+        IRegisterUserUseCase registerUserUseCase,
+        IGetCurrentUserUseCase getCurrentUserUseCase)
     {
         _registerUserUseCase = registerUserUseCase;
+        _getCurrentUserUseCase = getCurrentUserUseCase;
+    }
+
+    /// <summary>
+    /// Indica si el usuario autenticado ya completó el registro. El frontend lo usa tras el login
+    /// para decidir entre el onboarding (primer ingreso) y la aplicación.
+    /// </summary>
+    [HttpGet("me")]
+    [Authorize]
+    [ProducesResponseType(typeof(CurrentUserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Me(CancellationToken cancellationToken)
+    {
+        var auth0UserId = CurrentAuth0UserId;
+        if (string.IsNullOrWhiteSpace(auth0UserId))
+        {
+            return Unauthorized(new ProblemDetails
+            {
+                Status = StatusCodes.Status401Unauthorized,
+                Title = "No autorizado",
+                Detail = "El token de autenticación no contiene un identificador de usuario válido.",
+                Instance = HttpContext.Request.Path
+            });
+        }
+
+        return Ok(await _getCurrentUserUseCase.ExecuteAsync(auth0UserId, cancellationToken));
     }
 
     /// <summary>

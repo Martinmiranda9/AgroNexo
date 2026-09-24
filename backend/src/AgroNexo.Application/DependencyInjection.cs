@@ -25,6 +25,7 @@ public static class DependencyInjection
 
         // Identity Use Cases
         services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+        services.AddScoped<IGetCurrentUserUseCase, GetCurrentUserUseCase>();
 
         // Producer Use Cases
         services.AddScoped<IGetProducerProfileUseCase, GetProducerProfileUseCase>();
