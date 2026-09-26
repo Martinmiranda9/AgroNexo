@@ -3,7 +3,7 @@
 import { useId, useState } from 'react';
 import Link from 'next/link';
 import { CircleNotch, EnvelopeSimple, Eye, EyeSlash, LockSimple, WarningCircle } from '@phosphor-icons/react';
-import { Sprout } from 'lucide-react';
+import BrandMark from '@/ui/components/BrandMark';
 import { AUTH_CONTINUE_PATH, buildAuthUrl } from '@/core/auth/config';
 import BrandShowcasePanel from './BrandShowcasePanel';
 
@@ -112,10 +112,10 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
           <div className="mb-8 flex flex-col items-center text-center">
             <Link
               href="/"
-              className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#00311e]/15 bg-[#fef7e5] shadow-2xs transition-colors hover:border-[#00311e]/35"
+              className="mb-6 block h-14 w-14 rounded-2xl shadow-2xs"
               aria-label="AgroNexo — Inicio"
             >
-              <Sprout className="h-7 w-7 text-[#4D694E]" strokeWidth={1.75} />
+              <BrandMark variant="light" tile className="h-full w-full" />
             </Link>
             <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-[#00311e] sm:text-[32px]">
               {copy.title}

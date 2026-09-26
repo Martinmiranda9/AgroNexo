@@ -5,7 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sprout, CheckCircle2, ArrowRight } from 'lucide-react';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
+import BrandMark from '@/ui/components/BrandMark';
 
 // ─── Contenido con parámetros de URL ──────────────────────────────────────────
 
@@ -65,7 +66,7 @@ function WelcomeContent() {
           >
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
-                <Sprout className="h-5 w-5 flex-shrink-0 text-[#4D694E]" />
+                <BrandMark variant="light" className="h-5 w-5 flex-shrink-0" />
                 <p className="text-sm text-[#00311e]">
                   Tu perfil de <strong>Productor</strong> está listo
                 </p>
@@ -121,7 +122,7 @@ export default function WelcomePage() {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center bg-[#fef7e5]">
-          <Sprout className="h-8 w-8 animate-pulse text-[#00311e]" />
+          <BrandMark variant="light" className="h-12 w-12 animate-pulse" />
         </div>
       }
     >

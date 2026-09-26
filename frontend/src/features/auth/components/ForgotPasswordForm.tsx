@@ -3,7 +3,7 @@
 import { useId, useState } from 'react';
 import Link from 'next/link';
 import { CheckCircle, CircleNotch, WarningCircle } from '@phosphor-icons/react';
-import { Sprout } from 'lucide-react';
+import BrandMark from '@/ui/components/BrandMark';
 
 export default function ForgotPasswordForm() {
   const emailId = useId();
@@ -38,10 +38,10 @@ export default function ForgotPasswordForm() {
     <div className="flex w-full max-w-[380px] flex-col items-center text-center">
       <Link
         href="/"
-        className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#00311e]/15 bg-[#fef7e5] shadow-2xs"
+        className="mb-6 block h-14 w-14 rounded-2xl shadow-2xs"
         aria-label="AgroNexo — Inicio"
       >
-        <Sprout className="h-7 w-7 text-[#4D694E]" strokeWidth={1.75} />
+        <BrandMark variant="light" tile className="h-full w-full" />
       </Link>
       <h1 className="text-[28px] font-semibold leading-tight tracking-tight sm:text-[32px]">Restablecer contraseña</h1>
       <p className="mt-2 text-[14px] leading-relaxed text-[#4D694E]">

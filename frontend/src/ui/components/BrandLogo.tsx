@@ -1,14 +1,22 @@
 import Link from 'next/link';
-import { Sprout } from 'lucide-react';
+import BrandMark, { type BrandMarkVariant } from './BrandMark';
+
+interface BrandLogoProps {
+  /** Superficie donde se apoya: light = fondo claro, dark = fondo verde/oscuro. */
+  variant?: Exclude<BrandMarkVariant, 'monochrome'>;
+}
+
+const WORDMARK: Record<NonNullable<BrandLogoProps['variant']>, string> = {
+  light: 'text-pine',
+  dark: 'text-beige',
+};
 
 /** Isotipo + nombre de AgroNexo; siempre enlaza al inicio. */
-export default function BrandLogo() {
+export default function BrandLogo({ variant = 'light' }: BrandLogoProps) {
   return (
-    <Link href="/" aria-label="AgroNexo — Inicio" className="group flex items-center gap-2.5">
-      <span className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-pine/15 bg-beige transition-colors group-hover:border-pine/35">
-        <Sprout className="h-[18px] w-[18px] text-primary" strokeWidth={1.75} />
-      </span>
-      <span className="text-[17px] font-semibold tracking-tight text-pine">AgroNexo</span>
+    <Link href="/" aria-label="AgroNexo — Inicio" className="flex items-center gap-2.5">
+      <BrandMark variant={variant} tile className="h-9 w-9 shrink-0" />
+      <span className={`text-[17px] font-semibold tracking-tight ${WORDMARK[variant]}`}>AgroNexo</span>
     </Link>
   );
 }

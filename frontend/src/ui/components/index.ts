@@ -5,6 +5,7 @@ export { default as ChoiceGroup } from './ChoiceGroup';
 export { default as StepProgress } from './StepProgress';
 export { default as OptionCard } from './OptionCard';
 export { default as BrandLogo } from './BrandLogo';
+export { default as BrandMark } from './BrandMark';
 export { default as Card } from './Card';
 export { default as Modal } from './Modal';
 export { default as Badge } from './Badge';

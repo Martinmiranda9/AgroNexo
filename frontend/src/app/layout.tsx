@@ -20,9 +20,6 @@ export const metadata: Metadata = {
     template: '%s | AgroNexo',
   },
   description: 'Plataforma Agro Multi-tenant — conectá productores con profesionales del campo.',
-  icons: {
-    icon: '/favicon.ico',
-  },
 };
 
 export default function RootLayout({
