@@ -1,0 +1,40 @@
+# Backend + base de datos. El frontend va en Vercel.
+#   cp .env.example .env   (completar valores)
+#   docker compose up -d --build
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-agronexo_db}
+      POSTGRES_USER: ${POSTGRES_USER:-agronexo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?definí POSTGRES_PASSWORD en .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Sin "ports": la base solo es accesible desde la red interna de Docker.
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=${POSTGRES_DB:-agronexo_db};Username=${POSTGRES_USER:-agronexo};Password=${POSTGRES_PASSWORD}
+      Database__MigrateOnStartup: "true"
+      Https__DisableRedirection: "true" # el TLS lo termina el proxy
+      Auth0__Domain: ${AUTH0_DOMAIN:?definí AUTH0_DOMAIN en .env}
+      Auth0__Audience: ${AUTH0_AUDIENCE:?definí AUTH0_AUDIENCE en .env}
+      Cors__AllowedOrigins__0: ${FRONTEND_ORIGIN:?definí FRONTEND_ORIGIN en .env}
+    ports:
+      # Localhost: en el VPS se publica a través de nginx/Caddy, no directo.
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  pgdata:

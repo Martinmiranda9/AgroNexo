@@ -5,7 +5,10 @@ using AgroNexo.API.Services;
 using AgroNexo.Application;
 using AgroNexo.Application.Common.Interfaces;
 using AgroNexo.Infrastructure;
+using AgroNexo.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -36,7 +39,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
+        // En despliegue se define con Cors__AllowedOrigins__0, Cors__AllowedOrigins__1...
+        var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+        if (origins is not { Length: > 0 })
+            origins = new[] { "http://localhost:3000", "https://localhost:3000" };
+
+        policy.WithOrigins(origins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -193,7 +201,25 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// Detrás de nginx/Caddy la IP y el esquema reales llegan en X-Forwarded-*.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // El proxy corre en otro contenedor de la red interna de Docker: no se conoce su IP de antemano.
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
+
+app.UseForwardedHeaders();
+
+// Aplica migraciones al arrancar (contenedor). Se activa con Database__MigrateOnStartup=true.
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+{
+    using var scope = app.Services.CreateScope();
+    scope.ServiceProvider.GetRequiredService<AgroNexoDbContext>().Database.Migrate();
+}
 
 // 7. Middlewares Pipeline in Strict Order
 app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -207,7 +233,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
+if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing")
+    && !app.Configuration.GetValue<bool>("Https:DisableRedirection"))
 {
     app.UseHttpsRedirection();
 }
