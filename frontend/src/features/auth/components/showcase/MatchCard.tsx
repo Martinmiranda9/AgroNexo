@@ -10,14 +10,14 @@ export default function MatchCard() {
       <div className="flex items-center gap-3">
         <Avatar initials="MR" size="md" />
         <div className="min-w-0">
-          <p className="truncate text-[14px] font-semibold leading-tight tracking-tight">Ing. Agr. Marcos Ruiz</p>
-          <p className="mt-0.5 truncate text-[11.5px] text-dark/70">Asesor de cultivos</p>
+          <p className="truncate text-body-sm font-semibold tracking-heading">Ing. Agr. Marcos Ruiz</p>
+          <p className="mt-0.5 truncate text-caption text-dark/70">Asesor de cultivos</p>
         </div>
       </div>
 
-      <div className="mb-1.5 mt-4 flex items-baseline justify-between text-[11.5px]">
+      <div className="mb-1.5 mt-4 flex items-baseline justify-between text-caption">
         <span className="text-dark/70">Afinidad con tu campo</span>
-        <b className="font-mono text-[13px] font-semibold tabular-nums">98%</b>
+        <b className="font-mono text-body-sm font-semibold tabular-nums">98%</b>
       </div>
       <div className="h-1.5 overflow-hidden rounded-pill bg-pine/10">
         <div className="h-full w-[98%] rounded-pill bg-primary" />

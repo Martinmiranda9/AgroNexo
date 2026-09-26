@@ -26,7 +26,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={selectId} className="text-sm font-medium text-pine">
+          <label htmlFor={selectId} className="text-body-sm font-medium text-pine">
             {label}
           </label>
         )}
@@ -59,8 +59,8 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             aria-hidden
           />
         </div>
-        {error && <p className="text-xs text-danger">{error}</p>}
-        {hint && !error && <p className="text-xs text-neutral-warm">{hint}</p>}
+        {error && <p className="text-caption text-danger">{error}</p>}
+        {hint && !error && <p className="text-caption text-primary">{hint}</p>}
       </div>
     );
   },

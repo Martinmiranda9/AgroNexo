@@ -22,14 +22,14 @@ export default function YieldCard() {
           <Plant size={15} weight="regular" />
         </IconContainer>
         <div>
-          <p className="text-[13px] font-semibold leading-tight tracking-tight">Rinde estimado</p>
-          <p className="mt-0.5 text-[11px] text-dark/70">Soja · vs. campaña anterior</p>
+          <p className="text-body-sm font-semibold tracking-heading">Rinde estimado</p>
+          <p className="mt-0.5 text-caption text-dark/70">Soja · vs. campaña anterior</p>
         </div>
       </div>
 
       <div className="mb-3 mt-3 flex items-baseline gap-1.5">
-        <span className="font-mono text-[28px] font-semibold tabular-nums leading-none tracking-tight">3,9</span>
-        <span className="font-mono text-[12px] text-dark/70">t/ha</span>
+        <span className="font-mono text-heading-lg font-medium tabular-nums leading-none">3,9</span>
+        <span className="font-mono text-caption text-dark/70">t/ha</span>
         <Badge variant="positive" icon={<TrendUp size={12} weight="bold" />} className="ml-auto">
           <span className="font-mono tabular-nums">6%</span>
         </Badge>

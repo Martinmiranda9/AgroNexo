@@ -44,13 +44,13 @@ function WelcomeContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
           >
-            <h1 className="text-3xl font-bold text-[#00311e] sm:text-4xl">
+            <h1 className="text-heading-lg text-[#00311e] sm:text-heading-xl">
               ¡Bienvenido a{' '}
               <span className="text-[#4D694E]">Agro</span>
               <span className="text-[#00311e]">Connect</span>
               !
             </h1>
-            <p className="mt-3 text-lg text-[#978A56]">
+            <p className="mt-3 text-body-lg text-primary">
               Hola,{' '}
               <strong className="font-semibold text-[#00311e]">{firstName}</strong>. Tu cuenta fue
               creada exitosamente.
@@ -67,23 +67,23 @@ function WelcomeContent() {
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
                 <BrandMark variant="light" className="h-5 w-5 flex-shrink-0" />
-                <p className="text-sm text-[#00311e]">
+                <p className="text-body-sm text-[#00311e]">
                   Tu perfil de <strong>Productor</strong> está listo
                 </p>
               </div>
               {publicId && (
                 <div className="flex items-center gap-3">
                   <div className="h-5 w-5 flex-shrink-0 rounded-full bg-[#00311e]/10 flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-[#00311e]">#</span>
+                    <span className="text-caption font-bold text-[#00311e]">#</span>
                   </div>
-                  <p className="text-sm text-[#978A56]">
+                  <p className="text-body-sm text-primary">
                     ID público:{' '}
                     <span className="font-mono font-semibold text-[#00311e]">{publicId}</span>
                   </p>
                 </div>
               )}
               <div className="mt-1 h-px bg-[#00311e]/10" />
-              <p className="text-xs text-[#978A56]">
+              <p className="text-caption text-primary">
                 Podés completar tu perfil, agregar tus campos y conectarte con profesionales desde tu
                 dashboard.
               </p>
@@ -104,7 +104,7 @@ function WelcomeContent() {
               </Link>
             </Button>
             <Button asChild variant="ghost" size="sm">
-              <Link href="/login" className="text-[#978A56]">
+              <Link href="/login" className="text-primary">
                 Iniciar sesión más tarde
               </Link>
             </Button>

@@ -25,9 +25,32 @@
   --radius-input: 12px;
   --radius-pill: 9999px;
 
-  --font-sans: var(--font-geist-sans), sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
-  --font-serif: var(--font-instrument-serif), Georgia, serif;
+  /* ── Tipografía · Design System AgroNexo (Geist / Geist Mono) ── */
+  --font-sans: var(--font-geist-sans), "Geist", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
+
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-heading-sm: 20px;
+  --text-heading-sm--line-height: 28px;
+  --text-heading-sm--font-weight: 600;
+  --text-heading-md: 24px;
+  --text-heading-md--line-height: 32px;
+  --text-heading-md--font-weight: 600;
+  --text-heading-lg: 30px;
+  --text-heading-lg--line-height: 36px;
+  --text-heading-lg--font-weight: 700;
+  --text-heading-xl: 36px;
+  --text-heading-xl--line-height: 40px;
+  --text-heading-xl--font-weight: 700;
+
+  --tracking-heading: -0.01em;
 }
 
 :root {
@@ -58,12 +81,45 @@
 body {
   background-color: var(--color-beige, #fef7e5);
   color: var(--color-pine, #00311e);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
   min-height: 100vh;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Jerarquía semántica: H1–H6 según el Design System (las clases text-heading-* la pisan cuando hace falta) */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+    letter-spacing: var(--tracking-heading);
+  }
+  h1 { font-size: 36px; line-height: 40px; font-weight: 700; }
+  h2 { font-size: 30px; line-height: 36px; font-weight: 700; }
+  h3 { font-size: 24px; line-height: 32px; font-weight: 600; }
+  h4 { font-size: 20px; line-height: 28px; font-weight: 600; }
+  h5 { font-size: 18px; line-height: 28px; font-weight: 600; }
+  h6 { font-size: 16px; line-height: 24px; font-weight: 600; }
+}
+
+/* Cifras (qq/ha, $/ha, fechas) */
+@utility text-figure {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+/* Overline: rótulos de sección en mayúsculas */
+@utility text-overline {
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 /* Deriva lenta del fondo animado del login (solo transform: barato y sin layout) */

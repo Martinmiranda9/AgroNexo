@@ -63,8 +63,8 @@ export default function OptionCard({
       </span>
 
       <span className="flex min-w-0 flex-col">
-        <span className="text-[15px] font-semibold leading-tight tracking-tight text-pine">{title}</span>
-        {description && <span className="mt-1.5 text-[12.5px] leading-snug text-primary">{description}</span>}
+        <span className="text-body-sm font-semibold tracking-heading text-pine">{title}</span>
+        {description && <span className="mt-1.5 text-caption text-primary">{description}</span>}
       </span>
 
       <span

@@ -33,7 +33,7 @@ export default function PreviewPanel({ data, stepKey, caption }: PreviewPanelPro
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[13px] leading-relaxed text-beige/60"
+            className="text-body-sm text-beige/60"
           >
             {caption}
           </motion.p>

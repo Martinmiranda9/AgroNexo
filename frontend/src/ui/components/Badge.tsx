@@ -31,7 +31,7 @@ export default function Badge({ variant = 'neutral', icon, dot = false, classNam
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-[11px] font-semibold leading-none',
+        'inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-caption font-semibold leading-none',
         VARIANTS[variant],
         className,
       )}

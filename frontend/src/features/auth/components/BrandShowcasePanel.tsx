@@ -36,7 +36,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 // Tamaño de diseño de la composición; se escala para entrar en el panel a cualquier ancho/alto.
 const COMP_W = 600;
-const COMP_H = 370;
+const COMP_H = 410;
 
 /** Capa con parallax: las más cercanas (depth alto) se mueven más que las lejanas. */
 function Layer({ depth, px, py, children }: { depth: number; px: MotionValue<number>; py: MotionValue<number>; children: ReactNode }) {
@@ -106,7 +106,7 @@ export default function BrandShowcasePanel() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-pine/80 via-pine/0 to-pine/0" />
 
       <div className="relative z-10">
-        <Badge variant="inverse" dot className="px-3.5 py-1.5 text-[11.5px] font-medium tracking-wide">
+        <Badge variant="inverse" dot className="px-3.5 py-1.5 text-caption font-medium tracking-wide">
           Campaña 25/26
         </Badge>
       </div>
@@ -123,12 +123,12 @@ export default function BrandShowcasePanel() {
             </FloatingCard>
           </Layer>
           <Layer depth={18} px={px} py={py}>
-            <FloatingCard state={stateOf(2)} left={0} top={196} width={236} rotate={-3} delay={0.8} floatSeconds={8}>
+            <FloatingCard state={stateOf(2)} left={0} top={248} width={236} rotate={-3} delay={0.8} floatSeconds={8}>
               <YieldCard />
             </FloatingCard>
           </Layer>
           <Layer depth={28} px={px} py={py}>
-            <FloatingCard state={stateOf(1)} left={326} top={140} width={274} rotate={2.5} delay={0.55} floatSeconds={6}>
+            <FloatingCard state={stateOf(1)} left={326} top={206} width={274} rotate={2.5} delay={0.55} floatSeconds={6}>
               <MatchCard />
             </FloatingCard>
           </Layer>
@@ -146,8 +146,8 @@ export default function BrandShowcasePanel() {
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.4, ease: EASE }}
             >
-              <h2 className="text-[24px] font-medium leading-tight tracking-[-0.02em] xl:text-[28px]">{slide.title}</h2>
-              <p className="mx-auto mt-3 max-w-sm text-[13.5px] leading-relaxed text-beige/70">{slide.description}</p>
+              <h2 className="text-heading-md tracking-heading xl:text-heading-lg">{slide.title}</h2>
+              <p className="mx-auto mt-3 max-w-sm text-body-sm text-beige/70">{slide.description}</p>
             </motion.div>
           </AnimatePresence>
         </div>

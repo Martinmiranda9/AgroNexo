@@ -28,7 +28,7 @@ export default function ChoiceGroup({ label, options, value, onValueChange, mult
 
   return (
     <div role={multiple ? 'group' : 'radiogroup'} aria-label={label} className="flex flex-col gap-2">
-      {label && <span className="text-sm font-medium text-pine">{label}</span>}
+      {label && <span className="text-body-sm font-medium text-pine">{label}</span>}
 
       <div className={multiple ? 'flex flex-wrap gap-2' : 'flex flex-col gap-2'}>
         {options.map((o) => {
@@ -43,7 +43,7 @@ export default function ChoiceGroup({ label, options, value, onValueChange, mult
               className={cn(
                 'border text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine/15',
                 multiple
-                  ? 'flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-medium'
+                  ? 'flex h-10 items-center gap-1.5 rounded-full px-4 text-body-sm font-medium'
                   : 'flex flex-col items-start rounded-xl px-4 py-3',
                 active
                   ? 'border-pine bg-pine text-beige'
@@ -57,9 +57,9 @@ export default function ChoiceGroup({ label, options, value, onValueChange, mult
                 </>
               ) : (
                 <>
-                  <span className="text-sm font-semibold">{o.label}</span>
+                  <span className="text-body-sm font-semibold">{o.label}</span>
                   {o.description && (
-                    <span className={cn('mt-0.5 text-xs', active ? 'text-beige/70' : 'text-primary')}>{o.description}</span>
+                    <span className={cn('mt-0.5 text-caption', active ? 'text-beige/70' : 'text-primary')}>{o.description}</span>
                   )}
                 </>
               )}
@@ -68,7 +68,7 @@ export default function ChoiceGroup({ label, options, value, onValueChange, mult
         })}
       </div>
 
-      {error ? <p className="text-xs text-danger">{error}</p> : hint && <p className="text-xs text-neutral-warm">{hint}</p>}
+      {error ? <p className="text-caption text-danger">{error}</p> : hint && <p className="text-caption text-primary">{hint}</p>}
     </div>
   );
 }

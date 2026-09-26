@@ -56,7 +56,7 @@ export default function RegistrationWizard({
             <OnboardingHeader current={stepIndex} total={totalSteps} />
 
             {account?.email && (
-              <p className="border-pine/10 bg-beige text-primary mt-6 flex flex-wrap items-center gap-x-1.5 rounded-xl border px-3.5 py-2.5 text-[12.5px]">
+              <p className="border-pine/10 bg-beige text-primary mt-6 flex flex-wrap items-center gap-x-1.5 rounded-xl border px-3.5 py-2.5 text-caption">
                 <CheckCircle size={16} weight="fill" className="text-primary shrink-0" />
                 <span>
                   Cuenta {account.provider === 'google-oauth2' ? 'de Google' : ''}{' '}
@@ -82,11 +82,11 @@ export default function RegistrationWizard({
                 >
                   <h1
                     id={TITLE_ID}
-                    className="text-2xl leading-tight font-semibold tracking-tight sm:text-[28px]"
+                    className="text-heading-md tracking-heading"
                   >
                     {step.title}
                   </h1>
-                  <p className="text-primary mt-2 text-[13.5px] leading-relaxed">{step.subtitle}</p>
+                  <p className="text-primary mt-2 text-body-sm">{step.subtitle}</p>
                 </motion.div>
               </AnimatePresence>
 
@@ -122,7 +122,7 @@ export default function RegistrationWizard({
                 {submitError && (
                   <p
                     role="alert"
-                    className="border-danger/30 bg-danger/5 text-danger flex items-start gap-2 rounded-xl border px-3.5 py-3 text-[13px]"
+                    className="border-danger/30 bg-danger/5 text-danger flex items-start gap-2 rounded-xl border px-3.5 py-3 text-body-sm"
                   >
                     <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
                     {submitError}
@@ -159,7 +159,7 @@ export default function RegistrationWizard({
           </div>
         </div>
 
-        <footer className="text-primary mt-auto pt-8 text-center text-[12.5px]">
+        <footer className="text-primary mt-auto pt-8 text-center text-caption">
           ¿Ya tenés una cuenta?{' '}
           <Link
             href="/login"

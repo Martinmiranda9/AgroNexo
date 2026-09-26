@@ -10,9 +10,9 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const SIZES = {
-  sm: 'h-8 w-8 text-[12px]',
-  md: 'h-10 w-10 text-[14px]',
-  lg: 'h-12 w-12 text-[16px]',
+  sm: 'h-8 w-8 text-caption',
+  md: 'h-10 w-10 text-body-sm',
+  lg: 'h-12 w-12 text-body',
 } as const;
 
 const TONES = {
@@ -25,7 +25,7 @@ export default function Avatar({ initials, size = 'md', tone = 'solid', classNam
   return (
     <span
       className={cn(
-        'inline-flex shrink-0 select-none items-center justify-center rounded-full font-semibold tracking-tight',
+        'inline-flex shrink-0 select-none items-center justify-center rounded-full font-semibold tracking-heading',
         SIZES[size],
         TONES[tone],
         className,

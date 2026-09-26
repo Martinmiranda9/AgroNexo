@@ -12,7 +12,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           type={type}
           className={cn(
-            'flex h-11 w-full rounded-input border border-neutral-warm/30 bg-white px-4 py-2 text-sm text-dark',
+            'flex h-11 w-full rounded-input border border-neutral-warm/30 bg-white px-4 py-2 text-body-sm text-dark',
             'placeholder:text-neutral-warm/60',
             'transition-all duration-150',
             'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
@@ -26,7 +26,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && (
-          <p className="text-xs text-danger" role="alert">
+          <p className="text-caption text-danger" role="alert">
             {error}
           </p>
         )}

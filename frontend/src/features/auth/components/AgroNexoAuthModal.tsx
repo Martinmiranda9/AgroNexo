@@ -117,16 +117,16 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
             >
               <BrandMark variant="light" tile className="h-full w-full" />
             </Link>
-            <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-[#00311e] sm:text-[32px]">
+            <h1 className="text-heading-lg tracking-heading text-[#00311e]">
               {copy.title}
             </h1>
-            <p className="mt-2 text-[14px] leading-relaxed text-[#4D694E]">{copy.subtitle}</p>
+            <p className="mt-2 text-body-sm text-[#4D694E]">{copy.subtitle}</p>
           </div>
 
           {errorMessage && (
             <p
               role="alert"
-              className="mb-4 flex items-start gap-2 rounded-xl border border-[#8C4A34]/30 bg-[#8C4A34]/5 px-3.5 py-3 text-[13px] text-[#8C4A34]"
+              className="mb-4 flex items-start gap-2 rounded-xl border border-[#8C4A34]/30 bg-[#8C4A34]/5 px-3.5 py-3 text-body-sm text-[#8C4A34]"
             >
               <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
               {errorMessage}
@@ -135,7 +135,7 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 text-left">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor={emailId} className="text-[13px] font-medium text-[#00311e]">
+              <label htmlFor={emailId} className="text-body-sm font-medium text-[#00311e]">
                 Correo
               </label>
               <div className="relative">
@@ -152,13 +152,13 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
                   placeholder="tu@correo.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-10 pr-4 text-[14px] text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
+                  className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-10 pr-4 text-body-sm text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor={passwordId} className="text-[13px] font-medium text-[#00311e]">
+              <label htmlFor={passwordId} className="text-body-sm font-medium text-[#00311e]">
                 Contraseña
               </label>
               <div className="relative">
@@ -175,7 +175,7 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
                   placeholder={signup ? 'Mínimo 8 caracteres' : 'Tu contraseña'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-10 pr-11 text-[14px] text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
+                  className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-10 pr-11 text-body-sm text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
                 />
                 <button
                   type="button"
@@ -189,7 +189,7 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
               {!signup && (
                 <Link
                   href="/forgot-password"
-                  className="self-end text-[12.5px] font-medium text-[#4D694E] transition-colors hover:text-[#00311e]"
+                  className="self-end text-caption font-medium text-[#4D694E] transition-colors hover:text-[#00311e]"
                 >
                   Olvidé mi contraseña
                 </Link>
@@ -199,7 +199,7 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
             <button
               type="submit"
               disabled={submitting}
-              className="mt-1 flex h-12 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-[#00311e] text-[14px] font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-1 flex h-12 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-[#00311e] text-body-sm font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? <CircleNotch className="h-4 w-4 animate-spin" weight="bold" aria-label="Cargando" /> : copy.emailCta}
             </button>
@@ -207,19 +207,19 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
 
           <div className="my-6 flex items-center gap-3" aria-hidden="true">
             <div className="h-px flex-1 bg-[#00311e]/10" />
-            <span className="text-[12px] font-medium uppercase tracking-widest text-[#978A56]">o</span>
+            <span className="text-caption font-medium uppercase tracking-widest text-primary">o</span>
             <div className="h-px flex-1 bg-[#00311e]/10" />
           </div>
 
           <a
             href={buildAuthUrl({ connection: 'google', signup })}
-            className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[#00311e] text-[14px] font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985]"
+            className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[#00311e] text-body-sm font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985]"
           >
             <GoogleIcon />
             Continuar con Google
           </a>
 
-          <p className="mt-8 text-[11.5px] leading-relaxed text-[#978A56]">
+          <p className="mt-8 text-caption text-primary">
             Al continuar aceptás la{' '}
             <Link href="/privacy" className="text-[#4D694E] underline underline-offset-2 transition-colors hover:text-[#00311e]">
               Política de Privacidad
@@ -233,7 +233,7 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
         </div>
 
         <footer className="mt-auto pt-8 text-center">
-          <p className="text-[13px] text-[#4D694E]">
+          <p className="text-body-sm text-[#4D694E]">
             {copy.footerText}{' '}
             <Link
               href={copy.footerHref}

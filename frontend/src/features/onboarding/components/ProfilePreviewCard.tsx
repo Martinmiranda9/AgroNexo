@@ -49,14 +49,14 @@ export default function ProfilePreviewCard({ data }: { data: PreviewData }) {
 
   return (
     <div className="w-[300px] rounded-2xl border border-beige/10 bg-beige/[0.04] p-6 backdrop-blur-sm xl:w-[340px]">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-beige/10 text-lg font-semibold text-beige">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-beige/10 text-body-lg font-semibold text-beige">
         {initials(data.name) || <UserCircle size={28} weight="light" className="text-beige/50" />}
       </div>
 
       <div className="mt-4 flex min-h-6 items-center justify-center gap-1.5">
         {data.name ? (
           <>
-            <span className="truncate text-[15px] font-medium text-beige">{data.name}</span>
+            <span className="truncate text-body-sm font-medium text-beige">{data.name}</span>
             <SealCheck size={16} weight="fill" className="shrink-0 text-accent-light" aria-label="Perfil verificado" />
           </>
         ) : (
@@ -68,7 +68,7 @@ export default function ProfilePreviewCard({ data }: { data: PreviewData }) {
         <motion.span
           key={data.badge}
           {...fade}
-          className="mx-auto mt-2 block w-fit rounded-full bg-beige/10 px-2.5 py-0.5 text-[11px] font-medium text-beige/80"
+          className="mx-auto mt-2 block w-fit rounded-full bg-beige/10 px-2.5 py-0.5 text-caption font-medium text-beige/80"
         >
           {data.badge}
         </motion.span>
@@ -82,7 +82,7 @@ export default function ProfilePreviewCard({ data }: { data: PreviewData }) {
               <RowIcon size={14} className={row.text ? 'shrink-0 text-accent-light' : 'shrink-0 text-beige/25'} />
               <AnimatePresence mode="wait" initial={false}>
                 {row.text ? (
-                  <motion.span key="text" {...fade} className="truncate text-[12.5px] text-beige/80">
+                  <motion.span key="text" {...fade} className="truncate text-caption text-beige/80">
                     {row.text}
                   </motion.span>
                 ) : (

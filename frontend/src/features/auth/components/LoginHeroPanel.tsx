@@ -24,8 +24,8 @@ function StatusBadge({ children, icon, delay = 0 }: StatusBadgeProps) {
       className="
         inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 
         border border-white/20 bg-white/10 backdrop-blur-md
-        text-[11px] font-medium tracking-wide text-white/90
-      "
+        text-caption font-medium tracking-wide text-white/90
+     "
     >
       {icon}
       {children}
@@ -52,14 +52,14 @@ function FeatureCard({ icon, title, desc, delay = 0 }: FeatureCardProps) {
         flex flex-col gap-2 rounded-2xl border border-white/10 
         bg-white/5 p-4 backdrop-blur-md transition-colors 
         hover:bg-white/10
-      "
+     "
     >
       <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white">
         {icon}
       </div>
       <div className="mt-1">
-        <h4 className="text-[13px] font-semibold text-white/95">{title}</h4>
-        <p className="mt-1 text-[11px] leading-relaxed text-white/60">
+        <h4 className="text-body-sm font-semibold text-white/95">{title}</h4>
+        <p className="mt-1 text-caption text-white/60">
           {desc}
         </p>
       </div>
@@ -117,17 +117,17 @@ export default function LoginHeroPanel() {
           initial={reduce ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col gap-0 text-5xl font-bold tracking-tight text-white xl:text-6xl"
+          className="flex flex-col gap-0 text-heading-xl tracking-heading text-white"
         >
           <span>Cultivando un</span>
-          <span className="font-serif italic text-emerald-100 font-normal">mejor mañana</span>
+          <span className="font-normal text-emerald-100">mejor mañana</span>
         </motion.h1>
 
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-5 text-sm leading-relaxed text-white/70 max-w-[380px]"
+          className="mt-5 text-body-sm text-white/70 max-w-[380px]"
         >
           Soluciones de precisión para el agro moderno. Gestioná, monitoreá y
           maximizá tu rendimiento con tecnología confiable.

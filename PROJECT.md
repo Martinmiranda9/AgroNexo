@@ -41,3 +41,7 @@
 - `src/shared/`: Cross-cutting utils, hooks, constants, types
 - `tests/`: Unit and E2E test folders
 - `public/`: Static assets
+
+## Pendientes / Deuda técnica
+- [ ] **Unificar componentes UI duplicados**: existen dos carpetas con implementaciones distintas del mismo componente — `src/components/ui/` (button, input, select) y `src/ui/components/` (Button, Input, Select, ChoiceGroup), con alturas y tamaños distintos entre sí. Según la arquitectura por capas, `src/ui/` es la oficial. Definir cuál queda, migrar lo que falte y borrar la otra antes de seguir sumando pantallas nuevas.
+- [ ] **Eliminar la dev skill "taste" sin uso** en `frontend/.agents/skills/` (incluye `design-taste-frontend`, `brandkit`, `minimalist-ui`, `high-end-visual-design` referenciadas en `ia/frontend_implementation_plan.md`) — no se está usando actualmente, sacarla para no arrastrar confusión sobre qué guía de diseño aplica.

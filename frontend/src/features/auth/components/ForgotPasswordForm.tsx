@@ -43,25 +43,25 @@ export default function ForgotPasswordForm() {
       >
         <BrandMark variant="light" tile className="h-full w-full" />
       </Link>
-      <h1 className="text-[28px] font-semibold leading-tight tracking-tight sm:text-[32px]">Restablecer contraseña</h1>
-      <p className="mt-2 text-[14px] leading-relaxed text-[#4D694E]">
+      <h1 className="text-heading-lg tracking-heading">Restablecer contraseña</h1>
+      <p className="mt-2 text-body-sm text-[#4D694E]">
         Ingresá tu correo y te enviamos un enlace para elegir una contraseña nueva.
       </p>
 
       {status === 'sent' ? (
-        <p role="status" className="mt-8 flex items-start gap-2 rounded-xl border border-[#4D694E]/30 bg-[#4D694E]/5 px-3.5 py-3 text-left text-[13px]">
+        <p role="status" className="mt-8 flex items-start gap-2 rounded-xl border border-[#4D694E]/30 bg-[#4D694E]/5 px-3.5 py-3 text-left text-body-sm">
           <CheckCircle size={16} weight="fill" className="mt-0.5 shrink-0 text-[#4D694E]" />
           Si el correo tiene una cuenta, en unos minutos te llega el enlace. Revisá también el spam.
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="mt-8 flex w-full flex-col gap-3.5 text-left">
           {error && (
-            <p role="alert" className="flex items-start gap-2 rounded-xl border border-[#8C4A34]/30 bg-[#8C4A34]/5 px-3.5 py-3 text-[13px] text-[#8C4A34]">
+            <p role="alert" className="flex items-start gap-2 rounded-xl border border-[#8C4A34]/30 bg-[#8C4A34]/5 px-3.5 py-3 text-body-sm text-[#8C4A34]">
               <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
               {error}
             </p>
           )}
-          <label htmlFor={emailId} className="text-[13px] font-medium">
+          <label htmlFor={emailId} className="text-body-sm font-medium">
             Correo
           </label>
           <input
@@ -72,19 +72,19 @@ export default function ForgotPasswordForm() {
             placeholder="tu@correo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] px-4 text-[14px] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
+            className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] px-4 text-body-sm outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
           />
           <button
             type="submit"
             disabled={status === 'sending'}
-            className="flex h-12 w-full cursor-pointer items-center justify-center rounded-xl bg-[#00311e] text-[14px] font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985] disabled:opacity-60"
+            className="flex h-12 w-full cursor-pointer items-center justify-center rounded-xl bg-[#00311e] text-body-sm font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985] disabled:opacity-60"
           >
             {status === 'sending' ? <CircleNotch className="h-4 w-4 animate-spin" weight="bold" aria-label="Enviando" /> : 'Enviar enlace'}
           </button>
         </form>
       )}
 
-      <Link href="/login" className="mt-8 text-[13px] font-semibold underline underline-offset-4 hover:text-[#4D694E]">
+      <Link href="/login" className="mt-8 text-body-sm font-semibold underline underline-offset-4 hover:text-[#4D694E]">
         Volver a iniciar sesión
       </Link>
     </div>

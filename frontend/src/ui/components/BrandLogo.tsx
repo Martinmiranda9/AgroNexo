@@ -16,7 +16,7 @@ export default function BrandLogo({ variant = 'light' }: BrandLogoProps) {
   return (
     <Link href="/" aria-label="AgroNexo — Inicio" className="flex items-center gap-2.5">
       <BrandMark variant={variant} tile className="h-9 w-9 shrink-0" />
-      <span className={`text-[17px] font-semibold tracking-tight ${WORDMARK[variant]}`}>AgroNexo</span>
+      <span className={`text-body font-semibold tracking-heading ${WORDMARK[variant]}`}>AgroNexo</span>
     </Link>
   );
 }
