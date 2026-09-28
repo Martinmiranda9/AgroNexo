@@ -19,7 +19,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
   return (
     <main className="min-h-[100dvh] w-full bg-[#fef7e5] text-[#00311e] antialiased selection:bg-[#00311e]/10 selection:text-[#00311e]">
-      <AgroNexoAuthModal mode="login" error={error} />
+      <AgroNexoAuthModal error={error} />
     </main>
   );
 }

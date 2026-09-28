@@ -6,6 +6,7 @@ import { ArrowRight, CaretLeft, CheckCircle, WarningCircle } from '@phosphor-ico
 import { Button } from '@/ui/components';
 import type { RegistrationAccount, RegistrationKind } from '../config/types';
 import { useRegistrationWizard } from '../hooks/useRegistrationWizard';
+import AccountStep from './AccountStep';
 import OnboardingHeader from './OnboardingHeader';
 import PreviewPanel from './PreviewPanel';
 import RoleStep from './RoleStep';
@@ -21,10 +22,13 @@ const TITLE_ID = 'onboarding-step-title';
 export default function RegistrationWizard({
   initialKind,
   account,
+  requiresAccount = false,
 }: {
   initialKind?: RegistrationKind;
-  /** Cuenta ya autenticada: prellena nombre y apellido y registra con su sesión. */
+  /** Cuenta ya autenticada: prellena nombre, apellido y correo y registra con su sesión. */
   account?: RegistrationAccount;
+  /** Sin sesión y con Auth0 activo: el wizard empieza con el paso "Tu cuenta" (Google o correo y contraseña). */
+  requiresAccount?: boolean;
 }) {
   const reduce = useReducedMotion();
   const {
@@ -33,18 +37,21 @@ export default function RegistrationWizard({
     step,
     stepIndex,
     totalSteps,
+    isAccountStep,
     isRoleStep,
     isLastStep,
     values,
+    credentials,
     errors,
     preview,
     submitting,
     submitError,
     selectKind,
     updateValues,
+    updateCredentials,
     next,
     back,
-  } = useRegistrationWizard(initialKind, account);
+  } = useRegistrationWizard(initialKind, account, requiresAccount);
 
   return (
     <div className="bg-bg-card text-pine flex min-h-[100dvh] w-full flex-col md:flex-row">
@@ -106,7 +113,9 @@ export default function RegistrationWizard({
                     exit={{ opacity: 0, x: -16 }}
                     transition={{ duration: 0.3, ease: EASE }}
                   >
-                    {isRoleStep ? (
+                    {isAccountStep ? (
+                      <AccountStep step={step} credentials={credentials} errors={errors} onChange={updateCredentials} />
+                    ) : isRoleStep ? (
                       <RoleStep value={kind} onChange={selectKind} labelledBy={TITLE_ID} />
                     ) : (
                       <StepFields

@@ -4,7 +4,9 @@ import { useId, useState } from 'react';
 import Link from 'next/link';
 import { CircleNotch, EnvelopeSimple, Eye, EyeSlash, LockSimple, WarningCircle } from '@phosphor-icons/react';
 import BrandMark from '@/ui/components/BrandMark';
-import { AUTH_CONTINUE_PATH, buildAuthUrl } from '@/core/auth/config';
+import GoogleButton from '@/ui/components/GoogleButton';
+import { AUTH_CONTINUE_PATH } from '@/core/auth/config';
+import { startGoogleSignIn } from '@/core/auth/google-sign-in';
 import BrandShowcasePanel from './BrandShowcasePanel';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -14,61 +16,27 @@ import BrandShowcasePanel from './BrandShowcasePanel';
 // 10% Accents & Details: Olive (#4D694E) & Sage (#728141)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type AuthMode = 'login' | 'signup';
-
-const COPY: Record<AuthMode, { title: string; subtitle: string; emailCta: string; footerText: string; footerLink: string; footerHref: string }> = {
-  login: {
-    title: 'Bienvenido a AgroNexo',
-    subtitle: 'Iniciá sesión para gestionar tus establecimientos y asesoramientos.',
-    emailCta: 'Iniciar sesión',
-    footerText: '¿Todavía no tenés una cuenta?',
-    footerLink: 'Crear una',
-    footerHref: '/onboarding',
-  },
-  signup: {
-    title: 'Empezá con AgroNexo',
-    subtitle: 'Creá tu cuenta con tu correo o con Google. Después te pedimos los datos de tu campo o de tu perfil profesional.',
-    emailCta: 'Crear cuenta',
-    footerText: '¿Ya tenés una cuenta?',
-    footerLink: 'Iniciá sesión',
-    footerHref: '/login',
-  },
-};
+const COPY = {
+  title: 'Bienvenido a AgroNexo',
+  subtitle: 'Iniciá sesión para gestionar tus establecimientos y asesoramientos.',
+  emailCta: 'Iniciar sesión',
+  footerText: '¿Todavía no tenés una cuenta?',
+  footerLink: 'Crear cuenta',
+  footerHref: '/onboarding',
+} as const;
 
 const ERROR_MESSAGES: Record<string, string> = {
   auth_not_configured: 'El acceso todavía no está configurado en este entorno.',
   access_denied: 'No pudimos completar el acceso. Probá de nuevo.',
+  auth_failed: 'No pudimos completar el acceso con Google. Probá de nuevo.',
 };
 
-function GoogleIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
-      <path
-        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-        fill="#4285F4"
-      />
-      <path
-        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-        fill="#34A853"
-      />
-      <path
-        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-        fill="#FBBC05"
-      />
-      <path
-        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-        fill="#EA4335"
-      />
-    </svg>
-  );
-}
-
 /**
- * Entrada única de acceso, todo en la primera pantalla:
+ * Inicio de sesión (el registro vive en /onboarding):
  *  - Correo y contraseña: se validan contra Auth0 desde nuestro servidor (la contraseña no se guarda).
- *  - Google: abre directo la ventana de Google para elegir la cuenta y vuelve a la app ya logueado.
+ *  - Google: abre la ventana de Google para elegir la cuenta y, al terminar, sigue en /auth/continue.
  */
-export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: AuthMode; error?: string }) {
+export default function AgroNexoAuthModal({ error }: { error?: string }) {
   const emailId = useId();
   const passwordId = useId();
   const [email, setEmail] = useState('');
@@ -76,17 +44,30 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string>();
-  const copy = COPY[mode];
-  const signup = mode === 'signup';
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const copy = COPY;
   const errorMessage =
     formError ?? (error ? (ERROR_MESSAGES[error] ?? 'Ocurrió un error al ingresar. Probá de nuevo.') : undefined);
+
+  const handleGoogle = () => {
+    setGoogleLoading(true);
+    setFormError(undefined);
+    startGoogleSignIn({
+      onSuccess: () => window.location.assign(AUTH_CONTINUE_PATH),
+      onError: (code) => {
+        setFormError(ERROR_MESSAGES[code] ?? ERROR_MESSAGES.auth_failed);
+        setGoogleLoading(false);
+      },
+      onCancel: () => setGoogleLoading(false),
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setFormError(undefined);
     try {
-      const res = await fetch(`/api/auth/password/${signup ? 'signup' : 'login'}`, {
+      const res = await fetch('/api/auth/password/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -170,9 +151,8 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
                   id={passwordId}
                   type={showPassword ? 'text' : 'password'}
                   required
-                  minLength={signup ? 8 : undefined}
-                  autoComplete={signup ? 'new-password' : 'current-password'}
-                  placeholder={signup ? 'Mínimo 8 caracteres' : 'Tu contraseña'}
+                                    autoComplete="current-password"
+                  placeholder="Tu contraseña"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-10 pr-11 text-body-sm text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
@@ -186,14 +166,12 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
                   {showPassword ? <EyeSlash className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {!signup && (
-                <Link
-                  href="/forgot-password"
-                  className="self-end text-caption font-medium text-[#4D694E] transition-colors hover:text-[#00311e]"
-                >
-                  Olvidé mi contraseña
-                </Link>
-              )}
+              <Link
+                href="/forgot-password"
+                className="self-end text-caption font-medium text-[#4D694E] transition-colors hover:text-[#00311e]"
+              >
+                Olvidé mi contraseña
+              </Link>
             </div>
 
             <button
@@ -211,13 +189,7 @@ export default function AgroNexoAuthModal({ mode = 'login', error }: { mode?: Au
             <div className="h-px flex-1 bg-[#00311e]/10" />
           </div>
 
-          <a
-            href={buildAuthUrl({ connection: 'google', signup })}
-            className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[#00311e] text-body-sm font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985]"
-          >
-            <GoogleIcon />
-            Continuar con Google
-          </a>
+          <GoogleButton loading={googleLoading} onClick={handleGoogle} />
 
           <p className="mt-8 text-caption text-primary">
             Al continuar aceptás la{' '}

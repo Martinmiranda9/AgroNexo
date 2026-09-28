@@ -5,6 +5,8 @@ import { readPasswordSession } from './password-session';
 
 /** Datos de la identidad que Google/Auth0 ya conocen, para prellenar el registro. */
 export interface SessionUser {
+  /** `sub` de Auth0 (ej: `auth0|123`, `google-oauth2|456`). */
+  id: string;
   email?: string;
   emailVerified?: boolean;
   firstName?: string;
@@ -29,6 +31,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   const own = await readPasswordSession();
   if (own) {
     return {
+      id: own.sub,
       email: own.email,
       emailVerified: own.emailVerified,
       firstName: own.firstName,
@@ -44,6 +47,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 
   // Con email/contraseña Auth0 no separa nombre y apellido: solo Google los trae.
   return {
+    id: String(user.sub ?? ''),
     email: user.email,
     emailVerified: user.email_verified,
     firstName: user.given_name,
@@ -68,18 +72,31 @@ export async function getBackendToken(): Promise<string | undefined> {
   }
 }
 
-/** Consulta al backend si el usuario logueado ya completó el registro. `null` si no se pudo saber. */
-export async function fetchCurrentUser(): Promise<CurrentUser | null> {
+/**
+ * Estado de registro del usuario logueado. `unavailable` (backend caído, sin red, token rechazado) es
+ * distinto de `not-registered`: sin esa diferencia un corte del servidor mandaría a todos al onboarding.
+ */
+export type CurrentUserState =
+  | { status: 'registered'; user: CurrentUser }
+  | { status: 'not-registered' }
+  | { status: 'unavailable' };
+
+/** Consulta al backend si el usuario logueado ya completó el registro (`GET /identity/me`). */
+export async function fetchCurrentUser(): Promise<CurrentUserState> {
   const token = await getBackendToken();
-  if (!token) return null;
+  if (!token) return { status: 'unavailable' };
 
   try {
     const res = await fetch(`${API_ORIGIN}/api/v1/identity/me`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
     });
-    return res.ok ? ((await res.json()) as CurrentUser) : null;
+    // El backend responde 200 con `isRegistered: false` para una identidad nueva; cualquier otra cosa es un fallo.
+    if (!res.ok) return { status: 'unavailable' };
+
+    const user = (await res.json()) as CurrentUser;
+    return user.isRegistered ? { status: 'registered', user } : { status: 'not-registered' };
   } catch {
-    return null;
+    return { status: 'unavailable' };
   }
 }

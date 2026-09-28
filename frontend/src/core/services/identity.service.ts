@@ -8,6 +8,8 @@ export class ApiError extends Error {
     public readonly status: number,
     message: string,
     public readonly detail?: string,
+    /** Código legible por máquina (ej: `email_exists`) cuando el servidor lo informa. */
+    public readonly code?: string,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -26,15 +28,17 @@ async function handleResponse<T>(response: Response): Promise<T> {
   if (response.ok) return response.json() as Promise<T>;
 
   let detail: string | undefined;
+  let code: string | undefined;
   try {
     const problem = await response.json();
     const fieldErrors = problem?.errors ? Object.values<string[]>(problem.errors).flat() : [];
     detail = fieldErrors[0] ?? problem?.detail ?? problem?.title;
+    code = typeof problem?.code === 'string' ? problem.code : undefined;
   } catch {
     // respuesta sin body JSON
   }
 
-  throw new ApiError(response.status, STATUS_MESSAGES[response.status] ?? 'Ocurrió un error inesperado.', detail);
+  throw new ApiError(response.status, STATUS_MESSAGES[response.status] ?? 'Ocurrió un error inesperado.', detail, code);
 }
 
 /** Token JWT de desarrollo (solo entornos no productivos, hasta integrar Auth0). */
@@ -79,6 +83,23 @@ export async function registerWithSession(data: RegisterUserRequest): Promise<Re
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
+  });
+
+  return handleResponse<RegisterUserResponse>(response);
+}
+
+/**
+ * Registro completo con correo y contraseña. El servidor crea la cuenta en Auth0, inicia sesión y registra
+ * el perfil; si el backend falla la sesión igual queda abierta y el reintento repite la misma llamada.
+ */
+export async function registerWithCredentials(
+  data: RegisterUserRequest,
+  credentials: { email: string; password: string },
+): Promise<RegisterUserResponse> {
+  const response = await fetch('/api/auth/password/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...credentials, profile: data }),
   });
 
   return handleResponse<RegisterUserResponse>(response);

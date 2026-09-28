@@ -1,6 +1,9 @@
 /** Ruta a la que vuelve Auth0 tras autenticar: decide entre onboarding y aplicación. */
 export const AUTH_CONTINUE_PATH = '/auth/continue';
 
+/** Página final del popup de Google: avisa a la ventana principal y se cierra. */
+export const AUTH_POPUP_COMPLETE_PATH = '/auth/popup-complete';
+
 /** Conexiones de Auth0 que el frontend puede pedir por URL. Cualquier otra se ignora. */
 export const AUTH_CONNECTIONS = { google: 'google-oauth2' } as const;
 
@@ -19,6 +22,12 @@ const REQUIRED_ENV = [
  */
 export function isAuth0Configured(): boolean {
   return REQUIRED_ENV.every((name) => Boolean(process.env[name]));
+}
+
+/** Solo rutas internas: evita que `returnTo` sirva de redirección abierta (`//evil.com`, `/\evil.com`). */
+export function safeReturnTo(value: string | null | undefined): string | undefined {
+  if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return undefined;
+  return value;
 }
 
 /** Arma la URL de login/registro de Auth0. `connection: 'google'` salta la pantalla de Auth0 y abre Google. */

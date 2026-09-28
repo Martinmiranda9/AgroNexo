@@ -3,6 +3,13 @@ export type RegistrationKind = 'producer' | 'agronomist' | 'accountant' | 'lawye
 /** Valores del formulario: todo string; se convierte al armar el request. */
 export type FormValues = Record<string, string>;
 
+/** Credenciales que se piden en el paso "Tu cuenta". No van al backend: solo a Auth0 vía `/api/auth/password/register`. */
+export type AccountCredentials = {
+  email: string;
+  password: string;
+  passwordConfirm: string;
+};
+
 /** Cuenta ya autenticada (Google o email) con la que se completa el registro. */
 export interface RegistrationAccount {
   email?: string;
@@ -39,6 +46,22 @@ export interface TextField extends BaseField {
   autoComplete?: string;
 }
 
+/** Correo. `readOnly` cuando viene de una cuenta ya verificada (Google): se muestra pero no se edita. */
+export interface EmailField extends BaseField {
+  kind: 'email';
+  placeholder?: string;
+  readOnly?: boolean;
+  autoComplete?: string;
+}
+
+/** Contraseña con mostrar/ocultar. Con `confirms` es el campo "repetir": debe coincidir con el campo indicado. */
+export interface PasswordField extends BaseField {
+  kind: 'password';
+  placeholder?: string;
+  confirms?: string;
+  autoComplete?: 'new-password';
+}
+
 export interface SelectField extends BaseField {
   kind: 'select';
   placeholder?: string;
@@ -59,7 +82,7 @@ export interface LocationField {
   required?: boolean;
 }
 
-export type FieldDef = TextField | SelectField | ChoiceField | LocationField;
+export type FieldDef = TextField | EmailField | PasswordField | SelectField | ChoiceField | LocationField;
 
 /** Línea de información de la card de vista previa; `text` vacío = esqueleto. */
 export interface PreviewRow {
@@ -74,6 +97,7 @@ export interface PreviewData {
 }
 
 export interface StepDef {
+  /** `account` = paso "Tu cuenta"; `role` = elección de rol; el resto son los pasos de datos de cada rol. */
   id: string;
   title: string;
   subtitle: string;

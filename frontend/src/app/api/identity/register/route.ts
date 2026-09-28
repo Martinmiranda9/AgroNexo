@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { API_ORIGIN } from '@/core/config/api';
 import { getBackendToken } from '@/core/auth/server';
+import { forwardRegistration } from '@/core/auth/backend';
 
 /**
- * Reenvía el registro al backend con el access token de la sesión de Auth0.
+ * Registro de perfil para quien ya tiene sesión (Google, o correo que quedó a medias).
  * El token vive en una cookie httpOnly: el navegador nunca lo ve.
  */
 export async function POST(req: Request) {
@@ -15,22 +15,5 @@ export async function POST(req: Request) {
     );
   }
 
-  try {
-    const upstream = await fetch(`${API_ORIGIN}/api/v1/identity/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: await req.text(),
-      cache: 'no-store',
-    });
-
-    return new NextResponse(await upstream.text(), {
-      status: upstream.status,
-      headers: { 'Content-Type': upstream.headers.get('Content-Type') ?? 'application/json' },
-    });
-  } catch {
-    return NextResponse.json(
-      { status: 502, title: 'Servicio no disponible', detail: 'No pudimos conectarnos con el servidor.' },
-      { status: 502 },
-    );
-  }
+  return forwardRegistration(token, await req.text());
 }

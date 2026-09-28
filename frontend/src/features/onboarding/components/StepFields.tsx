@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { ChoiceGroup, Input, Select } from '@/ui/components';
+import PasswordField from './PasswordField';
 import type { FieldDef, FormValues } from '../config/types';
 import { joinMulti, parseMulti } from '../lib/values';
 import type { FieldErrors } from '../lib/validation';
@@ -41,6 +42,33 @@ export default function StepFields({ fields, values, errors, onChange }: StepFie
                 options={field.options}
                 value={values[field.name]}
                 onValueChange={(value) => onChange({ [field.name]: value })}
+              />
+            );
+          case 'password':
+            return (
+              <PasswordField
+                key={field.name}
+                field={field}
+                value={values[field.name] ?? ''}
+                error={errors[field.name]}
+                onChange={(value) => onChange({ [field.name]: value })}
+              />
+            );
+          case 'email':
+            return (
+              <Input
+                key={field.name}
+                {...common}
+                hint={field.hint}
+                className="h-12"
+                type="email"
+                inputMode="email"
+                placeholder={field.placeholder}
+                autoComplete={field.autoComplete}
+                maxLength={254}
+                disabled={field.readOnly}
+                value={values[field.name] ?? ''}
+                onChange={(e) => onChange({ [field.name]: e.target.value })}
               />
             );
           case 'choice':

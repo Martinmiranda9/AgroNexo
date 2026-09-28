@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { RegistrationWizard, resolveRegistrationKind } from '@/features/onboarding';
-import AgroNexoAuthModal from '@/features/auth/components/AgroNexoAuthModal';
+import BackendUnavailable from '@/features/auth/components/BackendUnavailable';
 import { isAuth0Configured } from '@/core/auth/config';
 import { fetchCurrentUser, getSessionUser } from '@/core/auth/server';
 
@@ -13,33 +13,31 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 interface OnboardingPageProps {
-  searchParams: Promise<{ type?: string; error?: string }>;
+  searchParams: Promise<{ type?: string }>;
 }
 
 /**
- * /onboarding                → sin cuenta: "Creá tu cuenta" (Google o correo). Con cuenta: el formulario.
- * /onboarding?type=agronomist → (producer|agronomist|accountant|lawyer|investor) salta la elección de rol.
+ * Único flujo de registro. Siempre es el wizard; lo que cambia es dónde empieza:
+ *  - sin sesión          → paso "Tu cuenta" (Google, o correo + contraseña + repetir contraseña)
+ *  - con sesión y sin perfil → directo al rol, con nombre, apellido y correo ya cargados
+ *  - ya registrado       → /dashboard
  *
- * Sin Auth0 configurado (desarrollo local) se muestra el formulario directo, como antes.
+ * /onboarding?type=agronomist (producer|agronomist|accountant|lawyer|investor) salta la elección de rol.
+ * Sin Auth0 configurado (desarrollo local) se muestra el formulario directo, con token de desarrollo.
  */
 export default async function OnboardingPage({ searchParams }: OnboardingPageProps) {
-  const { type, error } = await searchParams;
+  const { type } = await searchParams;
   const initialKind = resolveRegistrationKind(type);
 
   if (!isAuth0Configured()) return <RegistrationWizard initialKind={initialKind} />;
 
   const user = await getSessionUser();
-  if (!user) {
-    return (
-      <main className="min-h-[100dvh] w-full bg-[#fef7e5] text-[#00311e] antialiased">
-        <AgroNexoAuthModal mode="signup" error={error} />
-      </main>
-    );
-  }
+  if (!user) return <RegistrationWizard initialKind={initialKind} requiresAccount />;
 
-  // Si ya completó el registro no tiene sentido repetirlo.
+  // Si ya completó el registro no tiene sentido repetirlo; si el backend no responde, tampoco es un usuario nuevo.
   const current = await fetchCurrentUser();
-  if (current?.isRegistered) redirect('/dashboard');
+  if (current.status === 'unavailable') return <BackendUnavailable />;
+  if (current.status === 'registered') redirect('/dashboard');
 
   return (
     <RegistrationWizard

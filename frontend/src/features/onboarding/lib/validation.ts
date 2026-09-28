@@ -1,9 +1,11 @@
+import { passwordStrengthError } from '@/core/auth/password-rules';
 import type { FieldDef, FormValues, StepDef } from '../config/types';
 
 export type FieldErrors = Record<string, string>;
 
 const DOCUMENT_PATTERN = /^[0-9A-Za-z.\-/\s]{7,50}$/;
 const PHONE_PATTERN = /^\+[1-9][0-9]{7,14}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /** Quita espacios, guiones y paréntesis: "+54 9 351-123 4567" → "+5493511234567". */
 export const normalizePhone = (value: string) => value.replace(/[\s\-()]/g, '');
@@ -17,6 +19,21 @@ function validateField(field: FieldDef, values: FormValues): FieldErrors {
     return errors;
   }
 
+  if (field.kind === 'password') {
+    // Sin trim: los espacios de una contraseña cuentan.
+    const password = values[field.name] ?? '';
+    if (!password) errors[field.name] = 'Este campo es obligatorio.';
+    else if (field.confirms) {
+      if (password !== (values[field.confirms] ?? '')) errors[field.name] = 'Las contraseñas no coinciden.';
+    } else {
+      const message = passwordStrengthError(password);
+      if (message) errors[field.name] = message;
+    }
+    return errors;
+  }
+
+  if (field.kind === 'email' && field.readOnly) return errors;
+
   const value = (values[field.name] ?? '').trim();
 
   if (!value) {
@@ -29,6 +46,12 @@ function validateField(field: FieldDef, values: FormValues): FieldErrors {
     if (!Number.isInteger(n)) errors[field.name] = 'Ingresá un número entero.';
     else if (field.min !== undefined && n < field.min) errors[field.name] = `El mínimo es ${field.min}.`;
     else if (field.max !== undefined && n > field.max) errors[field.name] = `El máximo es ${field.max}.`;
+    return errors;
+  }
+
+  if (field.kind === 'email') {
+    if (!EMAIL_PATTERN.test(value)) errors[field.name] = 'Ingresá un correo válido.';
+    else if (value.length > 254) errors[field.name] = 'El correo es demasiado largo.';
     return errors;
   }
 
