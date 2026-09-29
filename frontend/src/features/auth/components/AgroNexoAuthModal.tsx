@@ -2,11 +2,11 @@
 
 import { useId, useState } from 'react';
 import Link from 'next/link';
-import { CircleNotch, EnvelopeSimple, Eye, EyeSlash, LockSimple, WarningCircle } from '@phosphor-icons/react';
+import { CircleNotch, EnvelopeSimple, WarningCircle } from '@phosphor-icons/react';
 import BrandMark from '@/ui/components/BrandMark';
 import GoogleButton from '@/ui/components/GoogleButton';
 import { AUTH_CONTINUE_PATH } from '@/core/auth/config';
-import { startGoogleSignIn } from '@/core/auth/google-sign-in';
+import { startEmailSignIn, startGoogleSignIn } from '@/core/auth/google-sign-in';
 import BrandShowcasePanel from './BrandShowcasePanel';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -33,15 +33,14 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 /**
  * Inicio de sesión (el registro vive en /onboarding):
- *  - Correo y contraseña: se validan contra Auth0 desde nuestro servidor (la contraseña no se guarda).
+ *  - Correo: abre la pantalla de Auth0 en un popup, con el correo precargado (ahí se pide la
+ *    contraseña). Auth0 no permite intercambiar credenciales directo desde nuestro servidor para
+ *    tenants nuevos, así que correo y Google comparten el mismo mecanismo de popup.
  *  - Google: abre la ventana de Google para elegir la cuenta y, al terminar, sigue en /auth/continue.
  */
 export default function AgroNexoAuthModal({ error }: { error?: string }) {
   const emailId = useId();
-  const passwordId = useId();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string>();
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -62,28 +61,18 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setFormError(undefined);
-    try {
-      const res = await fetch('/api/auth/password/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const body = (await res.json().catch(() => ({}))) as { next?: string; message?: string };
-      if (!res.ok) {
-        setFormError(body.message ?? 'No pudimos completar el acceso. Probá de nuevo.');
+    startEmailSignIn(email, {
+      onSuccess: () => window.location.assign(AUTH_CONTINUE_PATH),
+      onError: (code) => {
+        setFormError(ERROR_MESSAGES[code] ?? ERROR_MESSAGES.auth_failed);
         setSubmitting(false);
-        return;
-      }
-      // Navegación completa: las páginas del servidor leen la cookie de sesión recién creada.
-      window.location.assign(body.next ?? AUTH_CONTINUE_PATH);
-    } catch {
-      setFormError('No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.');
-      setSubmitting(false);
-    }
+      },
+      onCancel: () => setSubmitting(false),
+    });
   };
 
   return (
@@ -135,36 +124,6 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
                   onChange={(e) => setEmail(e.target.value)}
                   className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-10 pr-4 text-body-sm text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
                 />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor={passwordId} className="text-body-sm font-medium text-[#00311e]">
-                Contraseña
-              </label>
-              <div className="relative">
-                <LockSimple
-                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#978A56]"
-                  weight="regular"
-                />
-                <input
-                  id={passwordId}
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                                    autoComplete="current-password"
-                  placeholder="Tu contraseña"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-10 pr-11 text-body-sm text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#978A56] transition-colors hover:text-[#00311e]"
-                >
-                  {showPassword ? <EyeSlash className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
               </div>
               <Link
                 href="/forgot-password"

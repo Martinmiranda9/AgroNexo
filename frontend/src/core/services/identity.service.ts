@@ -87,20 +87,3 @@ export async function registerWithSession(data: RegisterUserRequest): Promise<Re
 
   return handleResponse<RegisterUserResponse>(response);
 }
-
-/**
- * Registro completo con correo y contraseña. El servidor crea la cuenta en Auth0, inicia sesión y registra
- * el perfil; si el backend falla la sesión igual queda abierta y el reintento repite la misma llamada.
- */
-export async function registerWithCredentials(
-  data: RegisterUserRequest,
-  credentials: { email: string; password: string },
-): Promise<RegisterUserResponse> {
-  const response = await fetch('/api/auth/password/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...credentials, profile: data }),
-  });
-
-  return handleResponse<RegisterUserResponse>(response);
-}

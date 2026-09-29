@@ -2,18 +2,11 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { registerUser, registerWithCredentials, registerWithSession, ApiError } from '@/core/services/identity.service';
+import { registerUser, registerWithSession, ApiError } from '@/core/services/identity.service';
 import { ACCOUNT_EMAIL_FIELD, ACCOUNT_STEP } from '../config/account';
 import { REGISTRATION_FLOWS } from '../config/flows';
 import { ROLE_STEP } from '../config/roles';
-import type {
-  AccountCredentials,
-  FormValues,
-  PreviewData,
-  RegistrationAccount,
-  RegistrationKind,
-  StepDef,
-} from '../config/types';
+import type { FormValues, PreviewData, RegistrationAccount, RegistrationKind, StepDef } from '../config/types';
 import { buildRegisterRequest } from '../lib/build-request';
 import { validateStep, type FieldErrors } from '../lib/validation';
 
@@ -22,8 +15,6 @@ const EMPTY_PREVIEW: PreviewData = {
   badge: 'Tu rol',
   rows: [{ icon: 'phone' }, { icon: 'map' }, { icon: 'briefcase' }, { icon: 'clock' }],
 };
-
-const EMPTY_CREDENTIALS: AccountCredentials = { email: '', password: '', passwordConfirm: '' };
 
 /** El correo de la cuenta se muestra (solo lectura) justo después del apellido. */
 function withAccountEmail(step: StepDef): StepDef {
@@ -36,7 +27,10 @@ function withAccountEmail(step: StepDef): StepDef {
  * Estado y transiciones del registro multipaso. Orden de pasos:
  *   [cuenta] → rol → pasos de datos del rol (`flow.steps`)
  * El paso de cuenta solo existe si todavía no hay sesión (`requiresAccount`); con una sesión (Google o
- * correo que quedó a medias) se omite y nombre, apellido y correo salen de la cuenta.
+ * correo, ambos autenticados vía el popup de Auth0 en `AccountStep.tsx`) se omite y nombre, apellido y
+ * correo salen de la cuenta. Por eso, al llegar a `submit()`, siempre hay `account` o estamos en el
+ * camino de desarrollo sin Auth0 (`registerUser` con token de prueba) — nunca se arma un registro con
+ * credenciales sueltas acá.
  */
 export function useRegistrationWizard(
   initialKind?: RegistrationKind,
@@ -61,8 +55,6 @@ export function useRegistrationWizard(
   const [values, setValues] = useState<FormValues>(
     initialKind ? { ...REGISTRATION_FLOWS[initialKind].initialValues, ...prefill } : { ...prefill },
   );
-  // Las credenciales van aparte de `values`: cambiar de rol reinicia `values` y no debe borrarlas.
-  const [credentials, setCredentials] = useState<AccountCredentials>(EMPTY_CREDENTIALS);
   // Con el rol ya definido por URL se salta directo al primer paso del formulario.
   const [stepIndex, setStepIndex] = useState(hasAccountStep ? 0 : initialKind ? 1 : 0);
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -100,30 +92,14 @@ export function useRegistrationWizard(
     [kind, prefill],
   );
 
-  const clearErrors = useCallback((keys: string[]) => {
+  const updateValues = useCallback((patch: FormValues) => {
+    setValues((prev) => ({ ...prev, ...patch }));
     setErrors((prev) => {
       const next = { ...prev };
-      keys.forEach((key) => delete next[key]);
+      Object.keys(patch).forEach((key) => delete next[key]);
       return next;
     });
   }, []);
-
-  const updateValues = useCallback(
-    (patch: FormValues) => {
-      setValues((prev) => ({ ...prev, ...patch }));
-      clearErrors(Object.keys(patch));
-    },
-    [clearErrors],
-  );
-
-  const updateCredentials = useCallback(
-    (patch: Partial<AccountCredentials>) => {
-      setCredentials((prev) => ({ ...prev, ...patch }));
-      // Cambiar la contraseña invalida el error de "no coinciden" que pudiera tener la confirmación.
-      clearErrors(patch.password !== undefined ? [...Object.keys(patch), 'passwordConfirm'] : Object.keys(patch));
-    },
-    [clearErrors],
-  );
 
   const back = useCallback(() => {
     setSubmitError(undefined);
@@ -135,44 +111,24 @@ export function useRegistrationWizard(
     setSubmitting(true);
     setSubmitError(undefined);
     try {
-      const request = buildRegisterRequest(kind, values);
-      // Con sesión el token lo agrega el servidor; sin sesión y con Auth0 se crea la cuenta acá mismo;
-      // sin Auth0 (dev local) se usa el token de prueba.
-      const response = account
-        ? await registerWithSession(request)
-        : hasAccountStep
-          ? await registerWithCredentials(request, {
-              email: credentials.email.trim().toLowerCase(),
-              password: credentials.password,
-            })
-          : await registerUser(request);
+      const request = buildRegisterRequest(kind, { ...values, email: values.email ?? account?.email });
+      // Con sesión (Google o correo, ambos autenticados por el popup) el token lo agrega el servidor;
+      // sin Auth0 configurado (dev local) se usa el token de prueba.
+      const response = account ? await registerWithSession(request) : await registerUser(request);
       const query = new URLSearchParams({ name: response.firstName, publicId: String(response.publicId) });
       router.push(`/welcome?${query}`);
     } catch (err) {
-      const message = err instanceof ApiError ? err.detail ?? err.message : 'No pudimos conectarnos con el servidor. Intentá de nuevo.';
-
-      // Problemas de la cuenta (correo en uso, contraseña rechazada): se vuelve al paso donde se corrigen.
-      const accountField =
-        err instanceof ApiError
-          ? ({ email_exists: 'email', invalid_email: 'email', weak_password: 'password' } as const)[err.code as string]
-          : undefined;
-      if (accountField) {
-        setErrors({ [accountField]: message });
-        setStepIndex(0);
-      } else {
-        setSubmitError(message);
-      }
+      setSubmitError(
+        err instanceof ApiError ? err.detail ?? err.message : 'No pudimos conectarnos con el servidor. Intentá de nuevo.',
+      );
       setSubmitting(false);
     }
-  }, [kind, values, account, hasAccountStep, credentials, router]);
+  }, [kind, values, account, router]);
 
   const next = useCallback(() => {
-    if (isAccountStep) {
-      const stepErrors = validateStep(ACCOUNT_STEP, credentials);
-      setErrors(stepErrors);
-      if (Object.keys(stepErrors).length === 0) setStepIndex(kind ? roleIndex + 1 : roleIndex);
-      return;
-    }
+    // El paso de cuenta no se avanza por acá: `AccountStep` maneja su propio popup y, al terminar,
+    // recarga la página ya con sesión (deja de existir `isAccountStep`).
+    if (isAccountStep) return;
     if (isRoleStep) {
       if (kind) setStepIndex(roleIndex + 1);
       return;
@@ -185,7 +141,7 @@ export function useRegistrationWizard(
 
     if (isLastStep) void submit();
     else setStepIndex((i) => i + 1);
-  }, [isAccountStep, isRoleStep, kind, roleIndex, credentials, formStep, step, values, isLastStep, submit]);
+  }, [isAccountStep, isRoleStep, kind, roleIndex, formStep, step, values, isLastStep, submit]);
 
   return {
     kind,
@@ -197,14 +153,12 @@ export function useRegistrationWizard(
     isRoleStep,
     isLastStep,
     values,
-    credentials,
     errors,
     preview,
     submitting,
     submitError,
     selectKind,
     updateValues,
-    updateCredentials,
     next,
     back,
   };

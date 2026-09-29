@@ -30,6 +30,11 @@ public class RegisterUserRequest
     [RegularExpression(PhoneNumberRules.Pattern, ErrorMessage = PhoneNumberRules.ErrorMessage)]
     public string PhoneNumber { get; set; } = string.Empty;
 
+    /// <summary>Correo del usuario, informado por el frontend (sesión de Google u onboarding). No se valida contra el token.</summary>
+    [EmailAddress(ErrorMessage = "Ingresá un correo válido.")]
+    [MaxLength(254)]
+    public string? Email { get; set; }
+
     // Producer-specific attributes (ignorado cuando UserType == Professional)
     public ProducerType? ProducerType { get; set; }
 

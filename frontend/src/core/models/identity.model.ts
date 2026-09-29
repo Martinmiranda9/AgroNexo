@@ -22,6 +22,7 @@ export interface RegisterUserRequest {
   documentNumber?: string;
   /** WhatsApp en formato internacional, ej: +5493511234567. */
   phoneNumber: string;
+  email?: string;
   // Productor
   producerType?: ProducerType;
   hectaresRange?: HectaresRange;

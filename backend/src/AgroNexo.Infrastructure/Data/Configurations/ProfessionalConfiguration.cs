@@ -30,6 +30,9 @@ public class ProfessionalConfiguration : IEntityTypeConfiguration<Professional>
         builder.Property(p => p.DocumentNumber)
             .HasMaxLength(50);
 
+        builder.Property(p => p.Email)
+            .HasMaxLength(254);
+
         builder.Property(p => p.Role)
             .IsRequired()
             .HasConversion<int>();

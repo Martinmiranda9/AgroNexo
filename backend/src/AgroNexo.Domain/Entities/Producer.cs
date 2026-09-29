@@ -15,6 +15,9 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
     public string LastName { get; private set; } = string.Empty;
     public string DocumentNumber { get; private set; } = string.Empty;
 
+    /// <summary>Correo del productor, informado por el frontend (sesión de Google u onboarding). Nullable por registros existentes.</summary>
+    public string? Email { get; private set; }
+
     /// <summary>
     /// Ubicación geográfica del productor para el sistema de matching por zona.
     /// </summary>
@@ -67,7 +70,8 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
         string? city = null,
         string? phoneNumber = null,
         HectaresRange? hectaresRange = null,
-        IEnumerable<ProfessionalRole>? lookingFor = null)
+        IEnumerable<ProfessionalRole>? lookingFor = null,
+        string? email = null)
     {
         if (tenantId == Guid.Empty)
             throw new DomainValidationException(nameof(TenantId), "El TenantId es obligatorio.");
@@ -94,11 +98,12 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
         PhoneNumber = ValidatePhone(phoneNumber);
         HectaresRange = ValidateHectares(hectaresRange);
         LookingFor = NormalizeLookingFor(lookingFor);
+        Email = string.IsNullOrWhiteSpace(email) ? null : email.Trim();
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
     }
 
-    public void UpdateProfile(string firstName, string lastName, string documentNumber, ProducerType? producerType = null, string? country = null, string? province = null, string? city = null, string? phoneNumber = null, HectaresRange? hectaresRange = null, IEnumerable<ProfessionalRole>? lookingFor = null)
+    public void UpdateProfile(string firstName, string lastName, string documentNumber, ProducerType? producerType = null, string? country = null, string? province = null, string? city = null, string? phoneNumber = null, HectaresRange? hectaresRange = null, IEnumerable<ProfessionalRole>? lookingFor = null, string? email = null)
     {
         if (string.IsNullOrWhiteSpace(firstName))
             throw new DomainValidationException(nameof(FirstName), "El nombre del productor no puede estar vacío.");
@@ -116,6 +121,7 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
         PhoneNumber = ValidatePhone(phoneNumber);
         HectaresRange = ValidateHectares(hectaresRange);
         LookingFor = NormalizeLookingFor(lookingFor);
+        Email = string.IsNullOrWhiteSpace(email) ? null : email.Trim();
         MarkUpdated();
     }
 

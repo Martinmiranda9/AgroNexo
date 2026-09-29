@@ -80,7 +80,8 @@ public class RegisterUserUseCase : IRegisterUserUseCase
                 request.City,
                 request.PhoneNumber,
                 request.HectaresRange,
-                request.LookingFor);
+                request.LookingFor,
+                request.Email);
 
             await _producerRepository.AddAsync(producer, cancellationToken);
             userId = producer.Id;
@@ -105,7 +106,8 @@ public class RegisterUserUseCase : IRegisterUserUseCase
                 request.MaxCapacity,
                 coveragePolygon,
                 phoneNumber: request.PhoneNumber,
-                licenseNumber: request.LicenseNumber);
+                licenseNumber: request.LicenseNumber,
+                email: request.Email);
 
             await _professionalRepository.AddAsync(professional, cancellationToken);
             userId = professional.Id;

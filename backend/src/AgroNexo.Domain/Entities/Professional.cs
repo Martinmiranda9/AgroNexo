@@ -15,6 +15,9 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
     public string FirstName { get; private set; } = string.Empty;
     public string LastName { get; private set; } = string.Empty;
     public string DocumentNumber { get; private set; } = string.Empty;
+
+    /// <summary>Correo del profesional, informado por el frontend (sesión de Google u onboarding). Nullable por registros existentes.</summary>
+    public string? Email { get; private set; }
     public ProfessionalRole Role { get; private set; } = ProfessionalRole.Agronomist;
     public string Specialty { get; private set; } = string.Empty;
 
@@ -59,7 +62,8 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
         Geometry? coverageArea = null,
         bool isVerified = false,
         string? phoneNumber = null,
-        string? licenseNumber = null)
+        string? licenseNumber = null,
+        string? email = null)
     {
         if (tenantId == Guid.Empty)
             throw new DomainValidationException(nameof(TenantId), "El TenantId es obligatorio.");
@@ -93,6 +97,7 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
         IsVerified = isVerified;
         PhoneNumber = ValidatePhone(phoneNumber);
         LicenseNumber = NormalizeLicense(licenseNumber);
+        Email = string.IsNullOrWhiteSpace(email) ? null : email.Trim();
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
     }
@@ -107,7 +112,8 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
         int maxCapacity,
         Geometry? coverageArea = null,
         string? phoneNumber = null,
-        string? licenseNumber = null)
+        string? licenseNumber = null,
+        string? email = null)
     {
         if (string.IsNullOrWhiteSpace(firstName))
             throw new DomainValidationException(nameof(FirstName), "El nombre del profesional no puede estar vacío.");
@@ -135,6 +141,7 @@ public class Professional : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISo
 
         PhoneNumber = ValidatePhone(phoneNumber);
         LicenseNumber = NormalizeLicense(licenseNumber);
+        Email = string.IsNullOrWhiteSpace(email) ? null : email.Trim();
         MarkUpdated();
     }
 

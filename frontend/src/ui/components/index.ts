@@ -15,3 +15,4 @@ export { default as Avatar } from './Avatar';
 export { default as IconContainer } from './IconContainer';
 export { default as BrandGradient } from './BrandGradient';
 export { default as GoogleButton } from './GoogleButton';
+export { default as VerificationBanner } from './VerificationBanner';

@@ -30,6 +30,9 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Producer>
         builder.Property(p => p.DocumentNumber)
             .HasMaxLength(50);
 
+        builder.Property(p => p.Email)
+            .HasMaxLength(254);
+
         builder.Property(p => p.PhoneNumber)
             .IsRequired()
             .HasMaxLength(20)

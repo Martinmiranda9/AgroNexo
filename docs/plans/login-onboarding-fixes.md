@@ -171,6 +171,37 @@ Notion, Airbnb, Spotify y Stripe comparten el patrón: **login y registro son en
 
 Tests nuevos: `tests/unit/onboarding-account.test.ts` (validación de cuenta, contraseñas, `safeReturnTo`).
 
+### Actualización (2026-09-28)
+- **Tarea 6 (correo en backend) — hecha.** `Producer`/`Professional` ahora tienen `Email` (nullable, sin índice único). El frontend lo manda como campo normal del body de `/identity/register` (no se extrae de un claim de Auth0 — hubiera requerido una Auth0 Action; se optó por el camino simple). Migración `AddEmailToProducerAndProfessional` generada y **aplicada** contra la base de Docker.
+- **Banner de verificación — hecho.** `ui/components/VerificationBanner.tsx`, montado en `/welcome`. Verde si `emailVerified`, rojo con "Reenviar mail"/"Ya verifiqué" si no, oculto si entró por Google o si la Management API no está configurada. Depende de `AUTH0_MGMT_CLIENT_ID/SECRET` (pendiente, ver más abajo).
+- **Bug encontrado y arreglado probando el popup:** `PopupComplete.tsx` cerraba `window` sin chequear que fuera un popup real (`window.opener`); en el camino de fallback (sin `BroadcastChannel`, o popup bloqueado) cerraba la pestaña principal del usuario en vez de solo redirigir. Corregido: `window.close()` ahora solo se llama si `window.opener` existe.
+- **Bloqueador externo duro:** el tenant de Auth0 configurado en `.env.local` (`agroconnect-dev.us.auth0.com`) devuelve 404 en `/.well-known/openid-configuration` — no existe o está inalcanzable. Bloquea TODO login real (Google, correo, mail de verificación) hasta que se resuelva desde el dashboard de Auth0.
+
+### Actualización (2026-09-29): login/registro por correo migrado a Authorization Code
+Auth0 bloquea el "Resource Owner Password Grant" a nivel de plataforma para tenants nuevos: la casilla
+"Password" en Grant Types del dashboard queda marcable pero no tiene efecto real — devuelve
+`access_denied` siempre, con cualquier configuración. Confirmado con `curl` directo contra `/oauth/token`,
+probando con y sin `audience`, con un usuario recién creado y contraseña válida en el primer intento, y
+descartando Suspicious IP Throttling, Brute-force Protection, Default Directory, RBAC y el método de
+autenticación del cliente como causa.
+
+Se cambió el login y registro por correo para que usen el mismo mecanismo de popup que Google
+(`core/auth/google-sign-in.ts`, ahora con `startEmailSignIn`), contra la pantalla hosteada de Auth0 con
+`login_hint`/`screen_hint=signup`, en vez de intercambiar credenciales directo desde el servidor. Se
+eliminaron `app/api/auth/password/{login,register}` y `loginWithPassword`/`signupWithPassword` de
+`auth0-password.ts` (quedó `requestPasswordReset`, que no depende de ese grant). El paso "Tu cuenta" del
+wizard (`AccountStep.tsx`) ya no pide ni valida contraseña, solo el correo.
+
+Bug encontrado en el camino: `AccountStep` tenía un `<form>` propio anidado dentro del `<form>` del
+wizard — HTML inválido; el submit del botón de correo terminaba disparando el `onSubmit` del wizard en
+vez del propio. Corregido usando un botón `type="button"` en vez de un segundo `<form>`.
+
+Verificado en el navegador con la Auth0 real: el flujo llega a `/api/auth/login?...&screen_hint=signup&login_hint=...` con 302 hacia Auth0, igual que Google.
+
+Nota de seguridad: durante el diagnóstico se puso "Suspicious IP Throttling" en modo Monitoring (no
+bloquea) para poder probar — **falta volverlo a "Active" antes de producción** (Security → Attack
+Protection en el dashboard de Auth0). Brute-force Protection se reactivó.
+
 ### Pendiente / decisiones
 1. **Contraseña con Google.** Hoy Google no pide contraseña. Si se quiere que igual cree una, hay que enlazar una identidad de base de datos a la cuenta de Google en Auth0 (Management API, account linking): es otro alcance.
 2. **UI de verificación de correo.** El dashboard es un placeholder (`return null`), así que no hay dónde montar el banner "Verificá tu correo" / "Reenviar" / "Ya verifiqué". La lógica y las rutas están listas; falta el componente cuando exista el layout autenticado. Falta definir política: bloquear el dashboard hasta verificar, o solo avisar.

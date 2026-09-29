@@ -38,7 +38,8 @@ public class RegisterUserUseCaseTests
             FirstName = "Esteban",
             LastName = "Quito",
             DocumentNumber = "20-99887766-5",
-            PhoneNumber = "+5493511234567"
+            PhoneNumber = "+5493511234567",
+            Email = "esteban@example.com"
         };
 
         _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|producer1", It.IsAny<CancellationToken>()))
@@ -70,7 +71,7 @@ public class RegisterUserUseCaseTests
         response.UserId.Should().NotBeEmpty();
 
         _tenantRepoMock.Verify(r => r.AddAsync(It.Is<Tenant>(t => t.Name == "Workspace de Esteban Quito"), It.IsAny<CancellationToken>()), Times.Once);
-        _producerRepoMock.Verify(r => r.AddAsync(It.Is<Producer>(p => p.FirstName == "Esteban" && p.Auth0UserId == "auth0|producer1"), It.IsAny<CancellationToken>()), Times.Once);
+        _producerRepoMock.Verify(r => r.AddAsync(It.Is<Producer>(p => p.FirstName == "Esteban" && p.Auth0UserId == "auth0|producer1" && p.Email == "esteban@example.com"), It.IsAny<CancellationToken>()), Times.Once);
         _professionalRepoMock.Verify(r => r.AddAsync(It.IsAny<Professional>(), It.IsAny<CancellationToken>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -90,7 +91,8 @@ public class RegisterUserUseCaseTests
             YearsExperience = 7,
             MaxCapacity = 30,
             PhoneNumber = "+5493511234567",
-            LicenseNumber = "MP-1234"
+            LicenseNumber = "MP-1234",
+            Email = "luciana@example.com"
         };
 
         _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|pro1", It.IsAny<CancellationToken>()))
@@ -121,7 +123,7 @@ public class RegisterUserUseCaseTests
         response.Specialty.Should().Be("Siembra Directa");
 
         _tenantRepoMock.Verify(r => r.AddAsync(It.Is<Tenant>(t => t.Name == "Workspace de Luciana Fernandez"), It.IsAny<CancellationToken>()), Times.Once);
-        _professionalRepoMock.Verify(r => r.AddAsync(It.Is<Professional>(p => p.Specialty == "Siembra Directa" && p.YearsExperience == 7), It.IsAny<CancellationToken>()), Times.Once);
+        _professionalRepoMock.Verify(r => r.AddAsync(It.Is<Professional>(p => p.Specialty == "Siembra Directa" && p.YearsExperience == 7 && p.Email == "luciana@example.com"), It.IsAny<CancellationToken>()), Times.Once);
         _producerRepoMock.Verify(r => r.AddAsync(It.IsAny<Producer>(), It.IsAny<CancellationToken>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -286,6 +288,25 @@ public class RegisterUserUseCaseTests
         response.LicenseNumber.Should().BeNull();
         _producerRepoMock.Verify(r => r.AddAsync(
             It.Is<Producer>(p => p.PhoneNumber == "+5493511234567" && p.LookingFor.Count == 2),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task RegisterUser_WithoutEmail_PersistsNullEmail()
+    {
+        SetupHappyRepos("auth0|noemail");
+        var request = new RegisterUserRequest
+        {
+            UserType = UserType.Producer,
+            FirstName = "Carlos",
+            LastName = "Perez",
+            PhoneNumber = "+5493511234567"
+        };
+
+        await _useCase.ExecuteAsync(request, "auth0|noemail");
+
+        _producerRepoMock.Verify(r => r.AddAsync(
+            It.Is<Producer>(p => p.Email == null),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 }

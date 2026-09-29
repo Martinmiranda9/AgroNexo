@@ -16,6 +16,7 @@ export function buildRegisterRequest(kind: RegistrationKind, v: FormValues): Reg
     lastName: v.lastName.trim(),
     documentNumber: clean(v.documentNumber),
     phoneNumber: normalizePhone(v.phoneNumber),
+    email: clean(v.email),
   };
 
   if (kind === 'producer') {

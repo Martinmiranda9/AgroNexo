@@ -1,57 +1,79 @@
 'use client';
 
-import { useState } from 'react';
-import { WarningCircle } from '@phosphor-icons/react';
+import { useId, useState } from 'react';
+import { EnvelopeSimple, WarningCircle } from '@phosphor-icons/react';
+import { Button, Input } from '@/ui/components';
 import GoogleButton from '@/ui/components/GoogleButton';
-import { startGoogleSignIn } from '@/core/auth/google-sign-in';
-import type { AccountCredentials, StepDef } from '../config/types';
-import type { FieldErrors } from '../lib/validation';
-import StepFields from './StepFields';
+import { startEmailSignIn, startGoogleSignIn } from '@/core/auth/google-sign-in';
 
-const GOOGLE_ERRORS: Record<string, string> = {
-  access_denied: 'No pudimos completar el acceso con Google. Probá de nuevo.',
+const ERRORS: Record<string, string> = {
+  access_denied: 'No pudimos completar el acceso. Probá de nuevo.',
 };
 
-interface AccountStepProps {
-  step: StepDef;
-  credentials: AccountCredentials;
-  errors: FieldErrors;
-  onChange: (patch: Partial<AccountCredentials>) => void;
-}
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /**
- * Paso "Tu cuenta": Google (popup) o correo y contraseña con confirmación. Con Google, al terminar la
- * página se recarga con la sesión activa y el wizard arranca ya con nombre, apellido y correo cargados.
+ * Paso "Tu cuenta": Google o correo, ambos en un popup con la pantalla hosteada de Auth0 (ahí se pide o
+ * crea la contraseña — Auth0 no permite intercambiar credenciales directo desde nuestro servidor para
+ * tenants nuevos). Al terminar, la página se recarga con la sesión activa y el wizard sigue con nombre,
+ * apellido y correo ya cargados.
  */
-export default function AccountStep({ step, credentials, errors, onChange }: AccountStepProps) {
+export default function AccountStep() {
+  const emailId = useId();
+  const [email, setEmail] = useState('');
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [googleError, setGoogleError] = useState<string>();
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [error, setError] = useState<string>();
+  const [emailError, setEmailError] = useState<string>();
+
+  const reload = () => window.location.assign(`${window.location.pathname}${window.location.search}`);
 
   const handleGoogle = () => {
     setGoogleLoading(true);
-    setGoogleError(undefined);
+    setError(undefined);
     startGoogleSignIn({
-      // Recarga la misma URL (conserva ?type=): el servidor ahora ve la sesión y prellena los datos.
-      onSuccess: () => window.location.assign(`${window.location.pathname}${window.location.search}`),
+      onSuccess: reload,
       onError: (code) => {
-        setGoogleError(GOOGLE_ERRORS[code] ?? 'No pudimos completar el acceso con Google. Probá de nuevo.');
+        setError(ERRORS[code] ?? ERRORS.access_denied);
         setGoogleLoading(false);
       },
       onCancel: () => setGoogleLoading(false),
     });
   };
 
+  const handleEmail = () => {
+    if (!EMAIL_PATTERN.test(email.trim())) {
+      setEmailError('Ingresá un correo válido.');
+      return;
+    }
+    setEmailError(undefined);
+    setEmailLoading(true);
+    setError(undefined);
+    startEmailSignIn(
+      email.trim(),
+      {
+        onSuccess: reload,
+        onError: (code) => {
+          setError(ERRORS[code] ?? ERRORS.access_denied);
+          setEmailLoading(false);
+        },
+        onCancel: () => setEmailLoading(false),
+      },
+      { signup: true },
+    );
+  };
+
   return (
     <div className="flex flex-col gap-5">
       <GoogleButton loading={googleLoading} onClick={handleGoogle} />
 
-      {googleError && (
+      {error && (
         <p
           role="alert"
           className="border-danger/30 bg-danger/5 text-danger flex items-start gap-2 rounded-xl border px-3.5 py-3 text-body-sm"
         >
           <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
-          {googleError}
+          {error}
         </p>
       )}
 
@@ -61,12 +83,32 @@ export default function AccountStep({ step, credentials, errors, onChange }: Acc
         <div className="bg-pine/10 h-px flex-1" />
       </div>
 
-      <StepFields
-        fields={step.fields}
-        values={{ ...credentials }}
-        errors={errors}
-        onChange={(patch) => onChange(patch as Partial<AccountCredentials>)}
-      />
+      {/* No es un <form>: ya está dentro del <form> del wizard (RegistrationWizard.tsx) y los formularios
+          anidados son HTML inválido — el submit del botón terminaba disparando el del wizard, no este. */}
+      <div className="flex flex-col gap-4">
+        <Input
+          id={emailId}
+          label="Correo"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          placeholder="tu@correo.com"
+          className="h-12"
+          leftIcon={<EnvelopeSimple size={16} />}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleEmail();
+            }
+          }}
+          error={emailError}
+        />
+        <Button type="button" variant="outline" size="lg" fullWidth loading={emailLoading} onClick={handleEmail}>
+          Continuar con correo
+        </Button>
+      </div>
     </div>
   );
 }

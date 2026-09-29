@@ -41,14 +41,12 @@ export default function RegistrationWizard({
     isRoleStep,
     isLastStep,
     values,
-    credentials,
     errors,
     preview,
     submitting,
     submitError,
     selectKind,
     updateValues,
-    updateCredentials,
     next,
     back,
   } = useRegistrationWizard(initialKind, account, requiresAccount);
@@ -114,7 +112,7 @@ export default function RegistrationWizard({
                     transition={{ duration: 0.3, ease: EASE }}
                   >
                     {isAccountStep ? (
-                      <AccountStep step={step} credentials={credentials} errors={errors} onChange={updateCredentials} />
+                      <AccountStep />
                     ) : isRoleStep ? (
                       <RoleStep value={kind} onChange={selectKind} labelledBy={TITLE_ID} />
                     ) : (
@@ -138,31 +136,35 @@ export default function RegistrationWizard({
                   </p>
                 )}
 
-                <div className="mt-auto flex gap-3">
-                  {stepIndex > 0 && (
+                {/* El paso de cuenta tiene sus propios botones (Google / correo, cada uno abre un popup);
+                    no hay nada que "continuar" acá hasta que termine y la página se recargue con sesión. */}
+                {!isAccountStep && (
+                  <div className="mt-auto flex gap-3">
+                    {stepIndex > 0 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="lg"
+                        aria-label="Volver al paso anterior"
+                        onClick={back}
+                        disabled={submitting}
+                        className="w-14 shrink-0 px-0"
+                      >
+                        <CaretLeft size={18} weight="bold" />
+                      </Button>
+                    )}
                     <Button
-                      type="button"
-                      variant="outline"
+                      type="submit"
                       size="lg"
-                      aria-label="Volver al paso anterior"
-                      onClick={back}
-                      disabled={submitting}
-                      className="w-14 shrink-0 px-0"
+                      fullWidth
+                      loading={submitting}
+                      disabled={isRoleStep && !kind}
                     >
-                      <CaretLeft size={18} weight="bold" />
+                      {isLastStep && flow ? flow.submitLabel : 'Continuar'}
+                      {!isLastStep && <ArrowRight size={16} weight="bold" />}
                     </Button>
-                  )}
-                  <Button
-                    type="submit"
-                    size="lg"
-                    fullWidth
-                    loading={submitting}
-                    disabled={isRoleStep && !kind}
-                  >
-                    {isLastStep && flow ? flow.submitLabel : 'Continuar'}
-                    {!isLastStep && <ArrowRight size={16} weight="bold" />}
-                  </Button>
-                </div>
+                  </div>
+                )}
               </form>
             </div>
           </div>

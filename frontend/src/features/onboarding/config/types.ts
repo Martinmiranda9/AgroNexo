@@ -3,13 +3,6 @@ export type RegistrationKind = 'producer' | 'agronomist' | 'accountant' | 'lawye
 /** Valores del formulario: todo string; se convierte al armar el request. */
 export type FormValues = Record<string, string>;
 
-/** Credenciales que se piden en el paso "Tu cuenta". No van al backend: solo a Auth0 vía `/api/auth/password/register`. */
-export type AccountCredentials = {
-  email: string;
-  password: string;
-  passwordConfirm: string;
-};
-
 /** Cuenta ya autenticada (Google o email) con la que se completa el registro. */
 export interface RegistrationAccount {
   email?: string;
