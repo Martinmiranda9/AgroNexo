@@ -29,8 +29,7 @@ services:
       ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=${POSTGRES_DB:-agronexo_db};Username=${POSTGRES_USER:-agronexo};Password=${POSTGRES_PASSWORD}
       Database__MigrateOnStartup: "true"
       Https__DisableRedirection: "true" # el TLS lo termina el proxy
-      Auth0__Domain: ${AUTH0_DOMAIN:?definí AUTH0_DOMAIN en .env}
-      Auth0__Audience: ${AUTH0_AUDIENCE:?definí AUTH0_AUDIENCE en .env}
+      Firebase__ProjectId: ${FIREBASE_PROJECT_ID:?definí FIREBASE_PROJECT_ID en .env}
       Cors__AllowedOrigins__0: ${FRONTEND_ORIGIN:?definí FRONTEND_ORIGIN en .env}
     ports:
       # Localhost: en el VPS se publica a través de nginx/Caddy, no directo.

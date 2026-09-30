@@ -4,63 +4,60 @@ import { useId, useState } from 'react';
 import { EnvelopeSimple, WarningCircle } from '@phosphor-icons/react';
 import { Button, Input } from '@/ui/components';
 import GoogleButton from '@/ui/components/GoogleButton';
-import { startEmailSignIn, startGoogleSignIn } from '@/core/auth/google-sign-in';
-
-const ERRORS: Record<string, string> = {
-  access_denied: 'No pudimos completar el acceso. Probá de nuevo.',
-};
+import PasswordField from './PasswordField';
+import { firebaseErrorMessage, isUserCancelled, signInWithGoogle, signUpWithEmail } from '@/core/auth/firebase-actions';
+import { passwordStrengthError } from '@/core/auth/password-rules';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /**
- * Paso "Tu cuenta": Google o correo, ambos en un popup con la pantalla hosteada de Auth0 (ahí se pide o
- * crea la contraseña — Auth0 no permite intercambiar credenciales directo desde nuestro servidor para
- * tenants nuevos). Al terminar, la página se recarga con la sesión activa y el wizard sigue con nombre,
- * apellido y correo ya cargados.
+ * Paso "Tu cuenta": Google (popup nativo de Firebase) o correo + contraseña + repetir, creados
+ * directo con el SDK de cliente de Firebase — sin redirección a una pantalla ajena. Al terminar, la
+ * página se recarga con la sesión activa y el wizard sigue con nombre, apellido y correo ya cargados.
  */
 export default function AccountStep() {
   const emailId = useId();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [googleLoading, setGoogleLoading] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
   const [error, setError] = useState<string>();
-  const [emailError, setEmailError] = useState<string>();
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
 
   const reload = () => window.location.assign(`${window.location.pathname}${window.location.search}`);
 
-  const handleGoogle = () => {
+  const handleGoogle = async () => {
     setGoogleLoading(true);
     setError(undefined);
-    startGoogleSignIn({
-      onSuccess: reload,
-      onError: (code) => {
-        setError(ERRORS[code] ?? ERRORS.access_denied);
-        setGoogleLoading(false);
-      },
-      onCancel: () => setGoogleLoading(false),
-    });
+    try {
+      await signInWithGoogle();
+      reload();
+    } catch (err) {
+      if (!isUserCancelled(err)) setError(firebaseErrorMessage(err));
+      setGoogleLoading(false);
+    }
   };
 
-  const handleEmail = () => {
-    if (!EMAIL_PATTERN.test(email.trim())) {
-      setEmailError('Ingresá un correo válido.');
-      return;
-    }
-    setEmailError(undefined);
+  const handleEmail = async () => {
+    const errors: typeof fieldErrors = {};
+    if (!EMAIL_PATTERN.test(email.trim())) errors.email = 'Ingresá un correo válido.';
+    const passwordError = passwordStrengthError(password);
+    if (passwordError) errors.password = passwordError;
+    if (password !== confirmPassword) errors.confirmPassword = 'Las contraseñas no coinciden.';
+
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
     setEmailLoading(true);
     setError(undefined);
-    startEmailSignIn(
-      email.trim(),
-      {
-        onSuccess: reload,
-        onError: (code) => {
-          setError(ERRORS[code] ?? ERRORS.access_denied);
-          setEmailLoading(false);
-        },
-        onCancel: () => setEmailLoading(false),
-      },
-      { signup: true },
-    );
+    try {
+      await signUpWithEmail(email.trim(), password);
+      reload();
+    } catch (err) {
+      setError(firebaseErrorMessage(err));
+      setEmailLoading(false);
+    }
   };
 
   return (
@@ -97,16 +94,22 @@ export default function AccountStep() {
           leftIcon={<EnvelopeSimple size={16} />}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleEmail();
-            }
-          }}
-          error={emailError}
+          error={fieldErrors.email}
+        />
+        <PasswordField
+          field={{ kind: 'password', name: 'password', label: 'Contraseña', autoComplete: 'new-password' }}
+          value={password}
+          error={fieldErrors.password}
+          onChange={setPassword}
+        />
+        <PasswordField
+          field={{ kind: 'password', name: 'confirmPassword', label: 'Repetir contraseña', confirms: 'password', autoComplete: 'new-password' }}
+          value={confirmPassword}
+          error={fieldErrors.confirmPassword}
+          onChange={setConfirmPassword}
         />
         <Button type="button" variant="outline" size="lg" fullWidth loading={emailLoading} onClick={handleEmail}>
-          Continuar con correo
+          Crear cuenta
         </Button>
       </div>
     </div>

@@ -1,18 +1,18 @@
-import { getAccessToken, getSession } from '@auth0/nextjs-auth0';
+import { cookies } from 'next/headers';
 import { API_ORIGIN } from '@/core/config/api';
-import { isAuth0Configured } from './config';
-import { readPasswordSession } from './password-session';
+import { SESSION_COOKIE, isFirebaseConfigured } from './config';
+import { verifyFirebaseIdToken } from './firebase-verify';
 
-/** Datos de la identidad que Google/Auth0 ya conocen, para prellenar el registro. */
+/** Datos de la identidad que Firebase ya conoce, para prellenar el registro. */
 export interface SessionUser {
-  /** `sub` de Auth0 (ej: `auth0|123`, `google-oauth2|456`). */
+  /** `sub` del token de Firebase: el UID del usuario. */
   id: string;
   email?: string;
   emailVerified?: boolean;
   firstName?: string;
   lastName?: string;
   picture?: string;
-  /** `google-oauth2` si entró con Google; `auth0` si entró con email y contraseña. */
+  /** `google.com` si entró con Google; `password` si entró con correo y contraseña. */
   provider: string;
 }
 
@@ -23,53 +23,36 @@ export interface CurrentUser {
   firstName?: string;
 }
 
-/** Sesión actual o `null` (sin login, o Auth0 sin configurar). */
+function splitName(name?: string): { firstName?: string; lastName?: string } {
+  if (!name) return {};
+  const [firstName, ...rest] = name.trim().split(/\s+/);
+  return { firstName, lastName: rest.join(' ') || undefined };
+}
+
+/** Sesión actual o `null` (sin login, cookie vencida/inválida, o Firebase sin configurar). */
 export async function getSessionUser(): Promise<SessionUser | null> {
-  if (!isAuth0Configured()) return null;
+  if (!isFirebaseConfigured()) return null;
 
-  // Sesión del formulario propio (correo y contraseña) o, si no hay, la de Google vía Auth0.
-  const own = await readPasswordSession();
-  if (own) {
-    return {
-      id: own.sub,
-      email: own.email,
-      emailVerified: own.emailVerified,
-      firstName: own.firstName,
-      lastName: own.lastName,
-      picture: own.picture,
-      provider: own.sub.split('|')[0] || 'auth0',
-    };
-  }
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  if (!token) return null;
 
-  const session = await getSession();
-  const user = session?.user;
-  if (!user) return null;
+  const payload = await verifyFirebaseIdToken(token);
+  if (!payload) return null;
 
-  // Con email/contraseña Auth0 no separa nombre y apellido: solo Google los trae.
   return {
-    id: String(user.sub ?? ''),
-    email: user.email,
-    emailVerified: user.email_verified,
-    firstName: user.given_name,
-    lastName: user.family_name,
-    picture: user.picture,
-    provider: String(user.sub ?? '').split('|')[0] || 'auth0',
+    id: payload.sub,
+    email: payload.email,
+    emailVerified: payload.email_verified,
+    ...splitName(payload.name),
+    picture: payload.picture,
+    provider: payload.firebase?.sign_in_provider ?? 'password',
   };
 }
 
-/** Access token para el backend, o `undefined` si no hay sesión. */
+/** ID token para el backend, o `undefined` si no hay sesión. Es el mismo valor que guarda la cookie. */
 export async function getBackendToken(): Promise<string | undefined> {
-  if (!isAuth0Configured()) return undefined;
-
-  const own = await readPasswordSession();
-  if (own) return own.accessToken;
-
-  try {
-    const { accessToken } = await getAccessToken();
-    return accessToken;
-  } catch {
-    return undefined;
-  }
+  if (!isFirebaseConfigured()) return undefined;
+  return (await cookies()).get(SESSION_COOKIE)?.value;
 }
 
 /**

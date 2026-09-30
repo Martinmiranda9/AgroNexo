@@ -27,9 +27,9 @@ function withAccountEmail(step: StepDef): StepDef {
  * Estado y transiciones del registro multipaso. Orden de pasos:
  *   [cuenta] → rol → pasos de datos del rol (`flow.steps`)
  * El paso de cuenta solo existe si todavía no hay sesión (`requiresAccount`); con una sesión (Google o
- * correo, ambos autenticados vía el popup de Auth0 en `AccountStep.tsx`) se omite y nombre, apellido y
+ * correo, ambos autenticados contra Firebase en `AccountStep.tsx`) se omite y nombre, apellido y
  * correo salen de la cuenta. Por eso, al llegar a `submit()`, siempre hay `account` o estamos en el
- * camino de desarrollo sin Auth0 (`registerUser` con token de prueba) — nunca se arma un registro con
+ * camino de desarrollo sin Firebase (`registerUser` con token de prueba) — nunca se arma un registro con
  * credenciales sueltas acá.
  */
 export function useRegistrationWizard(
@@ -112,8 +112,8 @@ export function useRegistrationWizard(
     setSubmitError(undefined);
     try {
       const request = buildRegisterRequest(kind, { ...values, email: values.email ?? account?.email });
-      // Con sesión (Google o correo, ambos autenticados por el popup) el token lo agrega el servidor;
-      // sin Auth0 configurado (dev local) se usa el token de prueba.
+      // Con sesión (Google o correo, ambos autenticados contra Firebase) el token lo agrega el servidor;
+      // sin Firebase configurado (dev local) se usa el token de prueba.
       const response = account ? await registerWithSession(request) : await registerUser(request);
       const query = new URLSearchParams({ name: response.firstName, publicId: String(response.publicId) });
       router.push(`/welcome?${query}`);

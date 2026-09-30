@@ -2,11 +2,11 @@
 
 import { useId, useState } from 'react';
 import Link from 'next/link';
-import { CircleNotch, EnvelopeSimple, WarningCircle } from '@phosphor-icons/react';
+import { CircleNotch, EnvelopeSimple, Eye, EyeSlash, WarningCircle } from '@phosphor-icons/react';
 import BrandMark from '@/ui/components/BrandMark';
 import GoogleButton from '@/ui/components/GoogleButton';
 import { AUTH_CONTINUE_PATH } from '@/core/auth/config';
-import { startEmailSignIn, startGoogleSignIn } from '@/core/auth/google-sign-in';
+import { firebaseErrorMessage, isUserCancelled, signInWithEmail, signInWithGoogle } from '@/core/auth/firebase-actions';
 import BrandShowcasePanel from './BrandShowcasePanel';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -27,52 +27,47 @@ const COPY = {
 
 const ERROR_MESSAGES: Record<string, string> = {
   auth_not_configured: 'El acceso todavía no está configurado en este entorno.',
-  access_denied: 'No pudimos completar el acceso. Probá de nuevo.',
-  auth_failed: 'No pudimos completar el acceso con Google. Probá de nuevo.',
 };
 
 /**
- * Inicio de sesión (el registro vive en /onboarding):
- *  - Correo: abre la pantalla de Auth0 en un popup, con el correo precargado (ahí se pide la
- *    contraseña). Auth0 no permite intercambiar credenciales directo desde nuestro servidor para
- *    tenants nuevos, así que correo y Google comparten el mismo mecanismo de popup.
- *  - Google: abre la ventana de Google para elegir la cuenta y, al terminar, sigue en /auth/continue.
+ * Inicio de sesión (el registro vive en /onboarding). Google y correo+contraseña van directo contra
+ * Firebase con el SDK de cliente: sin redirección a una pantalla ajena, el formulario es el nuestro.
  */
 export default function AgroNexoAuthModal({ error }: { error?: string }) {
   const emailId = useId();
+  const passwordId = useId();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string>();
   const [googleLoading, setGoogleLoading] = useState(false);
   const copy = COPY;
-  const errorMessage =
-    formError ?? (error ? (ERROR_MESSAGES[error] ?? 'Ocurrió un error al ingresar. Probá de nuevo.') : undefined);
+  const errorMessage = formError ?? (error ? (ERROR_MESSAGES[error] ?? 'Ocurrió un error al ingresar. Probá de nuevo.') : undefined);
 
-  const handleGoogle = () => {
+  const handleGoogle = async () => {
     setGoogleLoading(true);
     setFormError(undefined);
-    startGoogleSignIn({
-      onSuccess: () => window.location.assign(AUTH_CONTINUE_PATH),
-      onError: (code) => {
-        setFormError(ERROR_MESSAGES[code] ?? ERROR_MESSAGES.auth_failed);
-        setGoogleLoading(false);
-      },
-      onCancel: () => setGoogleLoading(false),
-    });
+    try {
+      await signInWithGoogle();
+      window.location.assign(AUTH_CONTINUE_PATH);
+    } catch (err) {
+      if (!isUserCancelled(err)) setFormError(firebaseErrorMessage(err));
+      setGoogleLoading(false);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setFormError(undefined);
-    startEmailSignIn(email, {
-      onSuccess: () => window.location.assign(AUTH_CONTINUE_PATH),
-      onError: (code) => {
-        setFormError(ERROR_MESSAGES[code] ?? ERROR_MESSAGES.auth_failed);
-        setSubmitting(false);
-      },
-      onCancel: () => setSubmitting(false),
-    });
+    try {
+      await signInWithEmail(email, password);
+      window.location.assign(AUTH_CONTINUE_PATH);
+    } catch (err) {
+      setFormError(firebaseErrorMessage(err));
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -124,6 +119,32 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
                   onChange={(e) => setEmail(e.target.value)}
                   className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-10 pr-4 text-body-sm text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
                 />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor={passwordId} className="text-body-sm font-medium text-[#00311e]">
+                Contraseña
+              </label>
+              <div className="relative">
+                <input
+                  id={passwordId}
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] pl-4 pr-11 text-body-sm text-[#00311e] outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#978A56] transition-colors hover:text-[#00311e]"
+                >
+                  {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
+                </button>
               </div>
               <Link
                 href="/forgot-password"

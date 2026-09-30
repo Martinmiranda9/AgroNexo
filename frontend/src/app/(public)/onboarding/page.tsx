@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { RegistrationWizard, resolveRegistrationKind } from '@/features/onboarding';
 import BackendUnavailable from '@/features/auth/components/BackendUnavailable';
-import { isAuth0Configured } from '@/core/auth/config';
+import { isFirebaseConfigured } from '@/core/auth/config';
 import { fetchCurrentUser, getSessionUser } from '@/core/auth/server';
 
 export const metadata: Metadata = {
@@ -23,13 +23,13 @@ interface OnboardingPageProps {
  *  - ya registrado       → /dashboard
  *
  * /onboarding?type=agronomist (producer|agronomist|accountant|lawyer|investor) salta la elección de rol.
- * Sin Auth0 configurado (desarrollo local) se muestra el formulario directo, con token de desarrollo.
+ * Sin Firebase configurado (desarrollo local) se muestra el formulario directo, con token de desarrollo.
  */
 export default async function OnboardingPage({ searchParams }: OnboardingPageProps) {
   const { type } = await searchParams;
   const initialKind = resolveRegistrationKind(type);
 
-  if (!isAuth0Configured()) return <RegistrationWizard initialKind={initialKind} />;
+  if (!isFirebaseConfigured()) return <RegistrationWizard initialKind={initialKind} />;
 
   const user = await getSessionUser();
   if (!user) return <RegistrationWizard initialKind={initialKind} requiresAccount />;

@@ -51,7 +51,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// 5. Configure Authentication with Auth0 / Dev JWT Bearer
+// 5. Configure Authentication with Firebase / Dev JWT Bearer
 var devSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("AgroNexo_SuperSecret_Dev_Key_12345!_For_Local_Testing"));
 
 builder.Services.AddAuthentication(options =>
@@ -78,15 +78,17 @@ builder.Services.AddAuthentication(options =>
     }
     else
     {
-        var auth0Domain = builder.Configuration["Auth0:Domain"]
-            ?? throw new InvalidOperationException("Auth0:Domain no configurado. La aplicación no puede iniciar sin este valor.");
-        var auth0Audience = builder.Configuration["Auth0:Audience"]
-            ?? throw new InvalidOperationException("Auth0:Audience no configurado. La aplicación no puede iniciar sin este valor.");
+        // Firebase firma los ID token con RS256, pero a diferencia de Auth0 NO publica un documento de
+        // descubrimiento OIDC en su issuer (https://securetoken.google.com/{projectId}/.well-known/
+        // openid-configuration no existe) — por eso NO se setea `options.Authority` (dispararía ese
+        // descubrimiento y fallaría). Las claves se resuelven a mano contra el JWKS fijo de Google
+        // (`FirebaseJwksCache`) y el emisor/audiencia se validan de forma estática.
+        var firebaseProjectId = builder.Configuration["Firebase:ProjectId"]
+            ?? throw new InvalidOperationException("Firebase:ProjectId no configurado. La aplicación no puede iniciar sin este valor.");
 
-        var authority = auth0Domain.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? auth0Domain : $"https://{auth0Domain}/";
+        var authority = $"https://securetoken.google.com/{firebaseProjectId}";
+        var jwksCache = new FirebaseJwksCache();
 
-        options.Authority = authority;
-        options.Audience = auth0Audience;
         options.RequireHttpsMetadata = true;
 
         options.TokenValidationParameters = new TokenValidationParameters
@@ -94,10 +96,11 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuer = true,
             ValidIssuer = authority,
             ValidateAudience = true,
-            ValidAudience = auth0Audience,
+            ValidAudience = firebaseProjectId,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidAlgorithms = new[] { SecurityAlgorithms.RsaSha256 },
+            IssuerSigningKeyResolver = (_, _, _, _) => jwksCache.GetKeys(),
             NameClaimType = ClaimTypes.NameIdentifier,
             RoleClaimType = ClaimTypes.Role
         };

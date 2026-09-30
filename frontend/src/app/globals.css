@@ -16,7 +16,6 @@
   /* ── Paleta Pine & Beige (Nuevos colores principales) ── */
   --color-pine: #00311e;
   --color-pine-hover: #002617;
-  --color-pine-muted: #00311e/80;
   --color-beige: #fef7e5;
   --color-beige-dark: #f5ead4;
   --color-beige-deeper: #ede0c4;
@@ -51,31 +50,6 @@
   --text-heading-xl--font-weight: 700;
 
   --tracking-heading: -0.01em;
-}
-
-:root {
-  /* ── Paleta Base ── */
-  --bg-page: #fef7e5;
-  --bg-hero: #FFF3D5;
-  --bg-card: #FFFBF0;
-  --primary: #4D694E;
-  --primary-hover: #3F4C26;
-  --accent-mid: #728141;
-  --accent-light: #99A474;
-  --dark: #24301E;
-  --neutral-warm: #978A56;
-  --danger: #8C4A34;
-  --radius-card: 16px;
-  --radius-input: 12px;
-  --background: #fef7e5;
-  --foreground: #00311e;
-
-  /* ── Pine & Beige ── */
-  --pine: #00311e;
-  --pine-hover: #00261700;
-  --beige: #fef7e5;
-  --beige-dark: #f5ead4;
-  --beige-deeper: #ede0c4;
 }
 
 body {

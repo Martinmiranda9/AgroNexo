@@ -12,7 +12,9 @@ namespace AgroNexo.API.Controllers;
 public abstract class ApiControllerBase : ControllerBase
 {
     /// <summary>
-    /// Gets the Auth0 User ID ('sub' claim) from the authenticated principal.
+    /// Gets the external identity provider's user id ('sub' claim, now issued by Firebase) from the
+    /// authenticated principal. Property name kept as-is: it's what every repository/use case matches
+    /// against the `Auth0UserId` column, and renaming it would be a mechanical, unrelated refactor.
     /// </summary>
     protected string? CurrentAuth0UserId =>
         User.FindFirst(ClaimTypes.NameIdentifier)?.Value

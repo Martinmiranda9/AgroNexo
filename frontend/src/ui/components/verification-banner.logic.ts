@@ -5,16 +5,13 @@
 export type VerificationBannerVisibility = 'hidden' | 'verified' | 'unverified';
 
 export interface ResolveVerificationBannerArgs {
-  /** `sub` de Auth0 partido por `|` (`google-oauth2` o `auth0`). Sin sesión: `undefined`. */
+  /** `sign_in_provider` del token de Firebase (`google.com` o `password`). Sin sesión: `undefined`. */
   provider?: string;
-  /**
-   * Estado real de `email_verified` en Auth0. `undefined` cubre carga en curso, 401 (sin sesión),
-   * 503 (Management API sin configurar) y cualquier otro error: todos son un estado neutral.
-   */
+  /** `emailVerified` del usuario de Firebase. `undefined` cubre carga en curso y sin sesión: estado neutral. */
   emailVerified?: boolean;
 }
 
-const GOOGLE_PROVIDER = 'google-oauth2';
+const GOOGLE_PROVIDER = 'google.com';
 
 /**
  * - Google siempre viene verificado: el banner nunca se muestra para ese proveedor.

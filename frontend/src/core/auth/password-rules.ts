@@ -1,4 +1,4 @@
-/** Mismas reglas que aplica Auth0 en su política "Good" y el mensaje de `signupWithPassword`. */
+/** Reglas propias de UX; Firebase solo exige 6 caracteres como mínimo, esto es más estricto a propósito. */
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 128;
 

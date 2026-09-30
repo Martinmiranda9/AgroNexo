@@ -27,7 +27,7 @@ export default function RegistrationWizard({
   initialKind?: RegistrationKind;
   /** Cuenta ya autenticada: prellena nombre, apellido y correo y registra con su sesión. */
   account?: RegistrationAccount;
-  /** Sin sesión y con Auth0 activo: el wizard empieza con el paso "Tu cuenta" (Google o correo y contraseña). */
+  /** Sin sesión y con Firebase activo: el wizard empieza con el paso "Tu cuenta" (Google o correo y contraseña). */
   requiresAccount?: boolean;
 }) {
   const reduce = useReducedMotion();
@@ -64,7 +64,7 @@ export default function RegistrationWizard({
               <p className="border-pine/10 bg-beige text-primary mt-6 flex flex-wrap items-center gap-x-1.5 rounded-xl border px-3.5 py-2.5 text-caption">
                 <CheckCircle size={16} weight="fill" className="text-primary shrink-0" />
                 <span>
-                  Cuenta {account.provider === 'google-oauth2' ? 'de Google' : ''}{' '}
+                  Cuenta {account.provider === 'google.com' ? 'de Google' : ''}{' '}
                   <strong className="text-pine font-semibold">{account.email}</strong>
                 </span>
                 <a

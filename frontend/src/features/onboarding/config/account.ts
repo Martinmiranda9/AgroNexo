@@ -3,7 +3,7 @@ import type { FieldDef, StepDef } from './types';
 export const ACCOUNT_STEP_ID = 'account';
 
 /**
- * Primer paso cuando todavía no hay sesión: Google o correo, ambos vía el popup de Auth0
+ * Primer paso cuando todavía no hay sesión: Google o correo y contraseña, ambos contra Firebase
  * (`AccountStep.tsx`, que maneja su propio formulario) — por eso `fields` queda vacío, no lo arma
  * `StepFields` como el resto de los pasos.
  */

@@ -8,7 +8,7 @@ export interface RegistrationAccount {
   email?: string;
   firstName?: string;
   lastName?: string;
-  /** `google-oauth2` si entró con Google. */
+  /** `google.com` si entró con Google, `password` si entró con correo y contraseña. */
   provider: string;
 }
 

@@ -4,6 +4,7 @@ import { useId, useState } from 'react';
 import Link from 'next/link';
 import { CheckCircle, CircleNotch, WarningCircle } from '@phosphor-icons/react';
 import BrandMark from '@/ui/components/BrandMark';
+import { sendPasswordReset } from '@/core/auth/firebase-actions';
 
 export default function ForgotPasswordForm() {
   const emailId = useId();
@@ -16,20 +17,10 @@ export default function ForgotPasswordForm() {
     setStatus('sending');
     setError(undefined);
     try {
-      const res = await fetch('/api/auth/password/forgot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      if (!res.ok) {
-        const body = (await res.json().catch(() => ({}))) as { message?: string };
-        setError(body.message ?? 'No pudimos enviar el correo. Probá de nuevo.');
-        setStatus('idle');
-        return;
-      }
+      await sendPasswordReset(email);
       setStatus('sent');
     } catch {
-      setError('No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.');
+      setError('No pudimos enviar el correo. Probá de nuevo.');
       setStatus('idle');
     }
   };
