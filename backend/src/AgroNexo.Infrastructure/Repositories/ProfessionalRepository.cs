@@ -27,8 +27,13 @@ public class ProfessionalRepository : IProfessionalRepository
         if (string.IsNullOrWhiteSpace(auth0UserId))
             return null;
 
+        // IgnoreQueryFilters is required here: this lookup is what RESOLVES the tenant for a given
+        // identity (TenantMiddleware, GetCurrentUserUseCase, duplicate-check on register), so it runs
+        // before CurrentTenantId is known. With the tenant-scoped query filter applied, CurrentTenantId
+        // defaults to Guid.Empty and this would never match any real row.
         var normalizedAuth0Id = auth0UserId.Trim();
         return await _context.Professionals
+            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(p => p.Auth0UserId == normalizedAuth0Id && p.IsActive, cancellationToken);
     }
 

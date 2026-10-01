@@ -1,4 +1,3 @@
-import { State } from 'country-state-city';
 import { USER_TYPE } from '@/core/models/identity.model';
 import type { HectaresRange, ProducerType, RegisterUserRequest, SearchableRole } from '@/core/models/identity.model';
 import { PROFESSIONAL_ROLE } from '../config/flows';
@@ -10,7 +9,7 @@ import { parseMulti } from './values';
 const clean = (value?: string) => value?.trim() || undefined;
 
 /** Convierte los valores del formulario en el body de POST /api/v1/identity/register. */
-export function buildRegisterRequest(kind: RegistrationKind, v: FormValues): RegisterUserRequest {
+export async function buildRegisterRequest(kind: RegistrationKind, v: FormValues): Promise<RegisterUserRequest> {
   const base = {
     firstName: v.firstName.trim(),
     lastName: v.lastName.trim(),
@@ -32,7 +31,9 @@ export function buildRegisterRequest(kind: RegistrationKind, v: FormValues): Reg
     };
   }
 
-  const state = v.provinceCode ? State.getStateByCodeAndCountry(v.provinceCode, v.countryCode) : undefined;
+  const state = v.provinceCode
+    ? (await import('country-state-city')).State.getStateByCodeAndCountry(v.provinceCode, v.countryCode)
+    : undefined;
   const hasCoverage = state?.latitude && state.longitude;
 
   return {

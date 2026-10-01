@@ -18,7 +18,8 @@ export interface SessionUser {
 
 export interface CurrentUser {
   isRegistered: boolean;
-  userType?: number;
+  /** El backend serializa el enum `UserType` como string (`JsonStringEnumConverter`): `'Producer' | 'Professional'`. */
+  userType?: string;
   publicId?: number;
   firstName?: string;
 }

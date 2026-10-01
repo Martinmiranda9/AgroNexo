@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { CaretDown } from '@phosphor-icons/react';
 import { cn } from '@/shared/utils/cn';

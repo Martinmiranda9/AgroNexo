@@ -1,3 +1,5 @@
+'use client';
+
 import { Check } from '@phosphor-icons/react';
 import { cn } from '@/shared/utils/cn';
 

@@ -8,9 +8,18 @@ import { joinMulti, parseMulti } from '../lib/values';
 import type { FieldErrors } from '../lib/validation';
 
 // country-state-city pesa bastante: se carga solo en los pasos que lo usan.
+// El skeleton reserva 3 filas (el máximo: país + provincia + ciudad) para que al llegar los
+// datos reales no haya salto de layout, solo el fade-in que hace LocationFields al montar.
 const LocationFields = dynamic(() => import('./LocationFields'), {
   ssr: false,
-  loading: () => <div className="h-[74px] animate-pulse rounded-xl bg-pine/5" aria-hidden />,
+  loading: () => (
+    <div className="flex flex-col gap-4" aria-hidden>
+      {[0, 1, 2].map((i) => (
+        // 74px ≈ altura real de un Select con label (ver ui/components/Select.tsx).
+        <div key={i} className="h-[74px] animate-pulse rounded-xl bg-pine/5" />
+      ))}
+    </div>
+  ),
 });
 
 interface StepFieldsProps {

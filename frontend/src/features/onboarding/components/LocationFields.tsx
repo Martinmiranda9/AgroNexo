@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { motion } from 'motion/react';
 import { City, Country, State } from 'country-state-city';
 import { Input, Select } from '@/ui/components';
 import type { FormValues, LocationField } from '../config/types';
@@ -13,7 +14,16 @@ interface LocationFieldsProps {
   onChange: (patch: FormValues) => void;
 }
 
-/** Selects en cascada País → Provincia → Ciudad (datos estáticos de country-state-city). */
+// Misma curva que el resto de las transiciones del wizard (RegistrationWizard.tsx).
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+/**
+ * Selects en cascada País → Provincia → Ciudad (datos estáticos de country-state-city).
+ * `StepFields.tsx` ya carga este componente con `next/dynamic` (code-split + skeleton propio:
+ * el paquete pesa ~8MB de datos), así que acá se consumen los datos de forma directa — ya están
+ * disponibles apenas el componente monta. El fade-in es solo para que el reemplazo del skeleton
+ * por los campos reales no se sienta como un salto brusco.
+ */
 export default function LocationFields({ field, values, errors, onChange }: LocationFieldsProps) {
   const { countryCode, provinceCode } = values;
 
@@ -30,7 +40,12 @@ export default function LocationFields({ field, values, errors, onChange }: Loca
   const labelOf = (list: { value: string; label: string }[], code: string) => list.find((o) => o.value === code)?.label ?? '';
 
   return (
-    <>
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: EASE }}
+      className="flex flex-col gap-4"
+    >
       {field.levels.includes('country') && (
         <Select
           label="País"
@@ -76,6 +91,6 @@ export default function LocationFields({ field, values, errors, onChange }: Loca
             onChange={(e) => onChange({ city: e.target.value })}
           />
         ))}
-    </>
+    </motion.div>
   );
 }

@@ -111,12 +111,11 @@ export function useRegistrationWizard(
     setSubmitting(true);
     setSubmitError(undefined);
     try {
-      const request = buildRegisterRequest(kind, { ...values, email: values.email ?? account?.email });
+      const request = await buildRegisterRequest(kind, { ...values, email: values.email ?? account?.email });
       // Con sesión (Google o correo, ambos autenticados contra Firebase) el token lo agrega el servidor;
       // sin Firebase configurado (dev local) se usa el token de prueba.
       const response = account ? await registerWithSession(request) : await registerUser(request);
-      const query = new URLSearchParams({ name: response.firstName, publicId: String(response.publicId) });
-      router.push(`/welcome?${query}`);
+      router.push(`/welcome/${response.publicId}/${kind}`);
     } catch (err) {
       setSubmitError(
         err instanceof ApiError ? err.detail ?? err.message : 'No pudimos conectarnos con el servidor. Intentá de nuevo.',

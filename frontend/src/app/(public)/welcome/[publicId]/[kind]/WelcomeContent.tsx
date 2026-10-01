@@ -1,20 +1,18 @@
 'use client';
 
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import BrandMark from '@/ui/components/BrandMark';
 
-// ─── Contenido con parámetros de URL ──────────────────────────────────────────
+export interface WelcomeContentProps {
+  firstName?: string;
+  publicId: string;
+  roleLabel: string;
+}
 
-function WelcomeContent() {
-  const params = useSearchParams();
-  const firstName = params.get('name') ?? 'Productor';
-  const publicId = params.get('publicId');
-
+export default function WelcomeContent({ firstName, publicId, roleLabel }: WelcomeContentProps) {
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-[#fef7e5] px-6">
       <div className="w-full max-w-md">
@@ -47,13 +45,16 @@ function WelcomeContent() {
             <h1 className="text-heading-lg text-[#00311e] sm:text-heading-xl">
               ¡Bienvenido a{' '}
               <span className="text-[#4D694E]">Agro</span>
-              <span className="text-[#00311e]">Connect</span>
+              <span className="text-[#00311e]">Nexo</span>
               !
             </h1>
             <p className="mt-3 text-body-lg text-primary">
-              Hola,{' '}
-              <strong className="font-semibold text-[#00311e]">{firstName}</strong>. Tu cuenta fue
-              creada exitosamente.
+              {firstName && (
+                <>
+                  Hola, <strong className="font-semibold text-[#00311e]">{firstName}</strong>.{' '}
+                </>
+              )}
+              Tu cuenta fue creada exitosamente.
             </p>
           </motion.div>
 
@@ -68,20 +69,18 @@ function WelcomeContent() {
               <div className="flex items-center gap-3">
                 <BrandMark variant="light" className="h-5 w-5 flex-shrink-0" />
                 <p className="text-body-sm text-[#00311e]">
-                  Tu perfil de <strong>Productor</strong> está listo
+                  Tu perfil de <strong>{roleLabel}</strong> está listo
                 </p>
               </div>
-              {publicId && (
-                <div className="flex items-center gap-3">
-                  <div className="h-5 w-5 flex-shrink-0 rounded-full bg-[#00311e]/10 flex items-center justify-center">
-                    <span className="text-caption font-bold text-[#00311e]">#</span>
-                  </div>
-                  <p className="text-body-sm text-primary">
-                    ID público:{' '}
-                    <span className="font-mono font-semibold text-[#00311e]">{publicId}</span>
-                  </p>
+              <div className="flex items-center gap-3">
+                <div className="h-5 w-5 flex-shrink-0 rounded-full bg-[#00311e]/10 flex items-center justify-center">
+                  <span className="text-caption font-bold text-[#00311e]">#</span>
                 </div>
-              )}
+                <p className="text-body-sm text-primary">
+                  ID público:{' '}
+                  <span className="font-mono font-semibold text-[#00311e]">{publicId}</span>
+                </p>
+              </div>
               <div className="mt-1 h-px bg-[#00311e]/10" />
               <p className="text-caption text-primary">
                 Podés completar tu perfil, agregar tus campos y conectarte con profesionales desde tu
@@ -112,21 +111,5 @@ function WelcomeContent() {
         </motion.div>
       </div>
     </div>
-  );
-}
-
-// ─── Wrapper con Suspense (requerido por useSearchParams) ─────────────────────
-
-export default function WelcomeContentWithSuspense() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[#fef7e5]">
-          <BrandMark variant="light" className="h-12 w-12 animate-pulse" />
-        </div>
-      }
-    >
-      <WelcomeContent />
-    </Suspense>
   );
 }
