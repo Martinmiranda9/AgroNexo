@@ -10,6 +10,7 @@ import {
   useTransform,
   type MotionValue,
 } from 'motion/react';
+import { Pause, Play } from '@phosphor-icons/react';
 import { Badge } from '@/ui/components';
 import BrandGradient from '@/ui/components/BrandGradient';
 import { FieldMapCard, FloatingCard, MatchCard, YieldCard, type ShowcaseState } from './showcase';
@@ -56,6 +57,9 @@ function Layer({ depth, px, py, children }: { depth: number; px: MotionValue<num
 export default function BrandShowcasePanel() {
   const [active, setActive] = useState(0);
   const [scale, setScale] = useState(1);
+  const [paused, setPaused] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  const [focused, setFocused] = useState(false);
   const reduce = useReducedMotion();
   const stageRef = useRef<HTMLDivElement>(null);
 
@@ -64,11 +68,13 @@ export default function BrandShowcasePanel() {
   const px = useSpring(mx, { stiffness: 70, damping: 18 });
   const py = useSpring(my, { stiffness: 70, damping: 18 });
 
-  // `active` en deps: al elegir un pilar a mano se reinicia el ciclo.
+  // `active` en deps: al elegir un pilar a mano se reinicia el ciclo. No rota con prefers-reduced-motion
+  // ni mientras el usuario pausa, apunta con el mouse o tiene el foco en el panel (WCAG 2.2.2).
   useEffect(() => {
+    if (reduce || paused || hovering || focused) return;
     const timer = setTimeout(() => setActive((p) => (p + 1) % BRAND_SLIDES.length), SLIDE_MS);
     return () => clearTimeout(timer);
-  }, [active]);
+  }, [active, reduce, paused, hovering, focused]);
 
   useEffect(() => {
     const el = stageRef.current;
@@ -90,6 +96,7 @@ export default function BrandShowcasePanel() {
   const handlePointerLeave = () => {
     mx.set(0);
     my.set(0);
+    setHovering(false);
   };
 
   const slide = BRAND_SLIDES[active];
@@ -98,7 +105,10 @@ export default function BrandShowcasePanel() {
   return (
     <section
       onPointerMove={handlePointerMove}
+      onPointerEnter={() => setHovering(true)}
       onPointerLeave={handlePointerLeave}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       className="relative isolate hidden flex-col overflow-hidden rounded-l-[2.5rem] bg-pine px-10 pb-12 pt-10 text-beige md:flex md:w-[54%] xl:rounded-l-[3.5rem] xl:px-14 xl:pb-14 xl:pt-12"
     >
       <BrandGradient className="-z-20" />
@@ -164,12 +174,22 @@ export default function BrandShowcasePanel() {
               className="group cursor-pointer p-1 focus-visible:outline-none"
             >
               <span
-                className={`block h-1 rounded-full transition-all duration-300 group-focus-visible:ring-2 group-focus-visible:ring-beige/60 ${
-                  i === active ? 'w-6 bg-beige' : 'w-1.5 bg-beige/30 group-hover:bg-beige/60'
+                className={`block h-1 rounded-full transition-all duration-300 group-focus-visible:ring-2 group-focus-visible:ring-beige group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-pine ${
+                  i === active ? 'w-6 bg-beige' : 'w-1.5 bg-beige/60 group-hover:bg-beige/80'
                 }`}
               />
             </button>
           ))}
+          {!reduce && (
+            <button
+              type="button"
+              onClick={() => setPaused((p) => !p)}
+              aria-label={paused ? 'Reanudar rotación automática' : 'Pausar rotación automática'}
+              className="ml-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-beige/80 transition-colors hover:text-beige focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-beige"
+            >
+              {paused ? <Play size={14} weight="fill" aria-hidden /> : <Pause size={14} weight="fill" aria-hidden />}
+            </button>
+          )}
         </div>
       </div>
     </section>

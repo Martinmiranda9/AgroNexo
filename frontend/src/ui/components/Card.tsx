@@ -5,8 +5,9 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * `light`: sobre superficies Beige.
    * `onDark`: sobre Pine o fondos con gradiente; el bisel externo se vuelve translúcido.
+   * `paper`: sobre el fondo casi blanco (`bg-paper`) de las pantallas de producto; núcleo blanco y bisel neutro.
    */
-  surface?: 'light' | 'onDark';
+  surface?: 'light' | 'onDark' | 'paper';
   /** Clases del núcleo interno (padding, layout). `className` aplica al bisel externo (posición, ancho). */
   coreClassName?: string;
 }
@@ -14,6 +15,13 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 const SHELL = {
   light: 'bg-beige-dark/60 ring-1 ring-pine/10',
   onDark: 'bg-beige/12 ring-1 ring-beige/25 backdrop-blur-md',
+  paper: 'bg-pine/[0.035] ring-1 ring-pine/8',
+} as const;
+
+const CORE = {
+  light: 'bg-bg-card',
+  onDark: 'bg-bg-card',
+  paper: 'bg-surface',
 } as const;
 
 /**
@@ -24,7 +32,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ surface = 'light', className, coreClassName, children, ...props }, ref) => (
     <div ref={ref} className={cn('rounded-[22px] p-1.5', SHELL[surface], className)} {...props}>
       <div
-        className={cn('overflow-hidden rounded-card border border-pine/10 bg-bg-card text-pine', coreClassName)}
+        className={cn('overflow-hidden rounded-card border border-pine/10 text-pine', CORE[surface], coreClassName)}
       >
         {children}
       </div>

@@ -1,3 +1,6 @@
+// Ojo: nada de `react-phone-number-input` acá. Este archivo lo importan Server Components (onboarding/welcome
+// page) y esa librería extiende React.Component: con el React de servidor revienta ("Super expression…") y da 500.
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { parseMulti } from '../lib/values';
 import type {
   FieldDef,
@@ -48,9 +51,7 @@ const personalFields: FieldDef[] = [
     kind: 'text',
     name: 'phoneNumber',
     label: 'WhatsApp',
-    placeholder: '+54 9 351 123 4567',
     required: true,
-    maxLength: 25,
     format: 'phone',
     inputMode: 'tel',
     autoComplete: 'tel',
@@ -58,6 +59,8 @@ const personalFields: FieldDef[] = [
   },
 ];
 
+const phoneText = (v: FormValues) =>
+  v.phoneNumber ? parsePhoneNumberFromString(v.phoneNumber)?.formatInternational() || v.phoneNumber : undefined;
 const fullName = (v: FormValues) => [v.firstName, v.lastName].filter(Boolean).join(' ') || undefined;
 const place = (v: FormValues) => [v.city, v.province, v.country].filter(Boolean).join(', ') || undefined;
 
@@ -109,7 +112,7 @@ function producerPreview(v: FormValues, step: number): PreviewData {
     name: fullName(v),
     badge: 'Productor',
     rows: [
-      { icon: 'phone', text: v.phoneNumber || undefined },
+      { icon: 'phone', text: phoneText(v) },
       { icon: 'map', text: step >= 1 ? place(v) : undefined },
       { icon: 'leaf', text: step >= 2 ? [type, hectares].filter(Boolean).join(' · ') || undefined : undefined },
       { icon: 'search', text: step >= 3 && wantedLabels ? `Busca: ${wantedLabels}` : undefined },
@@ -141,7 +144,7 @@ function professionalFlow(kind: Exclude<RegistrationKind, 'producer'>): Registra
     kind,
     roleLabel,
     submitLabel: 'Crear cuenta',
-    initialValues: { ...DEFAULT_LOCATION, coverageRadius: '100', yearsExperience: '', maxCapacity: '3' },
+    initialValues: { ...DEFAULT_LOCATION, coverageRadius: '100', yearsExperience: '0', maxCapacity: '3' },
     steps: [
       {
         id: 'personal',
@@ -162,12 +165,12 @@ function professionalFlow(kind: Exclude<RegistrationKind, 'producer'>): Registra
             ? [{ kind: 'text', name: 'licenseNumber', label: 'Matrícula', placeholder: 'Ej: 27512', required: true, maxLength: 50 } as const]
             : []),
           { kind: 'text', name: 'specialty', label: 'Especialidad', placeholder: specialtyPlaceholder, required: true, maxLength: 150 },
-          { kind: 'number', name: 'yearsExperience', label: 'Años de experiencia', placeholder: '0', required: true, min: 0, max: 70 },
+          { kind: 'counter', name: 'yearsExperience', label: 'Años de experiencia', unit: 'años', required: true, min: 0, max: 70 },
           {
-            kind: 'number',
+            kind: 'counter',
             name: 'maxCapacity',
             label: 'Productores que podés atender',
-            placeholder: '3',
+            unit: 'productores',
             required: true,
             min: 1,
             max: 200,
@@ -183,8 +186,14 @@ function professionalFlow(kind: Exclude<RegistrationKind, 'producer'>): Registra
           : 'Indicá desde dónde atendés. Dejalo vacío si trabajás de forma remota.',
         aside: 'Los productores dentro de tu zona de cobertura te ven primero.',
         fields: [
-          { kind: 'location', levels: ['country', 'province'], required: coverageRequired },
-          { kind: 'select', name: 'coverageRadius', label: 'Radio de cobertura', options: COVERAGE_RADIUS },
+          { kind: 'location', levels: ['country', 'province', 'city'], required: coverageRequired },
+          {
+            kind: 'select',
+            name: 'coverageRadius',
+            label: 'Radio de cobertura',
+            options: COVERAGE_RADIUS,
+            hint: 'Se mide desde tu ciudad. Si no la elegís, desde el centro de la provincia.',
+          },
         ],
       },
     ],
@@ -192,11 +201,14 @@ function professionalFlow(kind: Exclude<RegistrationKind, 'producer'>): Registra
       name: fullName(v),
       badge: roleLabel,
       rows: [
-        { icon: 'phone', text: v.phoneNumber || undefined },
+        { icon: 'phone', text: phoneText(v) },
         ...(requiresLicense ? [{ icon: 'badge' as const, text: step >= 1 && v.licenseNumber ? `Matrícula ${v.licenseNumber}` : undefined }] : []),
         { icon: 'briefcase', text: step >= 1 ? v.specialty : undefined },
         { icon: 'clock', text: step >= 1 && v.yearsExperience ? `${v.yearsExperience} años de experiencia` : undefined },
-        { icon: 'compass', text: step >= 2 && v.province ? `${v.province} · ${v.coverageRadius} km` : undefined },
+        {
+          icon: 'compass',
+          text: step >= 2 && v.province ? `${[v.city, v.province].filter(Boolean).join(', ')} · ${v.coverageRadius} km` : undefined,
+        },
       ],
     }),
   };

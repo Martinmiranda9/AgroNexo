@@ -12,7 +12,7 @@ export default function OnboardingHeader({ current, total }: OnboardingHeaderPro
     <header>
       <div className="flex items-center justify-between">
         <BrandLogo />
-        <span aria-hidden className="font-mono text-caption tabular-nums text-primary">
+        <span aria-hidden className="font-mono text-body-sm tabular-nums text-olive">
           Paso {Math.min(current + 1, total)} de {total}
         </span>
       </div>

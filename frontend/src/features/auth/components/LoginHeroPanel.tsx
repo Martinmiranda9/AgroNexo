@@ -49,12 +49,12 @@ function FeatureCard({ icon, title, desc, delay = 0 }: FeatureCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
       className="
-        flex flex-col gap-2 rounded-2xl border border-white/10 
+        flex flex-col gap-2 rounded-xl border border-white/10 
         bg-white/5 p-4 backdrop-blur-md transition-colors 
         hover:bg-white/10
      "
     >
-      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white">
+      <div className="flex h-7 w-7 items-center justify-center rounded-sm bg-white/10 text-white">
         {icon}
       </div>
       <div className="mt-1">

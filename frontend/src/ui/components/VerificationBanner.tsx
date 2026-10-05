@@ -6,7 +6,8 @@ import { CheckCircle, WarningCircle } from '@phosphor-icons/react';
 import { cn } from '@/shared/utils/cn';
 import { firebaseAuth } from '@/core/auth/firebase-client';
 import { resolveVerificationBannerVisibility } from './verification-banner.logic';
-import Button from './Button';
+import { Button } from './Button';
+import { Spinner } from './Spinner';
 
 export interface VerificationBannerProps {
   /** `sign_in_provider` del token de Firebase (`google.com` o `password`). Sin sesión, no pasar nada. */
@@ -77,28 +78,30 @@ export default function VerificationBanner({ provider, className }: Verification
       role="status"
       className={cn(
         'flex flex-col gap-3 rounded-card border px-4 py-3 text-body-sm sm:flex-row sm:items-center sm:justify-between',
-        isVerified ? 'border-primary/30 bg-primary/10 text-pine' : 'border-danger/30 bg-danger/10 text-pine',
+        isVerified ? 'border-olive/30 bg-olive/10 text-pine' : 'border-danger/30 bg-danger/10 text-pine',
         className,
       )}
     >
       <div className="flex items-start gap-2">
         {isVerified ? (
-          <CheckCircle size={20} weight="fill" className="text-primary mt-0.5 shrink-0" aria-hidden />
+          <CheckCircle size={20} weight="fill" className="text-olive mt-0.5 shrink-0" aria-hidden />
         ) : (
           <WarningCircle size={20} weight="fill" className="text-danger mt-0.5 shrink-0" aria-hidden />
         )}
         <p>
           {isVerified ? 'Tu correo está verificado.' : 'Todavía no verificaste tu correo.'}
-          {feedback && <span className="text-caption text-primary mt-0.5 block">{feedback}</span>}
+          {feedback && <span className="text-caption text-olive mt-0.5 block">{feedback}</span>}
         </p>
       </div>
 
       {!isVerified && (
         <div className="flex shrink-0 gap-2">
-          <Button type="button" variant="outline" size="sm" loading={phase === 'resending'} disabled={busy} onClick={handleResend}>
+          <Button type="button" variant="outline" size="sm" disabled={busy} onClick={handleResend}>
+            {phase === 'resending' && <Spinner data-icon="inline-start" />}
             Reenviar mail
           </Button>
-          <Button type="button" variant="ghost" size="sm" loading={phase === 'checking'} disabled={busy} onClick={handleCheckAgain}>
+          <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={handleCheckAgain}>
+            {phase === 'checking' && <Spinner data-icon="inline-start" />}
             Ya verifiqué
           </Button>
         </div>

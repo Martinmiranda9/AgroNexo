@@ -1,12 +1,13 @@
 import { redirect } from 'next/navigation';
 import BackendUnavailable from '@/features/auth/components/BackendUnavailable';
 import { fetchCurrentUser, getSessionUser } from '@/core/auth/server';
+import { ROUTES } from '@/shared/constants/routes';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * Destino de todos los logins (Google o email). Con sesión activa:
- *  - ya registrado  → /dashboard
+ *  - ya registrado  → /match-discovery (productor) o /dashboard (resto de los roles)
  *  - primer ingreso → /onboarding (con nombre y correo prellenados desde Google)
  *  - backend caído  → pantalla de error; nunca se lo manda al onboarding por un corte.
  */
@@ -17,5 +18,6 @@ export default async function AuthContinuePage() {
   const current = await fetchCurrentUser();
   if (current.status === 'unavailable') return <BackendUnavailable />;
 
-  redirect(current.status === 'registered' ? '/dashboard' : '/onboarding');
+  if (current.status !== 'registered') redirect(ROUTES.onboarding);
+  redirect(current.user.userType === 'Producer' ? ROUTES.matchDiscovery : ROUTES.dashboard);
 }

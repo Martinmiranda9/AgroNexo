@@ -2,7 +2,8 @@
 
 import { useId, useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle, CircleNotch, WarningCircle } from '@phosphor-icons/react';
+import { CheckCircle, WarningCircle } from '@phosphor-icons/react';
+import { Button, Field, FieldLabel, Input, Spinner } from '@/ui/components';
 import BrandMark from '@/ui/components/BrandMark';
 import { sendPasswordReset } from '@/core/auth/firebase-actions';
 
@@ -29,53 +30,49 @@ export default function ForgotPasswordForm() {
     <div className="flex w-full max-w-[380px] flex-col items-center text-center">
       <Link
         href="/"
-        className="mb-6 block h-14 w-14 rounded-2xl shadow-2xs"
+        className="mb-6 block h-14 w-14 rounded-xl shadow-2xs"
         aria-label="AgroNexo — Inicio"
       >
         <BrandMark variant="light" tile className="h-full w-full" />
       </Link>
       <h1 className="text-heading-lg tracking-heading">Restablecer contraseña</h1>
-      <p className="mt-2 text-body-sm text-[#4D694E]">
+      <p className="mt-2 text-body-sm text-olive">
         Ingresá tu correo y te enviamos un enlace para elegir una contraseña nueva.
       </p>
 
       {status === 'sent' ? (
-        <p role="status" className="mt-8 flex items-start gap-2 rounded-xl border border-[#4D694E]/30 bg-[#4D694E]/5 px-3.5 py-3 text-left text-body-sm">
-          <CheckCircle size={16} weight="fill" className="mt-0.5 shrink-0 text-[#4D694E]" />
+        <p role="status" className="mt-8 flex items-start gap-2 rounded-lg border border-olive/30 bg-olive/5 px-3.5 py-3 text-left text-body-sm">
+          <CheckCircle size={16} weight="fill" className="mt-0.5 shrink-0 text-olive" />
           Si el correo tiene una cuenta, en unos minutos te llega el enlace. Revisá también el spam.
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="mt-8 flex w-full flex-col gap-3.5 text-left">
           {error && (
-            <p role="alert" className="flex items-start gap-2 rounded-xl border border-[#8C4A34]/30 bg-[#8C4A34]/5 px-3.5 py-3 text-body-sm text-[#8C4A34]">
+            <p role="alert" className="flex items-start gap-2 rounded-lg border border-danger/30 bg-danger/5 px-3.5 py-3 text-body-sm text-danger">
               <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
               {error}
             </p>
           )}
-          <label htmlFor={emailId} className="text-body-sm font-medium">
-            Correo
-          </label>
-          <input
-            id={emailId}
-            type="email"
-            required
-            autoComplete="email"
-            placeholder="tu@correo.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="h-12 w-full rounded-xl border border-[#00311e]/15 bg-[#fef7e5] px-4 text-body-sm outline-none transition-colors placeholder:text-[#978A56] focus:border-[#00311e] focus:ring-1 focus:ring-[#00311e]/10"
-          />
-          <button
-            type="submit"
-            disabled={status === 'sending'}
-            className="flex h-12 w-full cursor-pointer items-center justify-center rounded-xl bg-[#00311e] text-body-sm font-medium text-[#fef7e5] shadow-sm transition-all hover:bg-[#002617] active:scale-[0.985] disabled:opacity-60"
-          >
-            {status === 'sending' ? <CircleNotch className="h-4 w-4 animate-spin" weight="bold" aria-label="Enviando" /> : 'Enviar enlace'}
-          </button>
+          <Field>
+            <FieldLabel htmlFor={emailId}>Correo</FieldLabel>
+            <Input
+              id={emailId}
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="tu@correo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Field>
+          <Button type="submit" size="lg" className="w-full" disabled={status === 'sending'}>
+            {status === 'sending' && <Spinner data-icon="inline-start" />}
+            Enviar enlace
+          </Button>
         </form>
       )}
 
-      <Link href="/login" className="mt-8 text-body-sm font-semibold underline underline-offset-4 hover:text-[#4D694E]">
+      <Link href="/login" className="mt-8 text-body-sm font-semibold underline underline-offset-4 hover:text-olive">
         Volver a iniciar sesión
       </Link>
     </div>

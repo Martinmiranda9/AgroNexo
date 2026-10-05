@@ -48,8 +48,8 @@ export default function ProfilePreviewCard({ data }: { data: PreviewData }) {
     : { initial: { opacity: 0, y: 4 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0 }, transition: { duration: 0.25 } };
 
   return (
-    <div className="w-[300px] rounded-2xl border border-beige/10 bg-beige/[0.04] p-6 backdrop-blur-sm xl:w-[340px]">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-beige/10 text-body-lg font-semibold text-beige">
+    <div className="w-[300px] rounded-xl border border-beige/10 bg-beige/[0.04] p-6 backdrop-blur-sm xl:w-[340px]">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-beige/10 text-body-lg font-semibold text-beige">
         {initials(data.name) || <UserCircle size={28} weight="light" className="text-beige/50" />}
       </div>
 

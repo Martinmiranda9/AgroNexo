@@ -68,6 +68,14 @@ export interface ChoiceField extends BaseField {
   options: FieldOption[];
 }
 
+/** Cantidad entera chica con botones − / +. Guarda el número como string. */
+export interface CounterField extends BaseField {
+  kind: 'counter';
+  min: number;
+  max: number;
+  unit?: string;
+}
+
 /** Cascada país → provincia → ciudad. Guarda country/countryCode/province/provinceCode/city. */
 export interface LocationField {
   kind: 'location';
@@ -75,7 +83,7 @@ export interface LocationField {
   required?: boolean;
 }
 
-export type FieldDef = TextField | EmailField | PasswordField | SelectField | ChoiceField | LocationField;
+export type FieldDef = TextField | EmailField | PasswordField | SelectField | ChoiceField | CounterField | LocationField;
 
 /** Línea de información de la card de vista previa; `text` vacío = esqueleto. */
 export interface PreviewRow {

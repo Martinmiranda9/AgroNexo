@@ -20,7 +20,7 @@ export default function MatchCard() {
         <b className="font-mono text-body-sm font-semibold tabular-nums">98%</b>
       </div>
       <div className="h-1.5 overflow-hidden rounded-pill bg-pine/10">
-        <div className="h-full w-[98%] rounded-pill bg-primary" />
+        <div className="h-full w-[98%] rounded-pill bg-olive" />
       </div>
 
       <div className="mt-4 flex items-center gap-2">

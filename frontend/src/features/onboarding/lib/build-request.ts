@@ -31,10 +31,11 @@ export async function buildRegisterRequest(kind: RegistrationKind, v: FormValues
     };
   }
 
-  const state = v.provinceCode
-    ? (await import('country-state-city')).State.getStateByCodeAndCountry(v.provinceCode, v.countryCode)
-    : undefined;
-  const hasCoverage = state?.latitude && state.longitude;
+  // El radio se mide desde la ciudad elegida; sin ciudad (o si el dato no trae coordenadas), desde el centro de la provincia.
+  const geoData = v.provinceCode ? await import('country-state-city') : undefined;
+  const state = geoData?.State.getStateByCodeAndCountry(v.provinceCode, v.countryCode);
+  const city = v.city ? geoData?.City.getCitiesOfState(v.countryCode, v.provinceCode).find((c) => c.name === v.city) : undefined;
+  const center = city?.latitude && city.longitude ? city : state?.latitude && state.longitude ? state : undefined;
 
   return {
     ...base,
@@ -44,8 +45,8 @@ export async function buildRegisterRequest(kind: RegistrationKind, v: FormValues
     licenseNumber: clean(v.licenseNumber),
     yearsExperience: Number(v.yearsExperience),
     maxCapacity: Number(v.maxCapacity),
-    coverageAreaCoordinates: hasCoverage
-      ? buildCoveragePolygon(Number(state.latitude), Number(state.longitude), Number(v.coverageRadius))
+    coverageAreaCoordinates: center
+      ? buildCoveragePolygon(Number(center.latitude), Number(center.longitude), Number(v.coverageRadius))
       : undefined,
   };
 }

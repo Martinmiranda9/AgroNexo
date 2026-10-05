@@ -17,7 +17,7 @@ const SIZES = {
 
 const TONES = {
   solid: 'bg-pine text-beige',
-  tint: 'bg-beige-dark text-primary',
+  tint: 'bg-beige-dark text-olive',
 } as const;
 
 /** Avatar circular con iniciales, tamaños fijos. */

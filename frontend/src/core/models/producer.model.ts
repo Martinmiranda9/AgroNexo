@@ -11,6 +11,11 @@ export interface ProducerProfile {
   lastName: string;
   documentNumber: string;
   producerType?: string;
+  /** Roles que el productor dijo buscar al registrarse. */
+  lookingFor?: string[];
+  country?: string;
+  province?: string;
+  city?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt?: string;

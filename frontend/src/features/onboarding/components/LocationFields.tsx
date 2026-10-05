@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useId, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { City, Country, State } from 'country-state-city';
-import { Input, Select } from '@/ui/components';
+import { Field, FieldError, FieldLabel, Input, NativeSelect, NativeSelectOption } from '@/ui/components';
 import type { FormValues, LocationField } from '../config/types';
 import type { FieldErrors } from '../lib/validation';
 
@@ -17,6 +17,9 @@ interface LocationFieldsProps {
 // Misma curva que el resto de las transiciones del wizard (RegistrationWizard.tsx).
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+// AgroNexo opera solo en Sudamérica (AR, BO, BR, CL, CO, EC, GY, PY, PE, SR, UY, VE).
+const SOUTH_AMERICA = ['AR', 'BO', 'BR', 'CL', 'CO', 'EC', 'GY', 'PY', 'PE', 'SR', 'UY', 'VE'];
+
 /**
  * Selects en cascada País → Provincia → Ciudad (datos estáticos de country-state-city).
  * `StepFields.tsx` ya carga este componente con `next/dynamic` (code-split + skeleton propio:
@@ -26,8 +29,18 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  */
 export default function LocationFields({ field, values, errors, onChange }: LocationFieldsProps) {
   const { countryCode, provinceCode } = values;
+  const countryId = useId();
+  const provinceId = useId();
+  const cityId = useId();
 
-  const countries = useMemo(() => Country.getAllCountries().map((c) => ({ value: c.isoCode, label: c.name })), []);
+  const countries = useMemo(
+    () =>
+      SOUTH_AMERICA.flatMap((code) => {
+        const c = Country.getCountryByCode(code);
+        return c ? [{ value: c.isoCode, label: c.name }] : [];
+      }).sort((a, b) => a.label.localeCompare(b.label, 'es')),
+    [],
+  );
   const provinces = useMemo(
     () => State.getStatesOfCountry(countryCode).map((s) => ({ value: s.isoCode, label: s.name })),
     [countryCode],
@@ -47,50 +60,83 @@ export default function LocationFields({ field, values, errors, onChange }: Loca
       className="flex flex-col gap-4"
     >
       {field.levels.includes('country') && (
-        <Select
-          label="País"
-          placeholder="Elegí un país"
-          value={countryCode}
-          options={countries}
-          error={errors.country}
-          onValueChange={(code) =>
-            onChange({ countryCode: code, country: labelOf(countries, code), provinceCode: '', province: '', city: '' })
-          }
-        />
+        <Field data-invalid={errors.country ? true : undefined}>
+          <FieldLabel htmlFor={countryId}>País</FieldLabel>
+          <NativeSelect
+            id={countryId}
+            className="w-full"
+            aria-invalid={!!errors.country}
+            value={countryCode}
+            onChange={(e) => {
+              const code = e.target.value;
+              onChange({ countryCode: code, country: labelOf(countries, code), provinceCode: '', province: '', city: '' });
+            }}
+          >
+            <NativeSelectOption value="">Elegí un país</NativeSelectOption>
+            {countries.map((o) => (
+              <NativeSelectOption key={o.value} value={o.value}>
+                {o.label}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+          <FieldError>{errors.country}</FieldError>
+        </Field>
       )}
 
       {field.levels.includes('province') && (
-        <Select
-          label="Provincia / Región"
-          placeholder="Elegí una provincia"
-          value={provinceCode}
-          options={provinces}
-          error={errors.province}
-          disabled={!countryCode || provinces.length === 0}
-          onValueChange={(code) => onChange({ provinceCode: code, province: labelOf(provinces, code), city: '' })}
-        />
+        <Field data-invalid={errors.province ? true : undefined}>
+          <FieldLabel htmlFor={provinceId}>Provincia / Región</FieldLabel>
+          <NativeSelect
+            id={provinceId}
+            className="w-full"
+            aria-invalid={!!errors.province}
+            disabled={!countryCode || provinces.length === 0}
+            value={provinceCode}
+            onChange={(e) => {
+              const code = e.target.value;
+              onChange({ provinceCode: code, province: labelOf(provinces, code), city: '' });
+            }}
+          >
+            <NativeSelectOption value="">Elegí una provincia</NativeSelectOption>
+            {provinces.map((o) => (
+              <NativeSelectOption key={o.value} value={o.value}>
+                {o.label}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+          <FieldError>{errors.province}</FieldError>
+        </Field>
       )}
 
-      {field.levels.includes('city') &&
-        (cities.length > 0 || !provinceCode ? (
-          <Select
-            label="Ciudad / Localidad"
-            placeholder="Elegí una ciudad"
-            value={values.city}
-            options={cities}
-            disabled={!provinceCode}
-            onValueChange={(city) => onChange({ city })}
-          />
-        ) : (
-          <Input
-            label="Ciudad / Localidad"
-            className="h-12"
-            placeholder="Escribí tu localidad"
-            value={values.city}
-            maxLength={100}
-            onChange={(e) => onChange({ city: e.target.value })}
-          />
-        ))}
+      {field.levels.includes('city') && (
+        <Field>
+          <FieldLabel htmlFor={cityId}>Ciudad / Localidad (opcional)</FieldLabel>
+          {cities.length > 0 || !provinceCode ? (
+            <NativeSelect
+              id={cityId}
+              className="w-full"
+              disabled={!provinceCode}
+              value={values.city}
+              onChange={(e) => onChange({ city: e.target.value })}
+            >
+              <NativeSelectOption value="">Elegí una ciudad</NativeSelectOption>
+              {cities.map((o) => (
+                <NativeSelectOption key={o.value} value={o.value}>
+                  {o.label}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+          ) : (
+            <Input
+              id={cityId}
+              placeholder="Escribí tu localidad"
+              value={values.city}
+              maxLength={100}
+              onChange={(e) => onChange({ city: e.target.value })}
+            />
+          )}
+        </Field>
+      )}
     </motion.div>
   );
 }

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function ForgotPasswordPage() {
   return (
-    <main className="flex min-h-[100dvh] w-full items-center justify-center bg-[#FFFBF0] px-8 py-10 text-[#00311e] antialiased">
+    <main className="flex min-h-[100dvh] w-full items-center justify-center bg-bg-card px-8 py-10 text-pine antialiased">
       <ForgotPasswordForm />
     </main>
   );

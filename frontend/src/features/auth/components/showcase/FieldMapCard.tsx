@@ -31,7 +31,7 @@ export default function FieldMapCard() {
         </Badge>
       </div>
 
-      <div className="relative mx-2.5 mb-2.5 overflow-hidden rounded-xl">
+      <div className="relative mx-2.5 mb-2.5 overflow-hidden rounded-lg">
         <Image
           src="/images/showcase/lote-aerial.webp"
           alt=""

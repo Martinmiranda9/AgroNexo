@@ -13,7 +13,7 @@ const SIZES = {
 } as const;
 
 const TONES = {
-  tint: 'bg-beige-dark text-primary',
+  tint: 'bg-beige-dark text-olive',
   solid: 'bg-pine text-beige',
 } as const;
 

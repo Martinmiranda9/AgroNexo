@@ -41,7 +41,7 @@ function validateField(field: FieldDef, values: FormValues): FieldErrors {
     return errors;
   }
 
-  if (field.kind === 'number') {
+  if (field.kind === 'number' || field.kind === 'counter') {
     const n = Number(value);
     if (!Number.isInteger(n)) errors[field.name] = 'Ingresá un número entero.';
     else if (field.min !== undefined && n < field.min) errors[field.name] = `El mínimo es ${field.min}.`;

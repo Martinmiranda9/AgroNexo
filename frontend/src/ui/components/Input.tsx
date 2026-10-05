@@ -1,96 +1,19 @@
 import * as React from 'react';
+import { Input as InputPrimitive } from '@base-ui/react/input';
 import { cn } from '@/shared/utils/cn';
-import { controlClass } from './field-styles';
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  error?: string;
-  hint?: string;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  onRightIconClick?: () => void;
+function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
+  return (
+    <InputPrimitive
+      type={type}
+      data-slot="input"
+      className={cn(
+        'border-input file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 disabled:bg-input/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-8 w-full min-w-0 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-3 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-3 md:text-sm',
+        className
+      )}
+      {...props}
+    />
+  );
 }
 
-/**
- * Input base del Design System AgroNexo.
- * Soporta icono izquierdo/derecho, mensaje de error y hint.
- * Usa Pine (#00311e) como color de texto y focus, Beige (#fef7e5) como fondo.
- */
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      label,
-      error,
-      hint,
-      leftIcon,
-      rightIcon,
-      onRightIconClick,
-      className,
-      id,
-      ...props
-    },
-    ref,
-  ) => {
-    const inputId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
-
-    return (
-      <div className="flex flex-col gap-1.5">
-        {label && (
-          <label
-            htmlFor={inputId}
-            className="text-body-sm font-medium text-pine"
-          >
-            {label}
-          </label>
-        )}
-
-        <div className="relative flex items-center">
-          {leftIcon && (
-            <span className="pointer-events-none absolute left-3.5 text-neutral-warm">
-              {leftIcon}
-            </span>
-          )}
-
-          <input
-            ref={ref}
-            id={inputId}
-            className={cn(
-              controlClass(!!error),
-              'py-2.5',
-              leftIcon ? 'pl-11' : 'pl-4',
-              rightIcon ? 'pr-11' : 'pr-4',
-              className,
-            )}
-            {...props}
-          />
-
-          {rightIcon && (
-            <button
-              type="button"
-              onClick={onRightIconClick}
-              className="absolute right-3.5 text-neutral-warm transition-colors hover:text-pine focus:outline-none"
-              tabIndex={-1}
-            >
-              {rightIcon}
-            </button>
-          )}
-        </div>
-
-        {error && (
-          <p className="flex items-center gap-1 text-caption text-danger">
-            <span>{error}</span>
-          </p>
-        )}
-
-        {hint && !error && (
-          <p className="text-caption text-primary">{hint}</p>
-        )}
-      </div>
-    );
-  },
-);
-
-Input.displayName = 'Input';
-
-export default Input;
-
+export { Input };

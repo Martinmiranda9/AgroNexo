@@ -11,7 +11,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const VARIANTS = {
   neutral: 'bg-pine/8 text-pine',
-  positive: 'bg-primary/12 text-pine',
+  positive: 'bg-olive/12 text-pine',
   alert: 'bg-neutral-warm/20 text-dark',
   error: 'bg-danger/10 text-danger',
   /** Para fondos Pine / gradiente. */
@@ -20,7 +20,7 @@ const VARIANTS = {
 
 const DOT = {
   neutral: 'bg-pine',
-  positive: 'bg-primary',
+  positive: 'bg-olive',
   alert: 'bg-neutral-warm',
   error: 'bg-danger',
   inverse: 'bg-accent-light',

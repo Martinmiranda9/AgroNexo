@@ -6,7 +6,7 @@ import Grainient from './Grainient';
 
 // [claro, medio, oscuro]: el shader mezcla estos tres. Se leen de los tokens en runtime
 // para no duplicar hex acá: si cambia la paleta, el gradiente cambia con ella.
-const TOKENS = ['--accent-mid', '--primary', '--pine'] as const;
+const TOKENS = ['--color-accent-mid', '--color-olive', '--color-pine'] as const;
 
 /**
  * Fondo animado con la paleta de marca (Pine → Oliva → Salvia) y grano fino.

@@ -1,8 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { CircleNotch } from '@phosphor-icons/react';
 import { cn } from '@/shared/utils/cn';
+import { Button } from './Button';
+import { Spinner } from './Spinner';
 
 function GoogleIcon() {
   return (
@@ -27,35 +28,32 @@ function GoogleIcon() {
   );
 }
 
-export interface GoogleButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export type GoogleButtonProps = Omit<React.ComponentProps<typeof Button>, 'variant'> & {
   loading?: boolean;
-}
+};
 
-/** "Continuar con Google": mismo botón en login y registro. La logica del popup vive en `core/auth/google-sign-in`. */
-const GoogleButton = React.forwardRef<HTMLButtonElement, GoogleButtonProps>(
-  ({ loading = false, disabled, className, children = 'Continuar con Google', ...props }, ref) => (
-    <button
-      ref={ref}
+/**
+ * "Continuar con Google": mismo botón en login y registro. Es `outline` a propósito: el CTA primario
+ * (Pine) es siempre el envío del formulario de correo. La lógica del popup vive en `core/auth/firebase-actions`.
+ */
+export default function GoogleButton({
+  loading = false,
+  disabled,
+  className,
+  children = 'Continuar con Google',
+  ...props
+}: GoogleButtonProps) {
+  return (
+    <Button
       type="button"
+      variant="outline"
+      size="lg"
       disabled={disabled || loading}
-      className={cn(
-        'bg-pine text-beige hover:bg-pine-hover focus-visible:ring-pine/15 flex h-12 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl text-body-sm font-medium shadow-sm transition-all focus-visible:ring-2 focus-visible:outline-none active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-60',
-        className,
-      )}
+      className={cn('w-full border-input', className)}
       {...props}
     >
-      {loading ? (
-        <CircleNotch className="h-4 w-4 animate-spin" weight="bold" aria-label="Cargando" />
-      ) : (
-        <>
-          <GoogleIcon />
-          {children}
-        </>
-      )}
-    </button>
-  ),
-);
-
-GoogleButton.displayName = 'GoogleButton';
-
-export default GoogleButton;
+      {loading ? <Spinner data-icon="inline-start" /> : <GoogleIcon />}
+      {children}
+    </Button>
+  );
+}

@@ -1,12 +1,17 @@
 @import "tailwindcss";
 
+/* AgroNexo no tiene tema oscuro. Por defecto Tailwind activa `dark:` con el modo oscuro del sistema, y los
+   componentes shadcn traen `dark:bg-input/30`, `dark:hover:…`: en un equipo en modo oscuro pintaban de marrón
+   inputs, selects y botones outline. Con esto `dark:` solo aplica bajo un ancestro `.dark` (hoy nunca). */
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   /* ── Paleta Base (Crema/Oliva) ── */
   --color-bg-page: #fef7e5;
   --color-bg-hero: #FFF3D5;
   --color-bg-card: #FFFBF0;
-  --color-primary: #4D694E;
-  --color-primary-hover: #3F4C26;
+  --color-olive: #4D694E;
+  --color-olive-hover: #3F4C26;
   --color-accent-mid: #728141;
   --color-accent-light: #99A474;
   --color-dark: #24301E;
@@ -19,6 +24,11 @@
   --color-beige: #fef7e5;
   --color-beige-dark: #f5ead4;
   --color-beige-deeper: #ede0c4;
+
+  /* Superficies de producto (búsqueda asistida): fondo casi blanco con cards blancas, en lugar del beige plano. */
+  --color-paper: #fbfbf8;
+  --color-surface: #ffffff;
+  --shadow-raised: 0 1px 2px rgb(0 49 30 / 0.05), 0 24px 48px -24px rgb(0 49 30 / 0.22);
 
   --radius-card: 16px;
   --radius-input: 12px;
@@ -50,6 +60,102 @@
   --text-heading-xl--font-weight: 700;
 
   --tracking-heading: -0.01em;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TEMA SHADCN → AGRONEXO
+   Los componentes de shadcn (y los que vengan de bloques/plantillas) leen estos nombres
+   semánticos (bg-primary, text-muted-foreground, border-input, ring-ring…). Se definen UNA vez
+   acá apuntando a la paleta Pine & Beige, así los componentes se instalan sin retocarlos y
+   quedan con la marca. Para cambiar la identidad: tocar solo esta tabla y la paleta de arriba.
+   ───────────────────────────────────────────────────────────────────────────── */
+:root {
+  --radius: 0.75rem; /* 12px: base de la escala sm/md/lg/xl */
+
+  --background: var(--color-beige);
+  --foreground: var(--color-pine);
+  --card: var(--color-bg-card);
+  --card-foreground: var(--color-pine);
+  --popover: var(--color-bg-card);
+  --popover-foreground: var(--color-pine);
+
+  --primary: var(--color-pine);
+  --primary-foreground: var(--color-beige);
+  --secondary: color-mix(in oklab, var(--color-pine) 8%, transparent);
+  --secondary-foreground: var(--color-pine);
+  --muted: var(--color-beige-dark);
+  --muted-foreground: var(--color-olive);
+  --accent: var(--color-beige-dark);
+  --accent-foreground: var(--color-pine);
+  --destructive: var(--color-danger);
+
+  --border: color-mix(in oklab, var(--color-pine) 12%, transparent);
+  /* Borde de controles: neutral-warm pleno (3.2–3.3:1 sobre beige/card, WCAG 1.4.11). Al 50% daba 1.7:1. */
+  --input: var(--color-neutral-warm);
+  /* Foco: Pine pleno. Los componentes usan border-ring (13:1) y ring-ring/50 (halo ≈3:1, WCAG 2.4.7/1.4.11).
+     Con ring al 30% el anillo final quedaba en ~15% de Pine (1.3:1) e invisible sobre botones Pine. */
+  --ring: var(--color-pine);
+
+  --chart-1: var(--color-pine);
+  --chart-2: var(--color-olive);
+  --chart-3: var(--color-accent-mid);
+  --chart-4: var(--color-accent-light);
+  --chart-5: var(--color-neutral-warm);
+
+  --sidebar: var(--color-bg-card);
+  --sidebar-foreground: var(--color-pine);
+  --sidebar-primary: var(--color-pine);
+  --sidebar-primary-foreground: var(--color-beige);
+  --sidebar-accent: var(--color-beige-dark);
+  --sidebar-accent-foreground: var(--color-pine);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
 }
 
 body {
@@ -87,6 +193,14 @@ body {
   font-weight: 500;
 }
 
+/* Display: titular de pantallas de entrada (tracking apretado). Más grande que heading-xl. */
+@utility text-display {
+  font-size: clamp(2.6rem, 7vw, 5.2rem);
+  line-height: 0.95;
+  font-weight: 600;
+  letter-spacing: -0.055em;
+}
+
 /* Overline: rótulos de sección en mayúsculas */
 @utility text-overline {
   font-size: 13px;
@@ -114,4 +228,92 @@ body {
   .agro-drift {
     animation: none;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ESCALA DE CONTROLES AGRONEXO (regla global)
+   shadcn trae controles compactos (h-8). AgroNexo usa alturas más cómodas y semibold. En vez de
+   retocar cada componente, se fija acá por `data-slot`/`data-size` (los emiten los componentes
+   oficiales). Va SIN @layer a propósito: le gana a las utilidades de Tailwind (h-8, px-2.5…).
+   Alturas: xs 28 · sm 36 · default 44 · lg 48; inputs/selects 48.
+   ───────────────────────────────────────────────────────────────────────────── */
+[data-slot='input'],
+[data-slot='native-select'],
+[data-slot='number-field-group'],
+[data-slot='phone-country'],
+[data-slot='input-group']:not(:has(> [data-align^='block'], > textarea)) {
+  height: 3rem;
+}
+[data-slot='input'],
+[data-slot='native-select'] {
+  padding-inline-start: 0.875rem;
+}
+/* 16px siempre: shadcn baja a 14px en md+, chico para el público de AgroNexo. También evita el zoom de iOS.
+   `input-group-control` es el `data-slot` que usa InputGroupInput (correo/contraseña con ícono). */
+[data-slot='input'],
+[data-slot='input-group-control'],
+[data-slot='native-select'] {
+  font-size: 1rem;
+}
+[data-slot='native-select'] {
+  padding-inline-end: 2.25rem;
+}
+[data-slot='native-select'][data-size='sm'] {
+  height: 2.25rem;
+}
+
+[data-slot='button'] {
+  font-weight: 600;
+}
+[data-slot='button'][data-size='default'] {
+  height: 2.75rem;
+  padding-inline: 1.25rem;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+[data-slot='button'][data-size='lg'] {
+  height: 3rem;
+  padding-inline: 1.5rem;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+[data-slot='button'][data-size='sm'] {
+  height: 2.25rem;
+  padding-inline: 1rem;
+  font-size: 0.875rem;
+}
+[data-slot='button'][data-size='xs'] {
+  height: 1.75rem;
+  padding-inline: 0.625rem;
+}
+[data-slot='button'][data-size='icon'] {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+}
+[data-slot='button'][data-size='icon-lg'] {
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+}
+[data-slot='button'][data-size='icon-sm'] {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+}
+[data-slot='button'][data-size='icon-xs'] {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+}
+/* Botón de ícono dentro de un campo (ojo de contraseña): 44px de área táctil en vez de 28px. */
+[data-slot='input-group'] [data-slot='button'][data-size='icon-xs'] {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+[data-slot='button']:has([data-icon='inline-start']) {
+  padding-inline-start: 1rem;
+}
+[data-slot='button']:has([data-icon='inline-end']) {
+  padding-inline-end: 1rem;
 }

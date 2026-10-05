@@ -16,10 +16,10 @@ export default function Error({
         <BrandLogo />
         <WarningCircle size={40} weight="regular" className="text-danger mt-10" aria-hidden />
         <h1 className="text-heading-md tracking-heading mt-4">Algo salió mal</h1>
-        <p className="text-body-sm text-primary mt-2">
+        <p className="text-body-sm text-olive mt-2">
           Ocurrió un error inesperado. Probá de nuevo en unos segundos.
         </p>
-        <Button type="button" size="lg" fullWidth className="mt-8" onClick={() => reset()}>
+        <Button type="button" size="lg" className="mt-8 w-full" onClick={() => reset()}>
           Reintentar
         </Button>
       </div>

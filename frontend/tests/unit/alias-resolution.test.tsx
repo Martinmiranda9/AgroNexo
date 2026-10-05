@@ -18,12 +18,12 @@ import * as matchDiscoveryFeature from '@/features/match-discovery';
 import * as matchesFeature from '@/features/matches';
 
 import { Button, Input, Card, Modal, Badge, Spinner, Toast } from '@/ui/components';
-import DirectButton from '@/ui/components/Button';
-import DirectInput from '@/ui/components/Input';
+import { Button as DirectButton } from '@/ui/components/Button';
+import { Input as DirectInput } from '@/ui/components/Input';
 import DirectCard from '@/ui/components/Card';
 import DirectModal from '@/ui/components/Modal';
 import DirectBadge from '@/ui/components/Badge';
-import DirectSpinner from '@/ui/components/Spinner';
+import { Spinner as DirectSpinner } from '@/ui/components/Spinner';
 import DirectToast from '@/ui/components/Toast';
 
 import { AppShell, Navbar, MobileNav, Sidebar, Footer } from '@/ui/layouts';
@@ -58,7 +58,8 @@ describe('AgroNexo Path Alias & Layer Resolution Empirical Verification', () => 
       expect(MatchesPage).toBeDefined();
 
       expect(typeof PublicPage).toBe('function');
-      expect(PublicPage()).toBeNull();
+      // La raíz redirige a /login (todavía no hay landing); `redirect()` de Next lanza NEXT_REDIRECT.
+      expect(() => PublicPage()).toThrow(/NEXT_REDIRECT/);
       expect(LoginPage()).toBeNull();
       expect(RegisterPage()).toBeNull();
       expect(DashboardPage()).toBeNull();

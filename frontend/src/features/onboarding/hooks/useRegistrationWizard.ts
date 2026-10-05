@@ -75,6 +75,12 @@ export function useRegistrationWizard(
   const totalSteps = roleIndex + 1 + (flow ?? REGISTRATION_FLOWS.producer).steps.length;
   const isLastStep = stepIndex === totalSteps - 1;
 
+  // Con sesión el paso "Tu cuenta" ya no se muestra, pero sigue contando: así el usuario que acaba de crear
+  // su cuenta pasa de "Paso 1 de 6" a "Paso 2 de 6" y no retrocede a "Paso 1 de 5".
+  const accountDoneOffset = account ? 1 : 0;
+  const displayStep = stepIndex + accountDoneOffset;
+  const displayTotal = totalSteps + accountDoneOffset;
+
   const preview = useMemo(
     () => (flow ? flow.preview(values, Math.max(stepIndex - roleIndex - 1, 0)) : EMPTY_PREVIEW),
     [flow, values, stepIndex, roleIndex],
@@ -136,7 +142,12 @@ export function useRegistrationWizard(
 
     const stepErrors = validateStep(step, values);
     setErrors(stepErrors);
-    if (Object.keys(stepErrors).length > 0) return;
+    if (Object.keys(stepErrors).length > 0) {
+      // Lleva el foco al primer campo con error (en celular el error puede quedar fuera de pantalla).
+      // Se espera al render para que `aria-invalid` ya esté aplicado.
+      requestAnimationFrame(() => document.querySelector<HTMLElement>('form [aria-invalid="true"], form fieldset[data-invalid="true"] input')?.focus());
+      return;
+    }
 
     if (isLastStep) void submit();
     else setStepIndex((i) => i + 1);
@@ -148,6 +159,8 @@ export function useRegistrationWizard(
     step,
     stepIndex,
     totalSteps,
+    displayStep,
+    displayTotal,
     isAccountStep,
     isRoleStep,
     isLastStep,
