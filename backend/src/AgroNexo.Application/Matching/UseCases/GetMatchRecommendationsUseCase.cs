@@ -38,7 +38,7 @@ public class GetMatchRecommendationsUseCase : IGetMatchRecommendationsUseCase
 
         foreach (var rec in orderedRecommendations)
         {
-            var professional = await _professionalRepository.GetByIdAsync(rec.ProfessionalId, cancellationToken);
+            var professional = await _professionalRepository.GetByIdAcrossTenantsAsync(rec.ProfessionalId, cancellationToken);
             if (professional != null)
             {
                 recommendationResponses.Add(new MatchRecommendationResponse

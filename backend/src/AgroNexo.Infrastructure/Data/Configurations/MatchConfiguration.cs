@@ -27,6 +27,18 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
 
         builder.Property(m => m.RespondedAt);
 
+        // Ficha de necesidad: value object guardado en la misma tabla. Todas las columnas son nulas para los matches
+        // creados sin ficha (y para los anteriores a este cambio).
+        builder.OwnsOne(m => m.NeedBrief, brief =>
+        {
+            brief.Property(b => b.Summary).HasColumnName("NeedSummary").HasMaxLength(600);
+            brief.Property(b => b.PlaceLabel).HasColumnName("NeedPlace").HasMaxLength(150);
+            brief.Property(b => b.Hectares).HasColumnName("NeedHectares");
+            brief.Property(b => b.Urgency).HasColumnName("NeedUrgency");
+            brief.Property(b => b.Topics).HasColumnName("NeedTopics").HasColumnType("text[]");
+            brief.Property(b => b.Crops).HasColumnName("NeedCrops").HasColumnType("text[]");
+        });
+
         builder.Property(m => m.CreatedAt)
             .IsRequired();
 

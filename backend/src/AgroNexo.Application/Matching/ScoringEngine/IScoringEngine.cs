@@ -27,6 +27,13 @@ public class ScoringCriteria
     public string? RequestedSpecialty { get; set; }
     public bool RequiresFieldPresence { get; set; }
     public double MaxRadiusKm { get; set; } = 100.0;
+
+    /// <summary>
+    /// Radio de decaimiento de la proximidad para profesionales que trabajan a distancia (contador, abogado,
+    /// inversionista). Es más amplio que <see cref="MaxRadiusKm"/>: no se los descarta por estar lejos, pero a igual
+    /// condición aparece primero quien está en la misma zona o provincia.
+    /// </summary>
+    public double RemoteRadiusKm { get; set; } = 800.0;
 }
 
 /// <summary>

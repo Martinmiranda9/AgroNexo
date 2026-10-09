@@ -3,6 +3,7 @@ using AgroNexo.Application.Matching.DTOs;
 using AgroNexo.Domain.Entities;
 using AgroNexo.Domain.Exceptions;
 using AgroNexo.Domain.Interfaces;
+using AgroNexo.Domain.ValueObjects;
 
 namespace AgroNexo.Application.Matching.UseCases;
 
@@ -67,7 +68,7 @@ public class CreateMatchUseCase : ICreateMatchUseCase
         var producer = await _ownershipValidator.GetOwnedProducerOrThrowAsync(producerId, auth0UserId, cancellationToken);
 
         // 2. Verify Professional exists
-        var professional = await _professionalRepository.GetByIdAsync(request.ProfessionalId, cancellationToken);
+        var professional = await _professionalRepository.GetByIdAcrossTenantsAsync(request.ProfessionalId, cancellationToken);
         if (professional == null)
             throw new EntityNotFoundException("Profesional", request.ProfessionalId);
 
@@ -78,8 +79,18 @@ public class CreateMatchUseCase : ICreateMatchUseCase
             throw new DuplicateMatchException(producerId, request.ProfessionalId);
         }
 
-        // 4. Create and persist new Match
-        var match = new Match(producerId, request.ProfessionalId);
+        // 4. Create and persist new Match, with the need brief the producer wrote (validated by the value object)
+        var needBrief = request.NeedBrief == null
+            ? null
+            : new NeedBrief(
+                request.NeedBrief.Summary,
+                request.NeedBrief.PlaceLabel,
+                request.NeedBrief.Hectares,
+                request.NeedBrief.Urgency,
+                request.NeedBrief.Topics,
+                request.NeedBrief.Crops);
+
+        var match = new Match(producerId, request.ProfessionalId, needBrief);
         await _matchRepository.AddAsync(match, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -93,7 +104,8 @@ public class CreateMatchUseCase : ICreateMatchUseCase
             Specialty = professional.Specialty,
             Status = match.Status,
             RequestedAt = match.RequestedAt,
-            RespondedAt = match.RespondedAt
+            RespondedAt = match.RespondedAt,
+            NeedBrief = NeedBriefResponse.From(match.NeedBrief)
         };
     }
 }

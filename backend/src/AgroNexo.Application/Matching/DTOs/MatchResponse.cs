@@ -16,4 +16,13 @@ public class MatchResponse
     public MatchStatus Status { get; set; }
     public DateTime RequestedAt { get; set; }
     public DateTime? RespondedAt { get; set; }
+
+    /// <summary>Contexto del pedido que adjuntó el productor; null si se creó sin ficha.</summary>
+    public NeedBriefResponse? NeedBrief { get; set; }
+
+    /// <summary>
+    /// Contacto del productor. Solo se completa para el profesional invitado cuando el Match está activo;
+    /// en cualquier otro caso es null.
+    /// </summary>
+    public MatchContactResponse? ProducerContact { get; set; }
 }

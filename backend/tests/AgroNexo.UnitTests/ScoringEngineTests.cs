@@ -82,9 +82,10 @@ public class ScoringEngineTests
     }
 
     [Fact]
-    public void CalculateScore_RequiresFieldPresenceFalse_BypassesDistancePenalty()
+    public void CalculateScore_RequiresFieldPresenceFalse_UsesWiderRemoteRadius()
     {
-        // Arrange: 500km distance, but remote work is allowed
+        // Arrange: 500km away. Remote work is allowed, so the 100km field radius does not apply,
+        // but distance still counts against the 800km remote radius -> 1 - 500/800 = 0.375
         var candidate = new ScoringCandidate
         {
             ProfessionalId = Guid.NewGuid(),
@@ -100,15 +101,70 @@ public class ScoringEngineTests
         {
             RequestedSpecialty = "Contabilidad Agropecuaria",
             RequiresFieldPresence = false,
-            MaxRadiusKm = 100.0
+            MaxRadiusKm = 100.0,
+            RemoteRadiusKm = 800.0
         };
 
         // Act
         var result = _engine.CalculateScore(candidate, criteria);
 
+        // Assert: 0.35 * 0.375 + 0.25 + 0.20 + 0.10 + 0.10 = 0.78125
+        result.ProximityScore.Should().Be(0.3750m);
+        result.TotalScore.Should().Be(0.7813m);
+    }
+
+    [Fact]
+    public void CalculateScore_RequiresFieldPresenceFalse_BeyondRemoteRadius_StillScoresOtherFactors()
+    {
+        // Arrange: farther than the remote radius -> zero proximity, but the professional is not discarded
+        var candidate = new ScoringCandidate
+        {
+            ProfessionalId = Guid.NewGuid(),
+            Specialty = "Contabilidad Agropecuaria",
+            YearsExperience = 10,
+            MaxCapacity = 20,
+            IsVerified = true,
+            ActiveMatches = 0,
+            DistanceKm = 1500.0
+        };
+
+        var criteria = new ScoringCriteria { RequiresFieldPresence = false, RemoteRadiusKm = 800.0 };
+
+        // Act
+        var result = _engine.CalculateScore(candidate, criteria);
+
+        // Assert: everything but proximity -> 0.25 + 0.20 + 0.10 + 0.10 = 0.65
+        result.ProximityScore.Should().Be(0.0000m);
+        result.TotalScore.Should().Be(0.6500m);
+    }
+
+    [Fact]
+    public void RankCandidates_RemoteRole_NearerProfessionalRanksFirstAllElseEqual()
+    {
+        // Arrange: two accountants identical in every factor except where they are
+        ScoringCandidate Accountant(double distanceKm) => new()
+        {
+            ProfessionalId = Guid.NewGuid(),
+            Role = ProfessionalRole.Accountant,
+            Specialty = "Impuestos",
+            YearsExperience = 10,
+            MaxCapacity = 20,
+            IsVerified = true,
+            ActiveMatches = 0,
+            DistanceKm = distanceKm
+        };
+
+        var farAway = Accountant(650.0);
+        var sameProvince = Accountant(90.0);
+        var criteria = new ScoringCriteria { RequiresFieldPresence = false };
+
+        // Act: far one is passed first so the result cannot depend on input order
+        var ranked = _engine.RankCandidates(new[] { farAway, sameProvince }, criteria);
+
         // Assert
-        result.ProximityScore.Should().Be(1.0000m);
-        result.TotalScore.Should().Be(1.0000m);
+        ranked[0].ProfessionalId.Should().Be(sameProvince.ProfessionalId);
+        ranked[1].ProfessionalId.Should().Be(farAway.ProfessionalId);
+        ranked[0].TotalScore.Should().BeGreaterThan(ranked[1].TotalScore);
     }
 
     [Fact]

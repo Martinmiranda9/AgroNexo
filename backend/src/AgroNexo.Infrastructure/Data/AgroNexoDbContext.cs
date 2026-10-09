@@ -118,6 +118,8 @@ public class AgroNexoDbContext : DbContext
         }
     }
 
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, long> InMemorySequences = new();
+
     private static readonly System.Text.RegularExpressions.Regex ValidSequenceName = new(@"^[a-zA-Z_][a-zA-Z0-9_]{0,62}$", System.Text.RegularExpressions.RegexOptions.Compiled);
 
     private static readonly HashSet<string> AllowedSequences = new()
@@ -134,6 +136,11 @@ public class AgroNexoDbContext : DbContext
     {
         if (!AllowedSequences.Contains(sequenceName) || !ValidSequenceName.IsMatch(sequenceName))
             throw new ArgumentException($"Nombre de secuencia no permitido: {sequenceName}", nameof(sequenceName));
+
+        // Los proveedores no relacionales (la base InMemory de los tests de integración) no ejecutan SQL: usan un
+        // contador en memoria. Con Npgsql esta rama nunca corre.
+        if (!Database.IsRelational())
+            return InMemorySequences.AddOrUpdate(sequenceName, 1, (_, current) => current + 1);
 
         var conn = Database.GetDbConnection();
         if (conn.State != System.Data.ConnectionState.Open)

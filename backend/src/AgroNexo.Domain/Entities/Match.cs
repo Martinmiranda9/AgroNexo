@@ -1,6 +1,7 @@
 using AgroNexo.Domain.Common;
 using AgroNexo.Domain.Enums;
 using AgroNexo.Domain.Exceptions;
+using AgroNexo.Domain.ValueObjects;
 
 namespace AgroNexo.Domain.Entities;
 
@@ -16,6 +17,9 @@ public class Match : BaseEntity, IAggregateRoot
     public DateTime RequestedAt { get; private set; } = DateTime.UtcNow;
     public DateTime? RespondedAt { get; private set; }
 
+    /// <summary>Ficha de necesidad que el productor adjuntó al pedido. Nula en matches creados sin ella.</summary>
+    public NeedBrief? NeedBrief { get; private set; }
+
     // Navigation properties
     public Producer? Producer { get; private set; }
     public Professional? Professional { get; private set; }
@@ -25,7 +29,7 @@ public class Match : BaseEntity, IAggregateRoot
     {
     }
 
-    public Match(Guid producerId, Guid professionalId)
+    public Match(Guid producerId, Guid professionalId, NeedBrief? needBrief = null)
     {
         if (producerId == Guid.Empty)
             throw new DomainValidationException(nameof(ProducerId), "El ProducerId es obligatorio.");
@@ -36,6 +40,7 @@ public class Match : BaseEntity, IAggregateRoot
         Id = Guid.NewGuid();
         ProducerId = producerId;
         ProfessionalId = professionalId;
+        NeedBrief = needBrief;
         Status = MatchStatus.Pending;
         RequestedAt = DateTime.UtcNow;
         CreatedAt = DateTime.UtcNow;

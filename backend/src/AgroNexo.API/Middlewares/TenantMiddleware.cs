@@ -53,6 +53,9 @@ public class TenantMiddleware
             Guid tenantId = Guid.Empty;
             bool hasTenant = !string.IsNullOrWhiteSpace(tenantClaim) && Guid.TryParse(tenantClaim, out tenantId);
 
+            // Los tokens de Firebase no traen rol ni tenant: se resuelven desde la base según dónde esté registrado el usuario.
+            string? registeredRole = null;
+
             if (!hasTenant && !string.IsNullOrWhiteSpace(auth0UserId))
             {
                 var producer = await producerRepository.GetByAuth0UserIdAsync(auth0UserId);
@@ -60,6 +63,7 @@ public class TenantMiddleware
                 {
                     tenantId = producer.TenantId;
                     hasTenant = true;
+                    registeredRole = "Producer";
                 }
                 else
                 {
@@ -68,6 +72,7 @@ public class TenantMiddleware
                     {
                         tenantId = professional.TenantId;
                         hasTenant = true;
+                        registeredRole = "Professional";
                     }
                 }
             }
@@ -78,6 +83,9 @@ public class TenantMiddleware
                 await context.Response.WriteAsJsonAsync(new { error = "tenant_claim_missing" });
                 return;
             }
+
+            // Un rol del token manda; solo si no trae ninguno se usa el del registro. Las políticas IsProducer/IsProfessional lo leen de acá.
+            role ??= registeredRole;
 
             if (hasTenant)
             {

@@ -45,6 +45,8 @@ public class UpdateMatchStatusUseCase : IUpdateMatchStatusUseCase
         if (match == null)
             throw new EntityNotFoundException("Match", matchId);
 
+        var professionalIsCaller = false;
+
         // Cross-tenant authorization check if auth0UserId is supplied
         if (!string.IsNullOrWhiteSpace(auth0UserId))
         {
@@ -58,6 +60,16 @@ public class UpdateMatchStatusUseCase : IUpdateMatchStatusUseCase
             {
                 throw new CrossTenantAccessException(
                     $"El usuario '{auth0UserId}' no tiene permisos sobre este Match.");
+            }
+
+            professionalIsCaller = isProfessionalOwner;
+
+            // Aceptar o rechazar el pedido le corresponde solo al profesional invitado: el productor no puede
+            // aceptarse a sí mismo. Cancelar y completar siguen disponibles para ambos.
+            if (request.Status is MatchStatus.Active or MatchStatus.Rejected && !isProfessionalOwner)
+            {
+                throw new CrossTenantAccessException(
+                    "Solo el profesional invitado puede aceptar o rechazar el pedido de match.");
             }
         }
 
@@ -88,7 +100,12 @@ public class UpdateMatchStatusUseCase : IUpdateMatchStatusUseCase
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         var prod = await _producerRepository.GetByIdAsync(match.ProducerId, cancellationToken);
-        var prof = await _professionalRepository.GetByIdAsync(match.ProfessionalId, cancellationToken);
+        // Quien responde es el profesional invitado (el productor no puede aceptar): al aceptar recibe el contacto.
+        var shareProducerContact = prod != null
+            && match.Status == MatchStatus.Active
+            && !string.IsNullOrWhiteSpace(auth0UserId)
+            && professionalIsCaller;
+        var prof = await _professionalRepository.GetByIdAcrossTenantsAsync(match.ProfessionalId, cancellationToken);
 
         return new MatchResponse
         {
@@ -100,7 +117,11 @@ public class UpdateMatchStatusUseCase : IUpdateMatchStatusUseCase
             Specialty = prof?.Specialty ?? string.Empty,
             Status = match.Status,
             RequestedAt = match.RequestedAt,
-            RespondedAt = match.RespondedAt
+            RespondedAt = match.RespondedAt,
+            NeedBrief = NeedBriefResponse.From(match.NeedBrief),
+            ProducerContact = shareProducerContact
+                ? new MatchContactResponse { PhoneNumber = prod!.PhoneNumber, Email = prod.Email }
+                : null
         };
     }
 }

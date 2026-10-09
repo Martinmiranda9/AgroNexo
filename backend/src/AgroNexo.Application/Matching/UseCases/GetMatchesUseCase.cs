@@ -2,6 +2,7 @@ using AgroNexo.Application.Common.Interfaces;
 using AgroNexo.Application.Common.Models;
 using AgroNexo.Application.Matching.DTOs;
 using AgroNexo.Domain.Entities;
+using AgroNexo.Domain.Enums;
 using AgroNexo.Domain.Interfaces;
 
 namespace AgroNexo.Application.Matching.UseCases;
@@ -92,17 +93,24 @@ public class GetMatchesUseCase : IGetMatchesUseCase
         foreach (var match in matches)
         {
             string producerName = "Productor";
+            MatchContactResponse? producerContact = null;
             string professionalName = "Profesional";
             string specialty = string.Empty;
 
-            if (match.Producer != null)
+            // El contacto del productor solo se comparte con el profesional invitado y una vez aceptado el pedido.
+            bool shareProducerContact = match.Status == MatchStatus.Active && filter.ProfessionalId.HasValue;
+
+            var producerEntity = match.Producer
+                ?? await _producerRepository.GetByIdAsync(match.ProducerId, cancellationToken);
+            if (producerEntity != null)
             {
-                producerName = $"{match.Producer.FirstName} {match.Producer.LastName}".Trim();
-            }
-            else
-            {
-                var prod = await _producerRepository.GetByIdAsync(match.ProducerId, cancellationToken);
-                if (prod != null) producerName = $"{prod.FirstName} {prod.LastName}".Trim();
+                producerName = $"{producerEntity.FirstName} {producerEntity.LastName}".Trim();
+                if (shareProducerContact)
+                    producerContact = new MatchContactResponse
+                    {
+                        PhoneNumber = producerEntity.PhoneNumber,
+                        Email = producerEntity.Email
+                    };
             }
 
             if (match.Professional != null)
@@ -112,7 +120,7 @@ public class GetMatchesUseCase : IGetMatchesUseCase
             }
             else
             {
-                var prof = await _professionalRepository.GetByIdAsync(match.ProfessionalId, cancellationToken);
+                var prof = await _professionalRepository.GetByIdAcrossTenantsAsync(match.ProfessionalId, cancellationToken);
                 if (prof != null)
                 {
                     professionalName = $"{prof.FirstName} {prof.LastName}".Trim();
@@ -130,7 +138,9 @@ public class GetMatchesUseCase : IGetMatchesUseCase
                 Specialty = specialty,
                 Status = match.Status,
                 RequestedAt = match.RequestedAt,
-                RespondedAt = match.RespondedAt
+                RespondedAt = match.RespondedAt,
+                NeedBrief = NeedBriefResponse.From(match.NeedBrief),
+                ProducerContact = producerContact
             });
         }
 

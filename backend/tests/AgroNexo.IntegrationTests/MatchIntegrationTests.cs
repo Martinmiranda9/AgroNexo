@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using AgroNexo.Application.Common.Models;
 using AgroNexo.Application.Matching.DTOs;
 using AgroNexo.Domain.Enums;
 using AgroNexo.IntegrationTests.Infrastructure;
@@ -136,5 +137,97 @@ public class MatchIntegrationTests : IntegrationTestBase
         problemDetails2.Should().NotBeNull();
         problemDetails2!.Status.Should().Be((int)HttpStatusCode.Conflict);
         problemDetails2.Title.Should().Contain("Conflicto de duplicidad");
+    }
+
+    /// <summary>
+    /// La ficha de necesidad viaja con el Match entre tenants: el profesional (otro tenant) la recibe al listar sus
+    /// pedidos y la conserva al aceptarlos.
+    /// </summary>
+    [Fact]
+    public async Task CreateMatch_WithNeedBrief_ProfessionalOfAnotherTenantReceivesItAndKeepsItAfterAccepting()
+    {
+        // Arrange
+        var producerReg = await RegisterProducerAsync("auth0|producer_brief", "Esteban", "Bauer", "20-33445566-7");
+        var profReg = await RegisterProfessionalAsync("auth0|prof_brief", "Maria", "Gomez", "27-11111111-1", ProfessionalRole.Accountant, "Impuestos agropecuarios", 10, 20);
+        var producerClient = CreateClientWithAuth("auth0|producer_brief", "Producer", producerReg.TenantId);
+        var profClient = CreateClientWithAuth("auth0|prof_brief", "Professional", profReg.TenantId);
+
+        var request = new CreateMatchRequest
+        {
+            ProfessionalId = profReg.UserId,
+            NeedBrief = new NeedBriefRequest
+            {
+                Summary = "Productor de Berrotarán, 350 ha de soja, necesita ayuda con retenciones, este mes.",
+                PlaceLabel = "Berrotarán, Córdoba",
+                Hectares = 350,
+                Urgency = MatchUrgency.ThisMonth,
+                Topics = new List<string> { "farm-taxes" },
+                Crops = new List<string> { "soybean" }
+            }
+        };
+
+        // Act 1: the producer sends the request with its brief
+        var createRes = await producerClient.PostAsJsonAsync("/api/v1/matches", request, JsonOptions);
+        createRes.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        // Act 2: the professional lists the requests addressed to them
+        var listRes = await profClient.GetAsync("/api/v1/matches");
+        listRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var page = await listRes.Content.ReadFromJsonAsync<PagedResult<MatchResponse>>(JsonOptions);
+
+        // Assert 1: the brief arrives complete, in the same shape the producer sent
+        page!.Items.Should().ContainSingle();
+        var received = page.Items[0];
+        received.NeedBrief.Should().NotBeNull();
+        received.NeedBrief!.Summary.Should().Contain("350 ha de soja");
+        received.NeedBrief.PlaceLabel.Should().Be("Berrotarán, Córdoba");
+        received.NeedBrief.Hectares.Should().Be(350);
+        received.NeedBrief.Urgency.Should().Be(MatchUrgency.ThisMonth);
+        received.NeedBrief.Topics.Should().Equal("farm-taxes");
+        received.NeedBrief.Crops.Should().Equal("soybean");
+
+        // Act 3: the professional accepts
+        var acceptRes = await profClient.PatchAsJsonAsync($"/api/v1/matches/{received.Id}/status", new UpdateMatchStatusRequest { Status = MatchStatus.Active }, JsonOptions);
+
+        // Assert 2: still active with its brief
+        acceptRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var accepted = await acceptRes.Content.ReadFromJsonAsync<MatchResponse>(JsonOptions);
+        accepted!.Status.Should().Be(MatchStatus.Active);
+        accepted.NeedBrief!.Summary.Should().Be(received.NeedBrief.Summary);
+    }
+
+    [Fact]
+    public async Task CreateMatch_InvalidNeedBrief_Returns400()
+    {
+        var producerReg = await RegisterProducerAsync("auth0|producer_badbrief", "Esteban", "Bauer", "20-33445566-7");
+        var profReg = await RegisterProfessionalAsync("auth0|prof_badbrief", "Maria", "Gomez", "27-11111111-1", ProfessionalRole.Accountant, "Impuestos agropecuarios", 10, 20);
+        var producerClient = CreateClientWithAuth("auth0|producer_badbrief", "Producer", producerReg.TenantId);
+
+        var request = new CreateMatchRequest
+        {
+            ProfessionalId = profReg.UserId,
+            NeedBrief = new NeedBriefRequest { Summary = "corto" }
+        };
+
+        var response = await producerClient.PostAsJsonAsync("/api/v1/matches", request, JsonOptions);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task UpdateMatchStatus_ProducerTriesToAcceptItsOwnRequest_Returns403_AndMatchStaysPending()
+    {
+        var producerReg = await RegisterProducerAsync("auth0|producer_selfaccept", "Esteban", "Bauer", "20-33445566-7");
+        var profReg = await RegisterProfessionalAsync("auth0|prof_selfaccept", "Maria", "Gomez", "27-11111111-1", ProfessionalRole.Lawyer, "Arrendamientos", 10, 20);
+        var producerClient = CreateClientWithAuth("auth0|producer_selfaccept", "Producer", producerReg.TenantId);
+
+        var createRes = await producerClient.PostAsJsonAsync("/api/v1/matches", new CreateMatchRequest { ProfessionalId = profReg.UserId }, JsonOptions);
+        var match = await createRes.Content.ReadFromJsonAsync<MatchResponse>(JsonOptions);
+
+        var acceptRes = await producerClient.PatchAsJsonAsync($"/api/v1/matches/{match!.Id}/status", new UpdateMatchStatusRequest { Status = MatchStatus.Active }, JsonOptions);
+
+        acceptRes.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        var listRes = await producerClient.GetFromJsonAsync<PagedResult<MatchResponse>>("/api/v1/matches", JsonOptions);
+        listRes!.Items.Single().Status.Should().Be(MatchStatus.Pending);
     }
 }

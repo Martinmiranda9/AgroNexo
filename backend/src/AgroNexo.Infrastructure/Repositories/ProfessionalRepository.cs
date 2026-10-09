@@ -22,6 +22,14 @@ public class ProfessionalRepository : IProfessionalRepository
             .FirstOrDefaultAsync(p => p.Id == id && p.IsActive, cancellationToken);
     }
 
+    public async Task<Professional?> GetByIdAcrossTenantsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        // IgnoreQueryFilters is required because a Match links a Producer with a Professional of another tenant.
+        return await _context.Professionals
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(p => p.Id == id && p.IsActive, cancellationToken);
+    }
+
     public async Task<Professional?> GetByAuth0UserIdAsync(string auth0UserId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(auth0UserId))

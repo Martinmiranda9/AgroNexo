@@ -14,4 +14,10 @@ public class CreateMatchRequest
     /// Optional if derived directly from the authenticated producer's context.
     /// </summary>
     public Guid? ProducerId { get; set; }
+
+    /// <summary>
+    /// Ficha de necesidad con el contexto del pedido (resumen, zona, hectáreas, urgencia, temas y cultivos).
+    /// Opcional: un pedido sin ficha sigue siendo válido.
+    /// </summary>
+    public NeedBriefRequest? NeedBrief { get; set; }
 }

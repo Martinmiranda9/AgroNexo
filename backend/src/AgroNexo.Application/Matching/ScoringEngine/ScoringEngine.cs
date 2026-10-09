@@ -4,6 +4,7 @@ namespace AgroNexo.Application.Matching.ScoringEngine;
 /// Deterministic recommendation scoring engine for AgroNexo.
 /// Evaluates candidate professionals against geo-spatial, credentials, specialty, experience, and workload factors.
 /// Weights: Proximity (35%), Verification (25%), Specialty (20%), Experience (10%), Workload Capacity (10%).
+/// Proximity applies to every role (remote roles use a wider radius), so closer professionals always rank first.
 /// </summary>
 public class ScoringEngine : IScoringEngine
 {
@@ -22,27 +23,26 @@ public class ScoringEngine : IScoringEngine
             throw new ArgumentNullException(nameof(criteria));
 
         // 1. Proximity Factor (35%)
+        // Quien debe ir al campo se mide contra el radio de cobertura; quien trabaja a distancia, contra un radio mucho
+        // más amplio. En ambos casos cuanto más cerca de la zona buscada, mejor puntaje: la distancia no descarta a
+        // nadie, pero ordena (misma zona primero).
+        double maxRadius = criteria.RequiresFieldPresence
+            ? (criteria.MaxRadiusKm > 0 ? criteria.MaxRadiusKm : 100.0)
+            : (criteria.RemoteRadiusKm > 0 ? criteria.RemoteRadiusKm : 800.0);
+
         decimal proximityScore;
-        if (!criteria.RequiresFieldPresence)
+        if (candidate.DistanceKm <= 0.0)
         {
             proximityScore = 1.0m;
         }
+        else if (candidate.DistanceKm >= maxRadius)
+        {
+            proximityScore = 0.0m;
+        }
         else
         {
-            double maxRadius = criteria.MaxRadiusKm > 0 ? criteria.MaxRadiusKm : 100.0;
-            if (candidate.DistanceKm <= 0.0)
-            {
-                proximityScore = 1.0m;
-            }
-            else if (candidate.DistanceKm >= maxRadius)
-            {
-                proximityScore = 0.0m;
-            }
-            else
-            {
-                double proximityRatio = 1.0 - (candidate.DistanceKm / maxRadius);
-                proximityScore = Math.Clamp((decimal)proximityRatio, 0.0m, 1.0m);
-            }
+            double proximityRatio = 1.0 - (candidate.DistanceKm / maxRadius);
+            proximityScore = Math.Clamp((decimal)proximityRatio, 0.0m, 1.0m);
         }
 
         // 2. Verification Factor (25%)
