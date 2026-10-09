@@ -3,20 +3,21 @@
 import { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { createMatchAction } from '@/core/actions/create-match.action';
-import type { CreateMatchResult, SearchLocation } from '@/core/models/match.model';
+import type { CreateMatchResult, NeedBrief, SearchLocation } from '@/core/models/match.model';
+import { AppHeader } from '@/features/app-shell';
 import { useMediaQuery } from '@/shared/hooks/useMediaQuery';
 import BrandGlow from '@/ui/components/BrandGlow';
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/ui/components/Sheet';
+import { Drawer, DrawerContent } from '@/ui/components/Drawer';
 import { useMatchDiscovery } from '../hooks/useMatchDiscovery';
-import { fullName, type ResultView } from '../lib/build-results';
+import type { ResultView } from '../lib/build-results';
 import type { MatchDiscoveryUser } from '../types';
-import MatchDiscoveryHeader from './MatchDiscoveryHeader';
 import MatchRequestDialog from './MatchRequestDialog';
 import NeedSummary from './NeedSummary';
-import ProfessionalDetail from './ProfessionalDetail';
+import ProfessionalDetail, { detailTitleId } from './ProfessionalDetail';
 import ResultsSection from './ResultsSection';
 import SearchHero from './SearchHero';
-import SearchingState from './SearchingState';
+import SearchingState, { SEARCH_STEPS } from './SearchingState';
+import ThoughtLine from '@/ui/components/ThoughtLine';
 
 interface MatchDiscoveryScreenProps {
   user: MatchDiscoveryUser;
@@ -35,18 +36,28 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
   const discovery = useMatchDiscovery(location);
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const reduceMotion = useReducedMotion();
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [requestFor, setRequestFor] = useState<ResultView | null>(null);
 
   const { phase, need, selected } = discovery;
   const requested = selected ? discovery.sentTo.has(selected.recommendation.professionalId) : false;
 
-  const confirmMatch = async (result: ResultView): Promise<CreateMatchResult> => {
+  const confirmMatch = async (result: ResultView, brief: NeedBrief): Promise<CreateMatchResult> => {
     if (discovery.isSample) {
       await new Promise((resolve) => setTimeout(resolve, SAMPLE_SEND_DELAY_MS));
       return { status: 'created', matchId: 'sample-match' };
     }
-    return createMatchAction(result.recommendation.professionalId);
+    return createMatchAction(result.recommendation.professionalId, brief);
+  };
+
+  const requestProps = {
+    result: requestFor,
+    need,
+    placeLabel: discovery.zone.location.label,
+    producerName: `${user.firstName} ${user.lastName}`.trim(),
+    onClose: () => setRequestFor(null),
+    onConfirm: confirmMatch,
+    onSent: discovery.markSent,
   };
 
   const fade = reduceMotion
@@ -63,7 +74,7 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
       <BrandGlow quiet={phase === 'results'} />
 
       <div className="relative z-10">
-        <MatchDiscoveryHeader user={user} />
+        <AppHeader user={user} />
 
         <main className="mx-auto max-w-[1180px] px-4 pb-16 sm:px-6">
           <AnimatePresence mode="wait" initial={false}>
@@ -79,18 +90,32 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
 
             {phase === 'searching' && (
               <motion.div key="searching" {...fade}>
-                <SearchingState />
+                <SearchingState query={discovery.draft} />
               </motion.div>
             )}
 
             {phase === 'results' && need && (
-              <motion.div key="results" className="pt-10" {...fade}>
+              <motion.div key="results" className="pt-8" {...fade}>
+                {/* La misma línea de la búsqueda, ya resuelta y plegada: se despliega para ver qué se hizo. */}
+                <ThoughtLine
+                  working={false}
+                  elapsed={discovery.searchSeconds}
+                  label="Buscando profesionales…"
+                  doneLabel="Buscamos en"
+                  steps={SEARCH_STEPS}
+                  glyph="sparkle"
+                  fontSize={14}
+                  className="text-olive mb-5"
+                />
                 <NeedSummary
                   need={need}
-                  location={location}
+                  location={discovery.zone.location}
+                  fromPrompt={discovery.zone.fromPrompt}
+                  unresolvedPlace={discovery.zone.unresolved}
                   onEdit={discovery.edit}
                   onRoleChange={discovery.changeRole}
                   onRemoveTopic={discovery.removeTopic}
+                  onClearDetail={discovery.clearDetail}
                 />
                 <ResultsSection
                   results={discovery.results}
@@ -99,13 +124,16 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
                   refreshing={discovery.refreshing}
                   error={discovery.error}
                   isSample={discovery.isSample}
+                  zoneLabel={discovery.zone.fromPrompt ? discovery.zone.location.label : 'tu campo'}
+                  allRoles={need.role === null}
                   onSelect={(id) => {
                     discovery.select(id);
-                    if (!isDesktop) setSheetOpen(true);
+                    if (!isDesktop) setDrawerOpen(true);
                   }}
                   onRequest={setRequestFor}
                   onEdit={discovery.edit}
                   onRetry={discovery.retry}
+                  onShowAllRoles={() => discovery.changeRole(null)}
                 />
               </motion.div>
             )}
@@ -113,40 +141,30 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
         </main>
       </div>
 
-      {/* En celular la ficha se abre desde abajo; en escritorio vive al costado de la lista. */}
-      <Sheet open={sheetOpen && !isDesktop && selected !== null} onOpenChange={setSheetOpen}>
-        <SheetContent
-          side="bottom"
-          className="bg-surface max-h-[90dvh] overflow-y-auto rounded-t-[22px] p-5 pt-10"
+      {/* En celular la ficha se abre en un drawer desde abajo; en escritorio vive al costado de la lista. */}
+      <Drawer
+        open={drawerOpen && !isDesktop && selected !== null}
+        onOpenChange={setDrawerOpen}
+        showSwipeHandle
+      >
+        <DrawerContent
+          className="bg-surface"
+          aria-labelledby={selected ? detailTitleId(selected.recommendation.id) : undefined}
         >
           {selected && (
-            <>
-              <SheetTitle className="sr-only">
-                Perfil de {fullName(selected.recommendation)}
-              </SheetTitle>
-              <SheetDescription className="sr-only">
-                Por qué aparece en tu búsqueda y cómo pedir el match.
-              </SheetDescription>
-              <ProfessionalDetail
-                key={selected.recommendation.id}
-                result={selected}
-                requested={requested}
-                onRequest={() => {
-                  setSheetOpen(false);
-                  setRequestFor(selected);
-                }}
-              />
-            </>
+            <ProfessionalDetail
+              key={selected.recommendation.id}
+              result={selected}
+              requested={requested}
+              onRequest={() => setRequestFor(selected)}
+            />
           )}
-        </SheetContent>
-      </Sheet>
+          {/* La solicitud se apila sobre la ficha: al cancelarla o deslizarla, la ficha sigue debajo. */}
+          {!isDesktop && <MatchRequestDialog {...requestProps} side="down" />}
+        </DrawerContent>
+      </Drawer>
 
-      <MatchRequestDialog
-        result={requestFor}
-        onClose={() => setRequestFor(null)}
-        onConfirm={confirmMatch}
-        onSent={discovery.markSent}
-      />
+      {isDesktop && <MatchRequestDialog {...requestProps} side="right" />}
     </div>
   );
 }

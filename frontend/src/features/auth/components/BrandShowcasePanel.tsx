@@ -11,7 +11,7 @@ import {
   type MotionValue,
 } from 'motion/react';
 import { Pause, Play } from '@phosphor-icons/react';
-import { Badge } from '@/ui/components';
+import { Badge, BadgeDot } from '@/ui/components';
 import BrandGradient from '@/ui/components/BrandGradient';
 import { FieldMapCard, FloatingCard, MatchCard, YieldCard, type ShowcaseState } from './showcase';
 
@@ -116,7 +116,8 @@ export default function BrandShowcasePanel() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-pine/80 via-pine/0 to-pine/0" />
 
       <div className="relative z-10">
-        <Badge variant="inverse" dot className="px-3.5 py-1.5 text-caption font-medium tracking-wide">
+        <Badge variant="inverse" className="h-auto gap-1.5 px-3.5 py-1.5 text-caption font-medium tracking-wide">
+          <BadgeDot className="animate-pulse bg-accent-light motion-reduce:animate-none" />
           Campaña 25/26
         </Badge>
       </div>

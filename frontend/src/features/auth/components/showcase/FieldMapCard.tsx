@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { MapPin } from '@phosphor-icons/react';
-import { Badge, Card } from '@/ui/components';
+import { Badge, BadgeDot, Card } from '@/ui/components';
 import IconContainer from '@/ui/components/IconContainer';
 
 // Dimensiones de la foto: el SVG de encima usa el mismo viewBox, así el lote queda alineado a cualquier ancho.
@@ -26,7 +26,8 @@ export default function FieldMapCard() {
             <span className="font-mono tabular-nums">82</span> ha · Venado Tuerto, Santa Fe
           </p>
         </div>
-        <Badge variant="positive" dot>
+        <Badge variant="success">
+          <BadgeDot />
           NDVI <span className="font-mono tabular-nums">0,78</span>
         </Badge>
       </div>

@@ -30,7 +30,8 @@ export default function YieldCard() {
       <div className="mb-3 mt-3 flex items-baseline gap-1.5">
         <span className="font-mono text-heading-lg font-medium tabular-nums leading-none">3,9</span>
         <span className="font-mono text-caption text-dark/70">t/ha</span>
-        <Badge variant="positive" icon={<TrendUp size={12} weight="bold" />} className="ml-auto">
+        <Badge variant="success" className="ml-auto">
+          <TrendUp data-icon="inline-start" size={12} weight="bold" />
           <span className="font-mono tabular-nums">6%</span>
         </Badge>
       </div>

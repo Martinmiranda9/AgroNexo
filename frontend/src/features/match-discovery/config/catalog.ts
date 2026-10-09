@@ -1,4 +1,5 @@
 import type { ProfessionalRole, SearchableRole } from '@/core/models/identity.model';
+import { NEED_TOPIC_LABELS, type CropId } from '@/shared/constants/need-labels';
 
 export const ROLE_LABEL: Record<SearchableRole, string> = {
   Agronomist: 'Ingeniero agrónomo',
@@ -51,7 +52,7 @@ export interface NeedTopic {
 export const NEED_TOPICS: NeedTopic[] = [
   {
     id: 'extensive-crops',
-    label: 'Cultivos extensivos',
+    label: NEED_TOPIC_LABELS['extensive-crops'],
     role: 'Agronomist',
     keywords: [
       'soja',
@@ -70,7 +71,7 @@ export const NEED_TOPICS: NeedTopic[] = [
   },
   {
     id: 'precision-ag',
-    label: 'Agricultura de precisión',
+    label: NEED_TOPIC_LABELS['precision-ag'],
     role: 'Agronomist',
     keywords: [
       'precision',
@@ -83,46 +84,62 @@ export const NEED_TOPICS: NeedTopic[] = [
   },
   {
     id: 'pastures',
-    label: 'Pasturas y forraje',
+    label: NEED_TOPIC_LABELS['pastures'],
     role: 'Agronomist',
     keywords: ['pastura', 'forraj', 'verdeo', 'alfalfa', 'cria', 'rodeo'],
   },
   {
     id: 'farm-taxes',
-    label: 'Impuestos agropecuarios',
+    label: NEED_TOPIC_LABELS['farm-taxes'],
     role: 'Accountant',
     keywords: ['impuest', 'iva', 'ganancias', 'arca', 'afip', 'retenc', 'monotribut'],
   },
   {
     id: 'grain-settlement',
-    label: 'Liquidación de granos',
+    label: NEED_TOPIC_LABELS['grain-settlement'],
     role: 'Accountant',
     keywords: ['liquidac', 'granos', 'lpg', 'cooperativa'],
   },
   {
     id: 'farm-credit',
-    label: 'Créditos y garantías',
+    label: NEED_TOPIC_LABELS['farm-credit'],
     role: 'Accountant',
     keywords: ['credito', 'prestamo', 'banco', 'garantia', 'carpeta'],
   },
   {
     id: 'farm-leases',
-    label: 'Arrendamientos',
+    label: NEED_TOPIC_LABELS['farm-leases'],
     role: 'Lawyer',
     keywords: ['arrend', 'alquil', 'aparceria', 'contrato'],
   },
   {
     id: 'succession',
-    label: 'Sucesiones',
+    label: NEED_TOPIC_LABELS['succession'],
     role: 'Lawyer',
     keywords: ['sucesi', 'herenc', 'heredero'],
   },
   {
     id: 'campaign-financing',
-    label: 'Financiamiento de campaña',
+    label: NEED_TOPIC_LABELS['campaign-financing'],
     role: 'Investor',
     keywords: ['financi', 'capital', 'invertir', 'inversion', 'fondos', 'socio'],
   },
+];
+
+export interface NeedCrop {
+  id: CropId;
+  /** Palabras completas (sin tildes) con las que el productor nombra el cultivo; se comparan como palabra entera. */
+  words: string[];
+}
+
+export const NEED_CROPS: NeedCrop[] = [
+  { id: 'soybean', words: ['soja', 'sojas'] },
+  { id: 'corn', words: ['maiz', 'maices'] },
+  { id: 'wheat', words: ['trigo', 'trigos'] },
+  { id: 'sunflower', words: ['girasol', 'girasoles'] },
+  { id: 'barley', words: ['cebada', 'cebadas'] },
+  { id: 'sorghum', words: ['sorgo', 'sorgos'] },
+  { id: 'peanut', words: ['mani', 'manises'] },
 ];
 
 export type Activity = 'Agricultura' | 'Ganadería' | 'Mixto' | 'Tambo';
@@ -163,3 +180,12 @@ export const EXAMPLE_NEEDS: ExampleNeed[] = [
     full: 'Busco un inversionista que me ayude a financiar la campaña de trigo, 600 ha.',
   },
 ];
+
+/** Profesión del tema que más aparece entre los ids dados ("retenciones" → contador); `null` si no hay temas. */
+export function roleFromTopics(topicIds: string[]): SearchableRole | null {
+  const votes = new Map<SearchableRole, number>();
+  for (const topic of NEED_TOPICS.filter((t) => topicIds.includes(t.id))) {
+    votes.set(topic.role, (votes.get(topic.role) ?? 0) + 1);
+  }
+  return [...votes.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+}

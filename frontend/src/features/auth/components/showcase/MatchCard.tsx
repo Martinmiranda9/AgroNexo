@@ -24,10 +24,12 @@ export default function MatchCard() {
       </div>
 
       <div className="mt-4 flex items-center gap-2">
-        <Badge variant="positive" icon={<SealCheck size={12} weight="fill" />}>
+        <Badge variant="success">
+          <SealCheck data-icon="inline-start" size={12} weight="fill" />
           Verificado
         </Badge>
-        <Badge variant="neutral" icon={<MapPin size={12} weight="bold" />}>
+        <Badge variant="secondary">
+          <MapPin data-icon="inline-start" size={12} weight="bold" />
           Rosario
         </Badge>
         <IconContainer size="sm" tone="solid" className="ml-auto">

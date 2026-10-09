@@ -15,7 +15,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 const SHELL = {
   light: 'bg-beige-dark/60 ring-1 ring-pine/10',
   onDark: 'bg-beige/12 ring-1 ring-beige/25 backdrop-blur-md',
-  paper: 'bg-pine/[0.035] ring-1 ring-pine/8',
+  paper: 'bg-surface-sunken ring-1 ring-pine/8',
 } as const;
 
 const CORE = {
@@ -30,14 +30,18 @@ const CORE = {
  */
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ surface = 'light', className, coreClassName, children, ...props }, ref) => (
-    <div ref={ref} className={cn('rounded-[22px] p-1.5', SHELL[surface], className)} {...props}>
+    <div ref={ref} className={cn('rounded-shell p-1.5', SHELL[surface], className)} {...props}>
       <div
-        className={cn('overflow-hidden rounded-card border border-pine/10 text-pine', CORE[surface], coreClassName)}
+        className={cn(
+          'rounded-card border-pine/10 text-pine overflow-hidden border',
+          CORE[surface],
+          coreClassName
+        )}
       >
         {children}
       </div>
     </div>
-  ),
+  )
 );
 
 Card.displayName = 'Card';

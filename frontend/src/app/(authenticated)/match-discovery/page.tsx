@@ -34,7 +34,9 @@ export default async function MatchDiscoveryPage() {
       user={{
         firstName: profile?.firstName ?? current.user.firstName ?? sessionUser.firstName ?? '',
         lastName: profile?.lastName ?? sessionUser.lastName ?? '',
+        role: 'Producer',
         publicId: profile?.publicId ?? current.user.publicId ?? null,
+        avatarUrl: sessionUser.picture,
       }}
       location={location}
     />

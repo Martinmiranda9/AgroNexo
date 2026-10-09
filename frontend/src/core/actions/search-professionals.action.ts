@@ -39,6 +39,9 @@ export async function searchProfessionalsAction(
       cache: 'no-store',
     });
 
+    if (!res.ok && process.env.NODE_ENV !== 'production') {
+      console.warn(`[match-discovery] el backend respondió ${res.status} a la búsqueda.`);
+    }
     if (res.status === 401) return { status: 'unauthorized' };
     if (res.status === 403) return { status: 'forbidden' };
     if (!res.ok) return { status: 'unavailable' };

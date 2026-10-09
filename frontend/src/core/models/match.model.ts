@@ -1,7 +1,30 @@
+import type { MatchStatus } from '@/shared/constants/match-status';
+import type { NeedBrief } from '@/shared/types/need-brief';
 import type { ProfessionalRole } from './identity.model';
 
+export type { MatchStatus, NeedBrief };
+
+/** Pedido de match tal como lo devuelve el backend (`MatchResponse`), visto por el productor o por el profesional. */
 export interface Match {
   id: string;
+  producerId: string;
+  producerName: string;
+  professionalId: string;
+  professionalName: string;
+  specialty: string;
+  status: MatchStatus;
+  requestedAt: string;
+  respondedAt: string | null;
+  /** Contexto que adjuntó el productor; `null` en pedidos creados sin ficha. */
+  needBrief: NeedBrief | null;
+  /** Contacto del productor: solo llega al profesional invitado y una vez aceptado el pedido; si no, `null`. */
+  producerContact?: MatchContact | null;
+}
+
+export interface MatchContact {
+  /** Formato internacional (E.164): `+5491155550000`. */
+  phoneNumber: string;
+  email: string | null;
 }
 
 // ─── Búsqueda de profesionales (POST /api/v1/match-discovery) ────────────────
@@ -59,6 +82,28 @@ export type CreateMatchResult =
   /** Ya existe un match Pending/Activo con ese profesional (409). */
   | { status: 'conflict' }
   | { status: 'not-found' }
+  /** La ficha no cumple las reglas del backend (largo, hectáreas, ids). */
+  | { status: 'invalid' }
+  | { status: 'unauthorized' }
+  | { status: 'forbidden' }
+  | { status: 'unavailable' };
+
+// ─── Pedidos de match (GET /api/v1/matches y PATCH /api/v1/matches/{id}/status) ───
+
+export type GetMatchesResult =
+  | { status: 'ok'; matches: Match[] }
+  | { status: 'unauthorized' }
+  | { status: 'forbidden' }
+  | { status: 'unavailable' };
+
+/** Respuesta del profesional a un pedido: acepta (`Active`) o rechaza (`Rejected`). */
+export type MatchDecision = Extract<MatchStatus, 'Active' | 'Rejected'>;
+
+export type UpdateMatchStatusResult =
+  | { status: 'ok'; match: Match }
+  | { status: 'not-found' }
+  /** El pedido ya no está pendiente, o la transición no es válida (400). */
+  | { status: 'invalid' }
   | { status: 'unauthorized' }
   | { status: 'forbidden' }
   | { status: 'unavailable' };

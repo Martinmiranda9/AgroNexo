@@ -18,6 +18,14 @@
   --color-neutral-warm: #978A56;
   --color-danger: #8C4A34;
 
+  /* ── Estados de tags (green-600 / amber-600 de Tailwind, de ss-components badge-18 / badge-16).
+     El rojo de "negativo" es --color-danger. ── */
+  --color-status-green: #16a34a;
+  --color-status-amber: #d97706;
+  /* Texto de los tags: el 600 sobre su propio tinte al 10% daba 2,9:1. El 800 llega a 6,4:1 (WCAG AA). */
+  --color-status-green-ink: #166534;
+  --color-status-amber-ink: #92400e;
+
   /* ── Paleta Pine & Beige (Nuevos colores principales) ── */
   --color-pine: #00311e;
   --color-pine-hover: #002617;
@@ -31,6 +39,8 @@
   --shadow-raised: 0 1px 2px rgb(0 49 30 / 0.05), 0 24px 48px -24px rgb(0 49 30 / 0.22);
 
   --radius-card: 16px;
+  /* Bisel externo de los contenedores protagonistas (ficha, diálogo, buscador): 16 + 6 de padding. */
+  --radius-shell: 22px;
   --radius-input: 12px;
   --radius-pill: 9999px;
 
@@ -88,6 +98,17 @@
   --accent: var(--color-beige-dark);
   --accent-foreground: var(--color-pine);
   --destructive: var(--color-danger);
+  /* No son de shadcn: estados positivo / pendiente de los tags (Badge success / warning). */
+  --success: var(--color-status-green);
+  --success-foreground: var(--color-status-green-ink);
+  --warning: var(--color-status-amber);
+  --warning-foreground: var(--color-status-amber-ink);
+
+  /* Tintes de superficie de producto (sobre paper/surface). Antes eran `pine/[0.035]`, `pine/25`, `olive/12`… sueltos. */
+  --surface-sunken: color-mix(in oklab, var(--color-pine) 3.5%, transparent);
+  --border-strong: color-mix(in oklab, var(--color-pine) 30%, transparent);
+  --fill-positive: color-mix(in oklab, var(--color-olive) 12%, transparent);
+  --fill-caution: color-mix(in oklab, var(--color-neutral-warm) 10%, transparent);
 
   --border: color-mix(in oklab, var(--color-pine) 12%, transparent);
   /* Borde de controles: neutral-warm pleno (3.2–3.3:1 sobre beige/card, WCAG 1.4.11). Al 50% daba 1.7:1. */
@@ -128,6 +149,14 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-border-strong: var(--border-strong);
+  --color-fill-positive: var(--fill-positive);
+  --color-fill-caution: var(--fill-caution);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -195,10 +224,10 @@ body {
 
 /* Display: titular de pantallas de entrada (tracking apretado). Más grande que heading-xl. */
 @utility text-display {
-  font-size: clamp(2.6rem, 7vw, 5.2rem);
-  line-height: 0.95;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1;
   font-weight: 600;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.04em;
 }
 
 /* Overline: rótulos de sección en mayúsculas */

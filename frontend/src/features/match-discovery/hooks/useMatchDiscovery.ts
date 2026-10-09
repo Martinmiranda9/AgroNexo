@@ -8,12 +8,13 @@ import { ROLE_REQUIRES_PRESENCE } from '../config/catalog';
 import { SAMPLE_DATA_ENABLED, getSampleDiscovery } from '../data/sample-professionals';
 import { buildResults, type ResultView } from '../lib/build-results';
 import { interpretNeed, type NeedInterpretation } from '../lib/interpret-need';
+import { resolvePlaceAction } from '../server/resolve-place.action';
 
 export type Phase = 'describe' | 'searching' | 'results';
 export type SearchError = 'unavailable' | 'forbidden' | 'unauthorized';
 
 /** Tiempo mínimo del estado "buscando", para que los pasos alcancen a leerse aunque la respuesta sea instantánea. */
-const MIN_SEARCHING_MS = 700;
+const MIN_SEARCHING_MS = 900;
 
 interface Fetched {
   recommendations: MatchRecommendation[];
@@ -57,6 +58,29 @@ async function fetchRecommendations(
   };
 }
 
+/** Dónde se busca: el lugar de registro del productor o el que nombró en el pedido. */
+interface SearchZone {
+  location: SearchLocation;
+  /** `true` si el punto viene de lo que escribió (y no es el de su registro). */
+  fromPrompt: boolean;
+  /** Lugar que nombró pero no se pudo ubicar: se buscó cerca de su campo y la pantalla lo avisa. */
+  unresolved: string | null;
+}
+
+/** Combina lo que escribió con su lugar de registro: sin lugar nombrado, o si no se encuentra, manda el registro. */
+async function resolveZone(
+  need: NeedInterpretation,
+  registered: SearchLocation
+): Promise<SearchZone> {
+  if (!need.place) return { location: registered, fromPrompt: false, unresolved: null };
+
+  const resolved = await resolvePlaceAction(need.place);
+  if (!resolved) return { location: registered, fromPrompt: false, unresolved: need.place };
+
+  // "Córdoba" siendo de Córdoba resuelve a su propio lugar de registro: no es otra zona.
+  return { location: resolved, fromPrompt: resolved.label !== registered.label, unresolved: null };
+}
+
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 /** Estado de la pantalla de búsqueda asistida: describir → buscando → resultados. */
@@ -64,12 +88,15 @@ export function useMatchDiscovery(location: SearchLocation) {
   const [phase, setPhase] = useState<Phase>('describe');
   const [draft, setDraft] = useState('');
   const [need, setNeed] = useState<NeedInterpretation | null>(null);
+  const [zone, setZone] = useState<SearchZone>({ location, fromPrompt: false, unresolved: null });
   const [recommendations, setRecommendations] = useState<MatchRecommendation[]>([]);
   const [isSample, setIsSample] = useState(false);
   const [error, setError] = useState<SearchError | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sentTo, setSentTo] = useState<ReadonlySet<string>>(new Set());
+  /** Cuánto tardó la última búsqueda, en segundos: se muestra junto a los resultados. */
+  const [searchSeconds, setSearchSeconds] = useState(0);
 
   // Cada búsqueda lleva un número: si el productor vuelve a buscar, la respuesta vieja se descarta.
   const latest = useRef(0);
@@ -88,11 +115,14 @@ export function useMatchDiscovery(location: SearchLocation) {
       setPhase('searching');
 
       const interpreted = await interpretNeed(text);
-      const fetched = await fetchRecommendations(location, interpreted.role);
+      const searchZone = await resolveZone(interpreted, location);
+      const fetched = await fetchRecommendations(searchZone.location, interpreted.role);
       await wait(Math.max(0, MIN_SEARCHING_MS - (Date.now() - startedAt)));
       if (run !== latest.current) return;
 
+      setSearchSeconds((Date.now() - startedAt) / 1000);
       setNeed(interpreted);
+      setZone(searchZone);
       apply(fetched);
       setSelectedId(null);
       setPhase('results');
@@ -107,20 +137,25 @@ export function useMatchDiscovery(location: SearchLocation) {
       const run = ++latest.current;
       setNeed({ ...need, role, topics: role === need.role ? need.topics : [] });
       setRefreshing(true);
-      const fetched = await fetchRecommendations(location, role);
+      const fetched = await fetchRecommendations(zone.location, role);
       if (run !== latest.current) return;
 
       apply(fetched);
       setSelectedId(null);
       setRefreshing(false);
     },
-    [location, need]
+    [zone.location, need]
   );
 
   const removeTopic = useCallback((topicId: string) => {
     setNeed((current) =>
       current ? { ...current, topics: current.topics.filter((id) => id !== topicId) } : current
     );
+  }, []);
+
+  /** Quita un dato que se entendió mal (actividad, hectáreas o urgencia); no cambia el ranking, sí la ficha. */
+  const clearDetail = useCallback((field: 'activity' | 'hectares' | 'urgency') => {
+    setNeed((current) => (current ? { ...current, [field]: null } : current));
   }, []);
 
   const edit = useCallback(() => {
@@ -133,9 +168,10 @@ export function useMatchDiscovery(location: SearchLocation) {
     setSentTo((current) => new Set(current).add(professionalId));
   }, []);
 
+  const zoneName = zone.fromPrompt ? zone.location.label : 'tu campo';
   const results: ResultView[] = useMemo(
-    () => (need ? buildResults(recommendations, need) : []),
-    [recommendations, need]
+    () => (need ? buildResults(recommendations, need, zoneName) : []),
+    [recommendations, need, zoneName]
   );
   const selected = results.find((r) => r.recommendation.id === selectedId) ?? results[0] ?? null;
 
@@ -144,15 +180,18 @@ export function useMatchDiscovery(location: SearchLocation) {
     draft,
     setDraft,
     need,
+    zone,
     results,
     selected,
     isSample,
     error,
     refreshing,
     sentTo,
+    searchSeconds,
     submit,
     changeRole,
     removeTopic,
+    clearDetail,
     edit,
     select: setSelectedId,
     markSent,

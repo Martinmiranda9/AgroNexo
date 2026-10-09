@@ -1,13 +1,16 @@
 import type { SearchableRole } from '@/core/models/identity.model';
 import {
   ACTIVITY_WORDS,
+  NEED_CROPS,
   NEED_TOPICS,
   ROLE_WORDS,
   SEARCHABLE_ROLES,
+  roleFromTopics,
   URGENCY_WORDS,
   type Activity,
   type Urgency,
 } from '../config/catalog';
+import { interpretNeedWithAiAction } from '../server/interpret-need.action';
 
 /** Lo que se entendió del pedido del productor. Es la entrada de la búsqueda y de la explicación. */
 export interface NeedInterpretation {
@@ -20,6 +23,10 @@ export interface NeedInterpretation {
   activity: Activity | null;
   hectares: number | null;
   urgency: Urgency | null;
+  /** Lugar que nombró el productor ("Río Cuarto", "Córdoba"); `null` si no nombró ninguno (se usa el de su registro). */
+  place: string | null;
+  /** Ids de `NEED_CROPS` ('soybean', 'corn'…); vacío si no nombró ninguno. */
+  crops: string[];
 }
 
 /** Minúsculas y sin tildes, para comparar texto escrito a mano. */
@@ -39,11 +46,14 @@ function detectRole(text: string, topicIds: string[]): SearchableRole | null {
   if (named) return named;
 
   // Sin profesión explícita, manda el tema que más aparece ("retenciones" → contador).
-  const votes = new Map<SearchableRole, number>();
-  for (const topic of NEED_TOPICS.filter((t) => topicIds.includes(t.id))) {
-    votes.set(topic.role, (votes.get(topic.role) ?? 0) + 1);
-  }
-  return [...votes.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+  return roleFromTopics(topicIds);
+}
+
+/** Cultivos nombrados, como palabra entera ("mani" no entra en "manifiesto"). */
+function detectCrops(text: string): string[] {
+  return NEED_CROPS.filter((crop) =>
+    new RegExp(String.raw`\b(?:${crop.words.map(escapeRegExp).join('|')})\b`).test(text)
+  ).map((crop) => crop.id);
 }
 
 function detectActivity(text: string): Activity | null {
@@ -87,15 +97,22 @@ export function interpretNeedLocally(text: string): NeedInterpretation {
     activity: detectActivity(folded),
     hectares: detectHectares(original),
     urgency: detectUrgency(folded),
+    // El lugar lo extrae la IA: sin ella se busca cerca del lugar de registro.
+    place: null,
+    crops: detectCrops(folded),
   };
 }
 
 /**
- * PUNTO DE CONEXIÓN DE LA IA (en pausa).
- * Cuando se conecte el modelo (Claude Haiku), este es el único lugar que cambia: llamar a una Server Action que
- * pida la interpretación con salida estructurada (mismo tipo `NeedInterpretation`) y, si falla o tarda de más,
- * devolver `interpretNeedLocally(text)`. La clave de API vive en el servidor, nunca en el navegador.
+ * Punto de entrada de la interpretación. Primero intenta con Gemini (Server Action, la clave nunca sale del servidor)
+ * y, si no hay clave, no responde a tiempo o devuelve algo inválido, usa `interpretNeedLocally`. La búsqueda no
+ * depende de la IA: sin ella la pantalla funciona igual, con menos comprensión del texto libre.
  */
 export async function interpretNeed(text: string): Promise<NeedInterpretation> {
-  return interpretNeedLocally(text);
+  const local = interpretNeedLocally(text);
+  try {
+    return (await interpretNeedWithAiAction(text, local.hectares)) ?? local;
+  } catch {
+    return local;
+  }
 }
