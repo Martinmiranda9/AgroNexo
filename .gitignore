@@ -19,3 +19,13 @@ Thumbs.db
 .vs/
 .idea/
 .claude/settings.local.json
+
+# Material de trabajo local (no se sube): informes de diseño, scripts de desarrollo y tests de apoyo
+docs/design/
+backend/scripts/dev/
+backend/tests/AgroNexo.UnitTests/NeedBriefTests.cs
+frontend/tests/unit/location-place.test.ts
+frontend/tests/unit/match-discovery-ai.test.ts
+frontend/tests/unit/match-view.test.ts
+frontend/tests/unit/need-brief-card.test.tsx
+frontend/tests/unit/need-brief.test.ts
