@@ -54,10 +54,13 @@ Un **equipo** (agrónomo, contador, inversor y otros profesionales) gestiona uno
 AgroNexo/
 ├── backend/     # API .NET 8 (src/ + tests/)
 ├── frontend/    # App Next.js (features, ui, core, shared)
-└── ia/          # Planes de implementación y lineamientos
+├── docs/        # Planes de trabajo (plans/) e investigación de mercado (research/)
+├── ia/          # Planes de implementación y lineamientos
+└── .github/     # Workflows de CI (backend y frontend)
 ```
 
 📚 **Documentación interna**
+- 🔎 Investigación de mercado (matchmaking profesional agro): [`docs/research/`](docs/research/)
 - 🎨 Plan de frontend y UI Kit: [`ia/frontend_implementation_plan.md`](ia/frontend_implementation_plan.md)
 - ⚙️ Plan y lineamientos de backend: [`ia/implementation_plan.md`](ia/implementation_plan.md) · [`ia/agent.md`](ia/agent.md)
 
