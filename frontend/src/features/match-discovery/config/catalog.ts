@@ -1,24 +1,18 @@
 import type { ProfessionalRole, SearchableRole } from '@/core/models/identity.model';
 import { NEED_TOPIC_LABELS, type CropId } from '@/shared/constants/need-labels';
+import {
+  PROFESSIONAL_ROLE_FILTER_LABEL,
+  PROFESSIONAL_ROLE_LABEL,
+  professionalRoleLabel,
+} from '@/shared/constants/roles';
 
-export const ROLE_LABEL: Record<SearchableRole, string> = {
-  Agronomist: 'Ingeniero agrónomo',
-  Accountant: 'Contador',
-  Lawyer: 'Abogado',
-  Investor: 'Inversionista',
-};
+export const ROLE_LABEL: Record<SearchableRole, string> = PROFESSIONAL_ROLE_LABEL;
 
 /** Nombre de la profesión para mostrar; `Other` (sin catálogo) queda como "Profesional". */
-export const roleLabel = (role: ProfessionalRole): string =>
-  ROLE_LABEL[role as SearchableRole] ?? 'Profesional';
+export const roleLabel = (role: ProfessionalRole): string => professionalRoleLabel(role);
 
 /** Plural corto para el filtro de profesión. */
-export const ROLE_FILTER_LABEL: Record<SearchableRole, string> = {
-  Agronomist: 'Agrónomos',
-  Accountant: 'Contadores',
-  Lawyer: 'Abogados',
-  Investor: 'Inversionistas',
-};
+export const ROLE_FILTER_LABEL: Record<SearchableRole, string> = PROFESSIONAL_ROLE_FILTER_LABEL;
 
 export const SEARCHABLE_ROLES = Object.keys(ROLE_LABEL) as SearchableRole[];
 

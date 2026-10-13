@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { createMatchAction } from '@/core/actions/create-match.action';
 import type { CreateMatchResult, NeedBrief, SearchLocation } from '@/core/models/match.model';
-import { AppHeader } from '@/features/app-shell';
+import { AppLayout } from '@/features/app-shell';
 import { useMediaQuery } from '@/shared/hooks/useMediaQuery';
 import BrandGlow from '@/ui/components/BrandGlow';
 import { Drawer, DrawerContent } from '@/ui/components/Drawer';
@@ -70,101 +70,103 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
       };
 
   return (
-    <div className="bg-paper relative min-h-[100dvh]">
-      <BrandGlow quiet={phase === 'results'} />
+    <AppLayout user={user}>
+      <div className="bg-paper relative min-h-[100dvh]">
+        <BrandGlow quiet={phase === 'results'} />
 
-      <div className="relative z-10">
-        <AppHeader user={user} />
+        <div className="relative z-10">
+          <main className="mx-auto max-w-[1180px] px-4 pb-16 sm:px-6">
+            <AnimatePresence mode="wait" initial={false}>
+              {phase === 'describe' && (
+                <motion.div key="describe" {...fade}>
+                  <SearchHero
+                    value={discovery.draft}
+                    onChange={discovery.setDraft}
+                    onSubmit={discovery.submit}
+                  />
+                </motion.div>
+              )}
 
-        <main className="mx-auto max-w-[1180px] px-4 pb-16 sm:px-6">
-          <AnimatePresence mode="wait" initial={false}>
-            {phase === 'describe' && (
-              <motion.div key="describe" {...fade}>
-                <SearchHero
-                  value={discovery.draft}
-                  onChange={discovery.setDraft}
-                  onSubmit={discovery.submit}
-                />
-              </motion.div>
-            )}
+              {phase === 'searching' && (
+                <motion.div key="searching" {...fade}>
+                  <SearchingState query={discovery.draft} />
+                </motion.div>
+              )}
 
-            {phase === 'searching' && (
-              <motion.div key="searching" {...fade}>
-                <SearchingState query={discovery.draft} />
-              </motion.div>
-            )}
+              {phase === 'results' && need && (
+                <motion.div key="results" className="pt-8" {...fade}>
+                  {/* La misma línea de la búsqueda, ya resuelta y plegada: se despliega para ver qué se hizo. */}
+                  <ThoughtLine
+                    working={false}
+                    elapsed={discovery.searchSeconds}
+                    label="Buscando profesionales…"
+                    doneLabel="Buscamos en"
+                    steps={SEARCH_STEPS}
+                    glyph="sparkle"
+                    fontSize={14}
+                    className="text-olive mb-5"
+                  />
+                  <NeedSummary
+                    need={need}
+                    location={discovery.zone.location}
+                    fromPrompt={discovery.zone.fromPrompt}
+                    unresolvedPlace={discovery.zone.unresolved}
+                    onEdit={discovery.edit}
+                    onRoleChange={discovery.changeRole}
+                    onRemoveTopic={discovery.removeTopic}
+                    onClearDetail={discovery.clearDetail}
+                  />
+                  <ResultsSection
+                    results={discovery.results}
+                    selected={selected}
+                    sentTo={discovery.sentTo}
+                    refreshing={discovery.refreshing}
+                    error={discovery.error}
+                    isSample={discovery.isSample}
+                    zoneLabel={
+                      discovery.zone.fromPrompt ? discovery.zone.location.label : 'tu campo'
+                    }
+                    allRoles={need.role === null}
+                    onSelect={(id) => {
+                      discovery.select(id);
+                      if (!isDesktop) setDrawerOpen(true);
+                    }}
+                    onRequest={setRequestFor}
+                    onEdit={discovery.edit}
+                    onRetry={discovery.retry}
+                    onShowAllRoles={() => discovery.changeRole(null)}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </main>
+        </div>
 
-            {phase === 'results' && need && (
-              <motion.div key="results" className="pt-8" {...fade}>
-                {/* La misma línea de la búsqueda, ya resuelta y plegada: se despliega para ver qué se hizo. */}
-                <ThoughtLine
-                  working={false}
-                  elapsed={discovery.searchSeconds}
-                  label="Buscando profesionales…"
-                  doneLabel="Buscamos en"
-                  steps={SEARCH_STEPS}
-                  glyph="sparkle"
-                  fontSize={14}
-                  className="text-olive mb-5"
-                />
-                <NeedSummary
-                  need={need}
-                  location={discovery.zone.location}
-                  fromPrompt={discovery.zone.fromPrompt}
-                  unresolvedPlace={discovery.zone.unresolved}
-                  onEdit={discovery.edit}
-                  onRoleChange={discovery.changeRole}
-                  onRemoveTopic={discovery.removeTopic}
-                  onClearDetail={discovery.clearDetail}
-                />
-                <ResultsSection
-                  results={discovery.results}
-                  selected={selected}
-                  sentTo={discovery.sentTo}
-                  refreshing={discovery.refreshing}
-                  error={discovery.error}
-                  isSample={discovery.isSample}
-                  zoneLabel={discovery.zone.fromPrompt ? discovery.zone.location.label : 'tu campo'}
-                  allRoles={need.role === null}
-                  onSelect={(id) => {
-                    discovery.select(id);
-                    if (!isDesktop) setDrawerOpen(true);
-                  }}
-                  onRequest={setRequestFor}
-                  onEdit={discovery.edit}
-                  onRetry={discovery.retry}
-                  onShowAllRoles={() => discovery.changeRole(null)}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </main>
-      </div>
-
-      {/* En celular la ficha se abre en un drawer desde abajo; en escritorio vive al costado de la lista. */}
-      <Drawer
-        open={drawerOpen && !isDesktop && selected !== null}
-        onOpenChange={setDrawerOpen}
-        showSwipeHandle
-      >
-        <DrawerContent
-          className="bg-surface"
-          aria-labelledby={selected ? detailTitleId(selected.recommendation.id) : undefined}
+        {/* En celular la ficha se abre en un drawer desde abajo; en escritorio vive al costado de la lista. */}
+        <Drawer
+          open={drawerOpen && !isDesktop && selected !== null}
+          onOpenChange={setDrawerOpen}
+          showSwipeHandle
         >
-          {selected && (
-            <ProfessionalDetail
-              key={selected.recommendation.id}
-              result={selected}
-              requested={requested}
-              onRequest={() => setRequestFor(selected)}
-            />
-          )}
-          {/* La solicitud se apila sobre la ficha: al cancelarla o deslizarla, la ficha sigue debajo. */}
-          {!isDesktop && <MatchRequestDialog {...requestProps} side="down" />}
-        </DrawerContent>
-      </Drawer>
+          <DrawerContent
+            className="bg-surface"
+            aria-labelledby={selected ? detailTitleId(selected.recommendation.id) : undefined}
+          >
+            {selected && (
+              <ProfessionalDetail
+                key={selected.recommendation.id}
+                result={selected}
+                requested={requested}
+                onRequest={() => setRequestFor(selected)}
+              />
+            )}
+            {/* La solicitud se apila sobre la ficha: al cancelarla o deslizarla, la ficha sigue debajo. */}
+            {!isDesktop && <MatchRequestDialog {...requestProps} side="down" />}
+          </DrawerContent>
+        </Drawer>
 
-      {isDesktop && <MatchRequestDialog {...requestProps} side="right" />}
-    </div>
+        {isDesktop && <MatchRequestDialog {...requestProps} side="right" />}
+      </div>
+    </AppLayout>
   );
 }

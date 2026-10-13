@@ -5,4 +5,5 @@ export const ROUTES = {
   dashboard: '/dashboard',
   matchDiscovery: '/match-discovery',
   matches: '/matches',
+  farms: '/farms',
 } as const;

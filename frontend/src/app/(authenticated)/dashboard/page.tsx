@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Tray } from '@phosphor-icons/react/dist/ssr';
 import { Avatar, Badge, BrandLogo, Card, buttonVariants } from '@/ui/components';
-import { AppHeader } from '@/features/app-shell';
+import { AppLayout } from '@/features/app-shell';
 import LogoutButton from '@/features/auth/components/LogoutButton';
 import BackendUnavailable from '@/features/auth/components/BackendUnavailable';
 import { fetchCurrentUser, getSessionUser } from '@/core/auth/server';
@@ -36,49 +36,57 @@ export default async function DashboardPage() {
   const displayName = user.firstName ?? sessionUser.firstName ?? 'AgroNexo';
   const roleLabel = user.userType ? ROLE_LABEL[String(user.userType)] : undefined;
 
+  const content = (
+    <div className="mx-auto flex w-full max-w-2xl flex-col items-center px-6 pt-6 pb-16 text-center">
+      <Avatar initials={initialsOf(displayName)} size="lg" />
+      <h1 className="text-heading-lg tracking-heading text-pine mt-4">Hola, {displayName}</h1>
+      <p className="text-body-sm text-olive mt-2">
+        Tu sesión está activa y tu perfil ya quedó registrado.
+      </p>
+
+      <div className="mt-4 flex items-center gap-2">
+        {roleLabel && <Badge variant="secondary">{roleLabel}</Badge>}
+        {user.publicId && <Badge variant="secondary">ID #{user.publicId}</Badge>}
+      </div>
+
+      <Card className="mt-10 w-full" coreClassName="flex flex-col items-center gap-3 px-6 py-10">
+        <Tray size={32} weight="regular" className="text-olive" aria-hidden />
+        <p className="text-body text-pine font-medium">Solicitudes de match</p>
+        <p className="text-body-sm text-olive max-w-sm">
+          Mirá las solicitudes de los productores que quieren trabajar con vos: la zona, las
+          hectáreas, la urgencia y lo que necesitan.
+        </p>
+        <Link href={ROUTES.matches} className={cn(buttonVariants({ size: 'lg' }), 'mt-3')}>
+          Ver solicitudes
+        </Link>
+      </Card>
+    </div>
+  );
+
+  // El profesional tiene el marco con barra lateral; el resto de los roles, el encabezado simple.
+  if (user.userType === 'Professional') {
+    return (
+      <AppLayout
+        user={{
+          firstName: displayName,
+          lastName: sessionUser.lastName ?? '',
+          role: 'Professional',
+          publicId: user.publicId ?? null,
+          avatarUrl: sessionUser.picture,
+        }}
+      >
+        <main className="bg-paper min-h-[100dvh] w-full lg:pt-8">{content}</main>
+      </AppLayout>
+    );
+  }
+
   return (
     <main className="bg-beige min-h-[100dvh] w-full">
-      {user.userType === 'Professional' ? (
-        <AppHeader
-          user={{
-            firstName: displayName,
-            lastName: sessionUser.lastName ?? '',
-            role: 'Professional',
-            publicId: user.publicId ?? null,
-            avatarUrl: sessionUser.picture,
-          }}
-        />
-      ) : (
-        <header className="flex items-center justify-between px-6 py-5 sm:px-10">
-          <BrandLogo />
-          <LogoutButton />
-        </header>
-      )}
-
-      <div className="mx-auto flex w-full max-w-2xl flex-col items-center px-6 pt-6 pb-16 text-center">
-        <Avatar initials={initialsOf(displayName)} size="lg" />
-        <h1 className="text-heading-lg tracking-heading text-pine mt-4">Hola, {displayName}</h1>
-        <p className="text-body-sm text-olive mt-2">
-          Tu sesión está activa y tu perfil ya quedó registrado.
-        </p>
-
-        <div className="mt-4 flex items-center gap-2">
-          {roleLabel && <Badge variant="secondary">{roleLabel}</Badge>}
-          {user.publicId && <Badge variant="secondary">ID #{user.publicId}</Badge>}
-        </div>
-
-        <Card className="mt-10 w-full" coreClassName="flex flex-col items-center gap-3 px-6 py-10">
-          <Tray size={32} weight="regular" className="text-olive" aria-hidden />
-          <p className="text-body text-pine font-medium">Solicitudes de match</p>
-          <p className="text-body-sm text-olive max-w-sm">
-            Mirá las solicitudes de los productores que quieren trabajar con vos: la zona, las
-            hectáreas, la urgencia y lo que necesitan.
-          </p>
-          <Link href={ROUTES.matches} className={cn(buttonVariants({ size: 'lg' }), 'mt-3')}>
-            Ver solicitudes
-          </Link>
-        </Card>
-      </div>
+      <header className="flex items-center justify-between px-6 py-5 sm:px-10">
+        <BrandLogo />
+        <LogoutButton />
+      </header>
+      {content}
     </main>
   );
 }

@@ -3,15 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  CaretDownIcon,
-  HandshakeIcon,
-  MagnifyingGlassIcon,
-  SignOutIcon,
-  SquaresFourIcon,
-  type Icon,
-} from '@phosphor-icons/react';
-import { signOutSession } from '@/core/auth/firebase-actions';
+import { CaretDownIcon, SignOutIcon } from '@phosphor-icons/react';
 import { ROUTES } from '@/shared/constants/routes';
 import { cn } from '@/shared/utils/cn';
 import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from '@/ui/components/AvatarShadcn';
@@ -26,41 +18,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/ui/components/DropdownMenu';
+import { NAV, ROLE_CAPTION, displayNameOf, initialsOf, signOut } from '../navigation';
 import type { AppUser } from '../types';
-
-interface NavItem {
-  href: string;
-  label: string;
-  icon: Icon;
-}
-
-/** El productor busca y sigue sus solicitudes; el profesional responde desde su panel. */
-const NAV: Record<AppUser['role'], NavItem[]> = {
-  Producer: [
-    { href: ROUTES.matchDiscovery, label: 'Buscar', icon: MagnifyingGlassIcon },
-    { href: ROUTES.matches, label: 'Mis solicitudes', icon: HandshakeIcon },
-  ],
-  Professional: [
-    { href: ROUTES.dashboard, label: 'Panel', icon: SquaresFourIcon },
-    { href: ROUTES.matches, label: 'Solicitudes', icon: HandshakeIcon },
-  ],
-};
-
-const ROLE_CAPTION: Record<AppUser['role'], string> = {
-  Producer: 'Productor',
-  Professional: 'Profesional',
-};
-
-const initialsOf = (user: AppUser) =>
-  `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase() || 'AN';
-
-async function signOut() {
-  try {
-    await signOutSession();
-  } finally {
-    window.location.assign(ROUTES.login);
-  }
-}
 
 interface AppHeaderProps {
   user: AppUser;
@@ -69,12 +28,13 @@ interface AppHeaderProps {
 }
 
 /**
- * Encabezado de las pantallas autenticadas: logo, navegación principal (Buscar ↔ Mis solicitudes) y menú de cuenta.
+ * Encabezado de las pantallas autenticadas: logo, navegación principal (Buscar ↔ Mis solicitudes ↔ Campos) y menú
+ * de cuenta.
  * Arriba de todo es transparente y deja ver el brillo; al bajar toma fondo y borde.
  */
 export default function AppHeader({ user, pendingCount = 0 }: AppHeaderProps) {
   const pathname = usePathname();
-  const name = `${user.firstName} ${user.lastName}`.trim() || 'Mi cuenta';
+  const name = displayNameOf(user);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
