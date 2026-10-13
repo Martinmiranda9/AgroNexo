@@ -196,6 +196,48 @@ public class MatchIntegrationTests : IntegrationTestBase
         accepted.NeedBrief!.Summary.Should().Be(received.NeedBrief.Summary);
     }
 
+    /// <summary>
+    /// Con el match aceptado, cada parte ve el contacto de la otra al listar; mientras está pendiente, ninguna.
+    /// </summary>
+    [Fact]
+    public async Task GetMatches_AfterAccepting_BothSidesReceiveTheOthersContact()
+    {
+        var producerReg = await RegisterProducerAsync("auth0|producer_contact", "Esteban", "Bauer", "20-33445566-7");
+        var profReg = await RegisterProfessionalAsync("auth0|prof_contact", "Maria", "Gomez", "27-11111111-1", ProfessionalRole.Lawyer, "Arrendamientos", 10, 20);
+        var producerClient = CreateClientWithAuth("auth0|producer_contact", "Producer", producerReg.TenantId);
+        var profClient = CreateClientWithAuth("auth0|prof_contact", "Professional", profReg.TenantId);
+
+        var createRes = await producerClient.PostAsJsonAsync("/api/v1/matches", new CreateMatchRequest { ProfessionalId = profReg.UserId }, JsonOptions);
+        createRes.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        // Pendiente: nadie ve el contacto de nadie
+        var pendingForProducer = await ListMatchesAsync(producerClient);
+        pendingForProducer.ProfessionalContact.Should().BeNull();
+        pendingForProducer.ProducerContact.Should().BeNull();
+
+        var acceptRes = await profClient.PatchAsJsonAsync($"/api/v1/matches/{pendingForProducer.Id}/status", new UpdateMatchStatusRequest { Status = MatchStatus.Active }, JsonOptions);
+        acceptRes.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        // Aceptado: el productor ve el del profesional y el profesional el del productor, nunca el propio
+        var forProducer = await ListMatchesAsync(producerClient);
+        forProducer.ProfessionalContact.Should().NotBeNull();
+        forProducer.ProfessionalContact!.PhoneNumber.Should().NotBeNullOrWhiteSpace();
+        forProducer.ProducerContact.Should().BeNull();
+
+        var forProfessional = await ListMatchesAsync(profClient);
+        forProfessional.ProducerContact.Should().NotBeNull();
+        forProfessional.ProducerContact!.PhoneNumber.Should().NotBeNullOrWhiteSpace();
+        forProfessional.ProfessionalContact.Should().BeNull();
+    }
+
+    private async Task<MatchResponse> ListMatchesAsync(HttpClient client)
+    {
+        var res = await client.GetAsync("/api/v1/matches");
+        res.StatusCode.Should().Be(HttpStatusCode.OK);
+        var page = await res.Content.ReadFromJsonAsync<PagedResult<MatchResponse>>(JsonOptions);
+        return page!.Items.Should().ContainSingle().Subject;
+    }
+
     [Fact]
     public async Task CreateMatch_InvalidNeedBrief_Returns400()
     {

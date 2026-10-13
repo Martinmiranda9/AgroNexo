@@ -12,8 +12,11 @@ public class CreateFarmRequest
     [StringLength(200, MinimumLength = 2, ErrorMessage = "El nombre debe tener entre 2 y 200 caracteres.")]
     public string Name { get; set; } = string.Empty;
 
-    [Range(0, 1_000_000, ErrorMessage = "Las hect�reas deben estar entre 0 y 1.000.000.")]
+    [Range(0, 1_000_000, ErrorMessage = "Las hectáreas deben estar entre 0 y 1.000.000.")]
     public decimal TotalHectares { get; set; }
+
+    [StringLength(500, ErrorMessage = "La descripción no puede superar los 500 caracteres.")]
+    public string? Description { get; set; }
 
     /// <summary>
     /// Optional polygon or point defining the farm boundaries/location (WGS84).

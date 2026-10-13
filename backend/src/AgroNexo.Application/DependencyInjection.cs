@@ -1,6 +1,7 @@
 using AgroNexo.Application.Common.Interfaces;
 using AgroNexo.Application.Common.Validators;
 using AgroNexo.Application.Identity.UseCases;
+using AgroNexo.Application.Farms.Services;
 using AgroNexo.Application.Farms.UseCases;
 using AgroNexo.Application.Matching.ScoringEngine;
 using AgroNexo.Application.Matching.UseCases;
@@ -40,6 +41,13 @@ public static class DependencyInjection
         services.AddScoped<IGetFarmsUseCase, GetFarmsUseCase>();
         services.AddScoped<IUpdateFarmUseCase, UpdateFarmUseCase>();
         services.AddScoped<IDeleteFarmUseCase, DeleteFarmUseCase>();
+        services.AddScoped<IArchiveFarmUseCase, ArchiveFarmUseCase>();
+
+        // Equipo del campo (espacio de trabajo compartido)
+        services.AddScoped<IFarmAccessService, FarmAccessService>();
+        services.AddScoped<IGetFarmCandidatesUseCase, GetFarmCandidatesUseCase>();
+        services.AddScoped<IManageFarmMembersUseCase, ManageFarmMembersUseCase>();
+        services.AddScoped<IGetWorkspacesUseCase, GetWorkspacesUseCase>();
 
         // Matching Use Cases
         services.AddScoped<IGenerateMatchRecommendationsUseCase, GenerateMatchRecommendationsUseCase>();

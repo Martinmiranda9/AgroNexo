@@ -20,6 +20,14 @@ public class FarmRepository : IFarmRepository
             .FirstOrDefaultAsync(f => f.Id == id, cancellationToken);
     }
 
+    public async Task<Farm?> GetByIdAcrossTenantsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        // IgnoreQueryFilters: el profesional del equipo mira un campo del tenant del productor.
+        return await _context.Farms
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(f => f.Id == id && f.IsActive, cancellationToken);
+    }
+
     public async Task<IReadOnlyList<Farm>> GetByProducerIdAsync(Guid producerId, CancellationToken cancellationToken = default)
     {
         return await _context.Farms

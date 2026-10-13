@@ -35,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddScoped<IMatchDiscoveryRepository, MatchDiscoveryRepository>();
         services.AddScoped<IFarmRepository, FarmRepository>();
+        services.AddScoped<IFarmMemberRepository, FarmMemberRepository>();
 
         // Register Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -34,6 +34,13 @@ public class FarmConfiguration : IEntityTypeConfiguration<Farm>
             .IsRequired()
             .HasDefaultValue(true);
 
+        builder.Property(f => f.Description)
+            .HasMaxLength(Farm.DescriptionMaxLength);
+
+        builder.Property(f => f.ArchivedAt);
+
+        builder.Ignore(f => f.IsArchived);
+
         builder.Property(f => f.PublicId)
             .IsRequired()
             .HasDefaultValue(0L);

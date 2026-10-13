@@ -44,7 +44,8 @@ public class CreateFarmUseCase : ICreateFarmUseCase
             producer.Id,
             request.Name,
             request.TotalHectares,
-            location);
+            location,
+            request.Description);
 
         await _farmRepository.AddAsync(farm, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -63,6 +64,8 @@ public class CreateFarmUseCase : ICreateFarmUseCase
             Name = farm.Name,
             TotalHectares = farm.TotalHectares,
             IsActive = farm.IsActive,
+            Description = farm.Description,
+            ArchivedAt = farm.ArchivedAt,
             LocationCoordinates = GeometryHelper.ToCoordinateDtos(farm.Location),
             CreatedAt = farm.CreatedAt,
             UpdatedAt = farm.UpdatedAt

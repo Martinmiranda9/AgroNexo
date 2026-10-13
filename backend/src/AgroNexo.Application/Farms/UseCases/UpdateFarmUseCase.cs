@@ -43,22 +43,10 @@ public class UpdateFarmUseCase : IUpdateFarmUseCase
             ? GeometryHelper.CreatePolygon(request.LocationCoordinates)
             : null;
 
-        farm.UpdateDetails(request.Name, request.TotalHectares, location);
+        farm.UpdateDetails(request.Name, request.TotalHectares, location, request.Description);
         await _farmRepository.UpdateAsync(farm, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new FarmResponse
-        {
-            Id = farm.Id,
-            PublicId = farm.PublicId,
-            ProducerId = farm.ProducerId,
-            TenantId = farm.TenantId,
-            Name = farm.Name,
-            TotalHectares = farm.TotalHectares,
-            IsActive = farm.IsActive,
-            LocationCoordinates = GeometryHelper.ToCoordinateDtos(farm.Location),
-            CreatedAt = farm.CreatedAt,
-            UpdatedAt = farm.UpdatedAt
-        };
+        return CreateFarmUseCase.MapToResponse(farm);
     }
 }

@@ -20,6 +20,10 @@ public class FarmResponse
     public string Name { get; set; } = string.Empty;
     public decimal TotalHectares { get; set; }
     public bool IsActive { get; set; }
+    public string? Description { get; set; }
+
+    /// <summary>Fecha en que el productor archivó el campo; null mientras está en uso.</summary>
+    public DateTime? ArchivedAt { get; set; }
 
     /// <summary>
     /// Polygon or point coordinates representing the farm boundaries or location (optional).

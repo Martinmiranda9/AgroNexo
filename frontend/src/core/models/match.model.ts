@@ -19,6 +19,8 @@ export interface Match {
   needBrief: NeedBrief | null;
   /** Contacto del productor: solo llega al profesional invitado y una vez aceptado el pedido; si no, `null`. */
   producerContact?: MatchContact | null;
+  /** Contacto del profesional: solo llega al productor que envió el pedido y una vez aceptado; si no, `null`. */
+  professionalContact?: MatchContact | null;
 }
 
 export interface MatchContact {

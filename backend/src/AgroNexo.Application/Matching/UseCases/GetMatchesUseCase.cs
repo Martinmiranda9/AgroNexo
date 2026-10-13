@@ -94,11 +94,13 @@ public class GetMatchesUseCase : IGetMatchesUseCase
         {
             string producerName = "Productor";
             MatchContactResponse? producerContact = null;
+            MatchContactResponse? professionalContact = null;
             string professionalName = "Profesional";
             string specialty = string.Empty;
 
-            // El contacto del productor solo se comparte con el profesional invitado y una vez aceptado el pedido.
+            // Con el pedido aceptado, cada parte recibe el contacto de la otra; pendiente o rechazado, ninguna.
             bool shareProducerContact = match.Status == MatchStatus.Active && filter.ProfessionalId.HasValue;
+            bool shareProfessionalContact = match.Status == MatchStatus.Active && filter.ProducerId.HasValue;
 
             var producerEntity = match.Producer
                 ?? await _producerRepository.GetByIdAsync(match.ProducerId, cancellationToken);
@@ -113,19 +115,18 @@ public class GetMatchesUseCase : IGetMatchesUseCase
                     };
             }
 
-            if (match.Professional != null)
+            var professionalEntity = match.Professional
+                ?? await _professionalRepository.GetByIdAcrossTenantsAsync(match.ProfessionalId, cancellationToken);
+            if (professionalEntity != null)
             {
-                professionalName = $"{match.Professional.FirstName} {match.Professional.LastName}".Trim();
-                specialty = match.Professional.Specialty;
-            }
-            else
-            {
-                var prof = await _professionalRepository.GetByIdAcrossTenantsAsync(match.ProfessionalId, cancellationToken);
-                if (prof != null)
-                {
-                    professionalName = $"{prof.FirstName} {prof.LastName}".Trim();
-                    specialty = prof.Specialty;
-                }
+                professionalName = $"{professionalEntity.FirstName} {professionalEntity.LastName}".Trim();
+                specialty = professionalEntity.Specialty;
+                if (shareProfessionalContact)
+                    professionalContact = new MatchContactResponse
+                    {
+                        PhoneNumber = professionalEntity.PhoneNumber,
+                        Email = professionalEntity.Email
+                    };
             }
 
             responses.Add(new MatchResponse
@@ -140,7 +141,8 @@ public class GetMatchesUseCase : IGetMatchesUseCase
                 RequestedAt = match.RequestedAt,
                 RespondedAt = match.RespondedAt,
                 NeedBrief = NeedBriefResponse.From(match.NeedBrief),
-                ProducerContact = producerContact
+                ProducerContact = producerContact,
+                ProfessionalContact = professionalContact
             });
         }
 

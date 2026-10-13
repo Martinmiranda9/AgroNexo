@@ -10,6 +10,8 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   surface?: 'light' | 'onDark' | 'paper';
   /** Clases del núcleo interno (padding, layout). `className` aplica al bisel externo (posición, ancho). */
   coreClassName?: string;
+  /** Item fuera de uso (un campo archivado): el núcleo pasa a paper. El texto no baja de opacidad, para no perder contraste. */
+  muted?: boolean;
 }
 
 const SHELL = {
@@ -29,12 +31,12 @@ const CORE = {
  * radios concéntricos. El núcleo es `bg-card` con borde hairline Pine.
  */
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ surface = 'light', className, coreClassName, children, ...props }, ref) => (
+  ({ surface = 'light', className, coreClassName, muted = false, children, ...props }, ref) => (
     <div ref={ref} className={cn('rounded-shell p-1.5', SHELL[surface], className)} {...props}>
       <div
         className={cn(
           'rounded-card border-pine/10 text-pine overflow-hidden border',
-          CORE[surface],
+          muted ? 'bg-paper' : CORE[surface],
           coreClassName
         )}
       >

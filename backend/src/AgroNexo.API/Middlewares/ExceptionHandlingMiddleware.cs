@@ -101,6 +101,14 @@ public class ExceptionHandlingMiddleware
                 null
             ),
 
+            DuplicateFarmMemberException ex => (
+                StatusCodes.Status409Conflict,
+                "Conflicto de duplicidad",
+                ex.Message,
+                "https://httpstatuses.io/409",
+                null
+            ),
+
             EntityNotFoundException ex => (
                 StatusCodes.Status404NotFound,
                 "Recurso no encontrado",

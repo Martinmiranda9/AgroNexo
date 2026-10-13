@@ -16,17 +16,20 @@ public class FarmsController : ApiControllerBase
     private readonly IGetFarmsUseCase _getFarmsUseCase;
     private readonly IUpdateFarmUseCase _updateFarmUseCase;
     private readonly IDeleteFarmUseCase _deleteFarmUseCase;
+    private readonly IArchiveFarmUseCase _archiveFarmUseCase;
 
     public FarmsController(
         ICreateFarmUseCase createFarmUseCase,
         IGetFarmsUseCase getFarmsUseCase,
         IUpdateFarmUseCase updateFarmUseCase,
-        IDeleteFarmUseCase deleteFarmUseCase)
+        IDeleteFarmUseCase deleteFarmUseCase,
+        IArchiveFarmUseCase archiveFarmUseCase)
     {
         _createFarmUseCase = createFarmUseCase;
         _getFarmsUseCase   = getFarmsUseCase;
         _updateFarmUseCase = updateFarmUseCase;
         _deleteFarmUseCase = deleteFarmUseCase;
+        _archiveFarmUseCase = archiveFarmUseCase;
     }
 
     /// <summary>
@@ -91,7 +94,7 @@ public class FarmsController : ApiControllerBase
             {
                 Status = StatusCodes.Status404NotFound,
                 Title  = "Lote no encontrado",
-                Detail = $"No se encontró el lote con identificador '{id}'.",
+                Detail = $"No se encontrÃ³ el lote con identificador '{id}'.",
                 Instance = HttpContext.Request.Path
             });
 
@@ -140,6 +143,29 @@ public class FarmsController : ApiControllerBase
 
         await _deleteFarmUseCase.ExecuteAsync(id, auth0UserId, cancellationToken);
         return NoContent();
+    }
+
+    /// <summary>
+    /// Archives a farm: it becomes read-only and its whole team is released. An archived farm cannot be reopened.
+    /// Only accessible by the owner producer.
+    /// </summary>
+    [HttpPatch("{id:guid}/status")]
+    [Authorize(Policy = "IsProducer")]
+    [ProducesResponseType(typeof(FarmResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateFarmStatus(
+        [FromRoute] Guid id,
+        [FromBody] UpdateFarmStatusRequest request,
+        CancellationToken cancellationToken)
+    {
+        var auth0UserId = CurrentAuth0UserId;
+        if (string.IsNullOrWhiteSpace(auth0UserId))
+            return Unauthorized(BuildUnauthorizedProblem());
+
+        var farm = await _archiveFarmUseCase.ExecuteAsync(id, request, auth0UserId, cancellationToken);
+        return Ok(farm);
     }
 
     // -- Helpers ---------------------------------------------------------------

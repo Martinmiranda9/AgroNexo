@@ -25,4 +25,10 @@ public class MatchResponse
     /// en cualquier otro caso es null.
     /// </summary>
     public MatchContactResponse? ProducerContact { get; set; }
+
+    /// <summary>
+    /// Contacto del profesional. Solo se completa para el productor que envió el pedido cuando el Match está activo;
+    /// en cualquier otro caso es null.
+    /// </summary>
+    public MatchContactResponse? ProfessionalContact { get; set; }
 }

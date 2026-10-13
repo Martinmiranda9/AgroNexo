@@ -33,6 +33,7 @@ public class AgroNexoDbContext : DbContext
     public DbSet<MatchDiscoveryRequest> MatchDiscoveryRequests => Set<MatchDiscoveryRequest>();
     public DbSet<MatchRecommendation> MatchRecommendations => Set<MatchRecommendation>();
     public DbSet<Farm> Farms => Set<Farm>();
+    public DbSet<FarmMember> FarmMembers => Set<FarmMember>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,6 +59,8 @@ public class AgroNexoDbContext : DbContext
         // 4. Farm entity filter (Tenant-scoped + Soft delete)
         modelBuilder.Entity<Farm>().HasQueryFilter(f =>
             f.IsActive && f.TenantId == CurrentTenantId);
+
+        // FarmMember tampoco tiene filtro de tenant: une el campo (tenant del productor) con un profesional de otro.
 
         // Note: Match, MatchDiscoveryRequest, and MatchRecommendation do NOT have a restrictive
         // single-tenant filter because Match serves as an inter-tenant bridge between Producer (Tenant A)

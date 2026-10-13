@@ -84,6 +84,9 @@ tests/
 ```
 Nombres de tests en inglés, formato `MethodName_Scenario_ExpectedResult` (ej: `CreateMatch_DuplicateProducerAndProfessional_ReturnsConflict`).
 
+### 11.1 Tests E2E (desde 2026-10-09)
+Todo cambio nuevo incluye tests E2E que lo cubran. Frontend: Playwright en `frontend/tests/e2e/<feature>.spec.ts` (archivo nuevo por feature, selectores accesibles con el texto en español de la UI, `waitForResponse` cuando pega a la API). Cambios solo de backend sin UI: test de integración nuevo que recorra el flujo completo por HTTP en `AgroNexo.IntegrationTests`. Los tests existentes no se modifican ni se reemplazan salvo pedido explícito. Detalle en [`CLAUDE.md`](../CLAUDE.md).
+
 ## 12. Logging y configuración
 - Logging estructurado (Serilog o el logger nativo de .NET) con niveles claros: `Information` para eventos de negocio relevantes (match creado, match cerrado), `Warning` para intentos fallidos de autorización, `Error` para excepciones no controladas. Nunca loguear tokens, passwords ni datos personales sensibles del productor.
 - Configuración sensible (connection strings, Auth0 domain/audience/secret) vía variables de entorno o `appsettings.{Environment}.json` + User Secrets en desarrollo — nunca hardcodeada ni versionada en el repo.
