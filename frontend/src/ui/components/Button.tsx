@@ -9,10 +9,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // AgroNexo: el hover oscurece (Pine hover) en vez de aclarar a Pine 80%.
-        default: 'bg-primary text-primary-foreground hover:bg-pine-hover',
+        // AgroNexo: el hover oscurece un paso de la escala (verde campo 700 → 800) en vez de aclarar al 80%.
+        default: 'bg-primary text-primary-foreground hover:bg-primary-hover',
+        // Borde neutro de control (sage-400, 3,3:1): el mismo del input y del botón de Google.
         outline:
-          'border-pine/40 bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50',
+          'border-input bg-transparent hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
         ghost:

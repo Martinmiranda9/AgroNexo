@@ -25,10 +25,9 @@ import { firebaseErrorMessage, isUserCancelled, signInWithEmail, signInWithGoogl
 import BrandShowcasePanel from './BrandShowcasePanel';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AGRONEXO BRAND SYSTEM — PINE & BEIGE PALETTE (60-30-10)
-// 60% Canvas & Surfaces: Beige (#fef7e5) & Card Ivory (#FFFBF0)
-// 30% Structure & High Contrast Text: Pine (#00311e) → máximo contraste sobre Beige
-// 10% Accents & Details: Olive (#4D694E) & Sage (#728141)
+// AGRONEXO BRAND SYSTEM — PALETA v4 "VERDE CAMPO" (ver globals.css y el plan de frontend)
+// Columna del formulario en blanco · panel de marca en pine · texto pine con secundario sage-600
+// Acción principal en verde campo 700 (bg-primary) · bordes de control sage-400
 // ─────────────────────────────────────────────────────────────────────────────
 
 const COPY = {

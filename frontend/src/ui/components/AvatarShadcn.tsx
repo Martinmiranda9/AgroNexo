@@ -70,7 +70,8 @@ function AvatarGroup({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="avatar-group"
       className={cn(
-        'group/avatar-group *:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2',
+        // AgroNexo: el aro toma el color de las cards (blancas); con ring-background quedaba un halo beige.
+        'group/avatar-group *:data-[slot=avatar]:ring-surface flex -space-x-2 *:data-[slot=avatar]:ring-2',
         className
       )}
       {...props}

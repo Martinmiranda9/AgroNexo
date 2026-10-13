@@ -75,7 +75,7 @@ export default function RegistrationWizard({
 
             {account?.email && (
               <p className="border-pine/10 bg-beige text-olive mt-6 flex flex-wrap items-center gap-x-1.5 rounded-lg border px-3.5 py-2.5 text-body-sm">
-                <CheckCircle size={16} weight="fill" className="text-olive shrink-0" />
+                <CheckCircle size={16} weight="fill" className="text-success shrink-0" />
                 <span>
                   Cuenta {account.provider === 'google.com' ? 'de Google' : ''}{' '}
                   <strong className="text-pine font-semibold">{account.email}</strong>

@@ -5,37 +5,80 @@
    inputs, selects y botones outline. Con esto `dark:` solo aplica bajo un ancestro `.dark` (hoy nunca). */
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-  /* ── Paleta Base (Crema/Oliva) ── */
-  --color-bg-page: #fef7e5;
-  --color-bg-hero: #FFF3D5;
-  --color-bg-card: #FFFBF0;
-  --color-olive: #4D694E;
-  --color-olive-hover: #3F4C26;
-  --color-accent-mid: #728141;
-  --color-accent-light: #99A474;
-  --color-dark: #24301E;
-  --color-neutral-warm: #978A56;
-  --color-danger: #8C4A34;
+/* ─────────────────────────────────────────────────────────────────────────────
+   PALETA AGRONEXO v4 · "Verde campo" (ver ia/frontend_implementation_plan.md › Paleta)
+   `static`: emite todas las variables aunque ninguna utilidad las use directo, porque los alias y el tema
+   shadcn de más abajo las referencian con var().
+   ───────────────────────────────────────────────────────────────────────────── */
+@theme static {
+  /* ── Escala de marca: verde campo (tono 148°), armada en OKLCH desde #3E7949.
+     700 = acción principal (botón, barra actual) · 950 = pine (sidebar, activo, dato clave). ── */
+  --color-field-50: #f4fcf3;
+  --color-field-100: #e5f7e5;
+  --color-field-200: #cdeecf;
+  --color-field-300: #ade1b2;
+  --color-field-400: #88cc8f;
+  --color-field-500: #63b070;
+  --color-field-600: #4d9259;
+  --color-field-700: #3e7949;
+  --color-field-800: #29603b;
+  --color-field-900: #16482d;
+  --color-field-950: #00311e;
 
-  /* ── Estados de tags (green-600 / amber-600 de Tailwind, de ss-components badge-18 / badge-16).
-     El rojo de "negativo" es --color-danger. ── */
+  /* ── Neutros salvia: grises con un toque mínimo del verde de marca. Sin crema en el producto.
+     50 = lienzo · blanco = cards · 200 = borde de card · 400 = borde de control (3,3:1) ·
+     500 = placeholder (4,7:1) · 600 = texto secundario (6,5:1) · 800 = texto de apoyo. ── */
+  --color-sage-25: #f9fbfa;
+  --color-sage-50: #f4f6f4;
+  --color-sage-100: #ecefec;
+  --color-sage-200: #e0e4e1;
+  --color-sage-300: #ced2ce;
+  --color-sage-400: #8a8f8b;
+  --color-sage-500: #707470;
+  --color-sage-600: #5a5f5b;
+  --color-sage-700: #434844;
+  --color-sage-800: #2c302c;
+  --color-sage-900: #191d19;
+  --color-sage-950: #0b100c;
+
+  /* ── Estados reales: verde / naranja / rojo. El 600 (500 en naranja) es el tinte y el punto; el texto de
+     los tags es el 800, que llega a 6,4–6,6:1 sobre su tinte. El rojo es el 700: texto y botón en AA. ── */
   --color-status-green: #16a34a;
-  --color-status-amber: #d97706;
-  /* Texto de los tags: el 600 sobre su propio tinte al 10% daba 2,9:1. El 800 llega a 6,4:1 (WCAG AA). */
   --color-status-green-ink: #166534;
-  --color-status-amber-ink: #92400e;
+  --color-status-orange: #f97316;
+  --color-status-orange-ink: #9a3412;
+  --color-status-red: #b91c1c;
 
-  /* ── Paleta Pine & Beige (Nuevos colores principales) ── */
+  /* ── Superficies de marca: la combinación del login/brandboard, solo en piezas puntuales (avisos, estados
+     vacíos, logros, invitaciones). Nunca como fondo de página. Ver `ui/components/BrandSurface.tsx`. ── */
+  --color-cream: #fef7e5;
+  --color-cream-border: #ede0c4;
+  --color-sand: #fff3d5;
+  --color-sand-border: #efdcab;
+  --color-moss: #4d694e; /* bajada y rótulo sobre cream/sand (5,5:1) */
+  --color-loam: #24301e; /* cuerpo sobre cream/sand (12,6:1) */
+  --color-sprout: #99a474; /* bajada sobre pine (5,4:1) */
+
+  /* ── Nombres heredados → paleta v4. Los componentes existentes los siguen usando y toman los colores
+     nuevos sin cambiar de clase. En código nuevo usar la escala (field/sage) o los tokens semánticos. ── */
   --color-pine: #00311e;
   --color-pine-hover: #002617;
-  --color-beige: #fef7e5;
-  --color-beige-dark: #f5ead4;
-  --color-beige-deeper: #ede0c4;
-
-  /* Superficies de producto (búsqueda asistida): fondo casi blanco con cards blancas, en lugar del beige plano. */
-  --color-paper: #fbfbf8;
+  --color-beige: #f4f6f4; /* = sage-50: fondo claro y texto sobre pine */
+  --color-beige-dark: #ecefec; /* = sage-100 */
+  --color-beige-deeper: #e0e4e1; /* = sage-200 */
+  --color-bg-page: #f4f6f4; /* = sage-50 */
+  --color-bg-hero: #f4fcf3; /* = field-50 */
+  --color-bg-card: #ffffff;
+  --color-paper: #f4f6f4; /* = sage-50: lienzo de las pantallas de producto */
   --color-surface: #ffffff;
+  --color-olive: #5a5f5b; /* = sage-600: texto secundario, íconos */
+  --color-olive-hover: #434844; /* = sage-700 */
+  --color-accent-mid: #63b070; /* = field-500 */
+  --color-accent-light: #ade1b2; /* = field-300: acentos sobre pine (9,7:1) */
+  --color-dark: #2c302c; /* = sage-800: texto de apoyo */
+  --color-neutral-warm: #8a8f8b; /* = sage-400: bordes de control, íconos inactivos */
+  --color-danger: #b91c1c; /* = status-red */
+
   --shadow-raised: 0 1px 2px rgb(0 49 30 / 0.05), 0 24px 48px -24px rgb(0 49 30 / 0.22);
 
   --radius-card: 16px;
@@ -76,61 +119,67 @@
    TEMA SHADCN → AGRONEXO
    Los componentes de shadcn (y los que vengan de bloques/plantillas) leen estos nombres
    semánticos (bg-primary, text-muted-foreground, border-input, ring-ring…). Se definen UNA vez
-   acá apuntando a la paleta Pine & Beige, así los componentes se instalan sin retocarlos y
-   quedan con la marca. Para cambiar la identidad: tocar solo esta tabla y la paleta de arriba.
+   acá apuntando a la paleta v4, así los componentes se instalan sin retocarlos y quedan con la
+   marca. Para cambiar la identidad: tocar solo esta tabla y la paleta de arriba.
+   Proporción buscada: ~60% lienzo salvia, ~28% superficies blancas, ~8% pine/verde, ~4% estados.
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
   --radius: 0.75rem; /* 12px: base de la escala sm/md/lg/xl */
 
-  --background: var(--color-beige);
+  --background: var(--color-sage-50);
   --foreground: var(--color-pine);
-  --card: var(--color-bg-card);
+  --card: var(--color-surface);
   --card-foreground: var(--color-pine);
-  --popover: var(--color-bg-card);
+  --popover: var(--color-surface);
   --popover-foreground: var(--color-pine);
 
-  --primary: var(--color-pine);
-  --primary-foreground: var(--color-beige);
+  /* Acción principal: verde campo 700 con texto blanco (5,2:1). Hover: 800. Lo activo/seleccionado
+     (chips, toggles, radios, checkbox, pasos) es pine: así el botón y la selección no compiten. */
+  --primary: var(--color-field-700);
+  --primary-hover: var(--color-field-800);
+  --primary-foreground: #ffffff;
   --secondary: color-mix(in oklab, var(--color-pine) 8%, transparent);
   --secondary-foreground: var(--color-pine);
-  --muted: var(--color-beige-dark);
-  --muted-foreground: var(--color-olive);
-  --accent: var(--color-beige-dark);
+  --muted: var(--color-sage-100);
+  --muted-foreground: var(--color-sage-600);
+  --accent: var(--color-sage-100);
   --accent-foreground: var(--color-pine);
-  --destructive: var(--color-danger);
-  /* No son de shadcn: estados positivo / pendiente de los tags (Badge success / warning). */
+  --destructive: var(--color-status-red);
+  /* No son de shadcn: estados positivo / pendiente de los tags (Badge success / warning).
+     Los estados van siempre como pill clara con texto 800; el verde de marca va siempre sólido. Así
+     "Aceptada" y el botón principal no se confunden aunque compartan familia de verde. */
   --success: var(--color-status-green);
   --success-foreground: var(--color-status-green-ink);
-  --warning: var(--color-status-amber);
-  --warning-foreground: var(--color-status-amber-ink);
+  --warning: var(--color-status-orange);
+  --warning-foreground: var(--color-status-orange-ink);
 
-  /* Tintes de superficie de producto (sobre paper/surface). Antes eran `pine/[0.035]`, `pine/25`, `olive/12`… sueltos. */
-  --surface-sunken: color-mix(in oklab, var(--color-pine) 3.5%, transparent);
-  --border-strong: color-mix(in oklab, var(--color-pine) 30%, transparent);
-  --fill-positive: color-mix(in oklab, var(--color-olive) 12%, transparent);
-  --fill-caution: color-mix(in oklab, var(--color-neutral-warm) 10%, transparent);
+  /* Tintes de superficie de producto (sobre lienzo/superficie). Neutros: el verde queda para la marca. */
+  --surface-sunken: color-mix(in oklab, var(--color-sage-900) 4%, transparent);
+  --border-strong: color-mix(in oklab, var(--color-sage-900) 25%, transparent);
+  --fill-positive: color-mix(in oklab, var(--color-status-green) 14%, transparent);
+  --fill-caution: color-mix(in oklab, var(--color-status-orange) 12%, transparent);
 
-  --border: color-mix(in oklab, var(--color-pine) 12%, transparent);
-  /* Borde de controles: neutral-warm pleno (3.2–3.3:1 sobre beige/card, WCAG 1.4.11). Al 50% daba 1.7:1. */
-  --input: var(--color-neutral-warm);
-  /* Foco: Pine pleno. Los componentes usan border-ring (13:1) y ring-ring/50 (halo ≈3:1, WCAG 2.4.7/1.4.11).
-     Con ring al 30% el anillo final quedaba en ~15% de Pine (1.3:1) e invisible sobre botones Pine. */
+  --border: var(--color-sage-200);
+  /* Borde de controles: sage-400 (3,3:1 sobre blanco, 3,0:1 sobre el lienzo; WCAG 1.4.11). */
+  --input: var(--color-sage-400);
+  /* Foco: Pine pleno. Los componentes usan border-ring (13:1) y ring-ring/50 (halo ≈3:1, WCAG 2.4.7/1.4.11). */
   --ring: var(--color-pine);
 
-  --chart-1: var(--color-pine);
-  --chart-2: var(--color-olive);
-  --chart-3: var(--color-accent-mid);
-  --chart-4: var(--color-accent-light);
-  --chart-5: var(--color-neutral-warm);
+  --chart-1: var(--color-field-700);
+  --chart-2: var(--color-field-500);
+  --chart-3: var(--color-field-300);
+  --chart-4: var(--color-sage-400);
+  --chart-5: var(--color-field-950);
 
-  --sidebar: var(--color-bg-card);
-  --sidebar-foreground: var(--color-pine);
-  --sidebar-primary: var(--color-pine);
-  --sidebar-primary-foreground: var(--color-beige);
-  --sidebar-accent: var(--color-beige-dark);
-  --sidebar-accent-foreground: var(--color-pine);
-  --sidebar-border: var(--border);
-  --sidebar-ring: var(--ring);
+  /* Sidebar fuerte: pine con texto verde claro; hover un paso más claro, activo en verde 800. */
+  --sidebar: var(--color-pine);
+  --sidebar-foreground: var(--color-field-200);
+  --sidebar-primary: var(--color-field-800);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--color-field-900);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: var(--color-field-900);
+  --sidebar-ring: var(--color-field-300);
 }
 
 @theme inline {
@@ -141,6 +190,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -188,7 +238,7 @@
 }
 
 body {
-  background-color: var(--color-beige, #fef7e5);
+  background-color: var(--color-sage-50, #f4f6f4);
   color: var(--color-pine, #00311e);
   font-family: var(--font-sans);
   font-size: 16px;

@@ -42,7 +42,7 @@ export default function ForgotPasswordForm() {
 
       {status === 'sent' ? (
         <p role="status" className="mt-8 flex items-start gap-2 rounded-lg border border-olive/30 bg-olive/5 px-3.5 py-3 text-left text-body-sm">
-          <CheckCircle size={16} weight="fill" className="mt-0.5 shrink-0 text-olive" />
+          <CheckCircle size={16} weight="fill" className="mt-0.5 shrink-0 text-success" />
           Si el correo tiene una cuenta, en unos minutos te llega el enlace. Revisá también el spam.
         </p>
       ) : (

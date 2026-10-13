@@ -84,7 +84,7 @@ export default function VerificationBanner({ provider, className }: Verification
     >
       <div className="flex items-start gap-2">
         {isVerified ? (
-          <CheckCircle size={20} weight="fill" className="text-olive mt-0.5 shrink-0" aria-hidden />
+          <CheckCircle size={20} weight="fill" className="text-success mt-0.5 shrink-0" aria-hidden />
         ) : (
           <WarningCircle size={20} weight="fill" className="text-danger mt-0.5 shrink-0" aria-hidden />
         )}

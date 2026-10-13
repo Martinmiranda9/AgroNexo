@@ -30,7 +30,7 @@ export default function ProfessionalMeta({
       ? {
           key: 'license',
           label: 'Matrícula',
-          icon: <SealCheckIcon size={iconSize} className="text-olive" aria-hidden />,
+          icon: <SealCheckIcon size={iconSize} className="text-success" aria-hidden />,
           value: 'Matrícula verificada',
         }
       : null,
