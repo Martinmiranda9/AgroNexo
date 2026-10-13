@@ -20,6 +20,8 @@ interface SidebarProps {
   /** Rótulo del grupo de navegación. */
   label: string;
   items: SidebarItem[];
+  /** Acción principal entre el logo y la navegación (por ejemplo, "Nuevo campo"). */
+  action?: ReactNode;
   /** Cuenta del usuario y acciones, pegadas abajo. */
   footer?: ReactNode;
   className?: string;
@@ -29,7 +31,7 @@ interface SidebarProps {
  * Barra lateral de escritorio sobre pine: texto verde claro, hover un paso más claro y el ítem activo en verde 800.
  * Solo presentación: el feature decide qué ítems hay y cuál está activo.
  */
-export default function Sidebar({ brand, label, items, footer, className }: SidebarProps) {
+export default function Sidebar({ brand, label, items, action, footer, className }: SidebarProps) {
   return (
     <aside
       className={cn(
@@ -37,7 +39,10 @@ export default function Sidebar({ brand, label, items, footer, className }: Side
         className
       )}
     >
-      <div className="px-2">{brand}</div>
+      <div className="flex flex-col gap-6">
+        <div className="px-2">{brand}</div>
+        {action}
+      </div>
 
       <nav aria-label={label} className="flex flex-col gap-1">
         <p className="text-overline text-field-400 px-3 pb-2">{label}</p>
