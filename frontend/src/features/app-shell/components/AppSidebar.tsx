@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { SignOutIcon } from '@phosphor-icons/react';
+import { NewFarmButton } from '@/features/farms';
 import { ROUTES } from '@/shared/constants/routes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/components/AvatarShadcn';
 import BrandLogo from '@/ui/components/BrandLogo';
@@ -15,7 +16,10 @@ interface AppSidebarProps {
   pendingCount?: number;
 }
 
-/** Barra lateral de escritorio: la misma navegación del encabezado, con la cuenta y el cierre de sesión abajo. */
+/**
+ * Barra lateral de escritorio: la misma navegación del encabezado, con la cuenta y el cierre de sesión abajo. Al
+ * productor le suma "Nuevo campo" entre el logo y la navegación.
+ */
 export default function AppSidebar({ user, pendingCount = 0 }: AppSidebarProps) {
   const pathname = usePathname();
   const name = displayNameOf(user);
@@ -32,6 +36,12 @@ export default function AppSidebar({ user, pendingCount = 0 }: AppSidebarProps) 
       brand={<BrandLogo variant="dark" />}
       label="Principal"
       items={items}
+      action={
+        // Solo el productor crea campos; se puede antes o después de tener un match.
+        user.role === 'Producer' ? (
+          <NewFarmButton className="border-sidebar-foreground/30 text-sidebar-primary-foreground hover:bg-sidebar-accent focus-visible:border-sidebar-ring focus-visible:ring-sidebar-ring/40 h-11 w-full border bg-transparent" />
+        ) : undefined
+      }
       footer={
         <div className="flex items-center gap-3 px-2">
           <Avatar size="lg">
