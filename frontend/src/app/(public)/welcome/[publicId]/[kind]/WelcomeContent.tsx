@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import { ArrowRightIcon, CheckCircleIcon } from '@phosphor-icons/react';
+import { MdArrowForward, MdOutlineCheckCircle } from 'react-icons/md';
 import { Alert, AlertDescription, AlertTitle, Button } from '@/ui/components';
 import BrandMark from '@/ui/components/BrandMark';
 
@@ -32,7 +32,7 @@ export default function WelcomeContent({ firstName, publicId, roleLabel }: Welco
             {/* Anillo exterior */}
             <div aria-hidden className="absolute inset-0 rounded-full bg-pine/15 motion-safe:animate-ping" />
             <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-pine">
-              <CheckCircleIcon size={40} weight="regular" className="text-beige" aria-hidden />
+              <MdOutlineCheckCircle size={40} className="text-beige" aria-hidden />
             </div>
           </motion.div>
 
@@ -64,7 +64,7 @@ export default function WelcomeContent({ firstName, publicId, roleLabel }: Welco
             className="mt-6 w-full"
           >
             <Alert variant="success">
-              <CheckCircleIcon />
+              <MdOutlineCheckCircle />
               <AlertTitle>Cuenta creada con éxito</AlertTitle>
               <AlertDescription>Entrá a tu panel para empezar a conectarte con profesionales.</AlertDescription>
             </Alert>
@@ -110,7 +110,7 @@ export default function WelcomeContent({ firstName, publicId, roleLabel }: Welco
           >
             <Button render={<Link href="/dashboard" />} nativeButton={false} size="lg" className="w-full">
               Ir a mi panel
-              <ArrowRightIcon data-icon="inline-end" size={16} weight="bold" aria-hidden />
+              <MdArrowForward data-icon="inline-end" size={16} aria-hidden />
             </Button>
           </motion.div>
         </motion.div>

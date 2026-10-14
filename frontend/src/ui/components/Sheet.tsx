@@ -1,4 +1,4 @@
-// Código oficial: shadcn/ui `sheet` (base-nova). Solo cambian los imports (alias de AgroNexo e íconos Phosphor).
+// Código oficial: shadcn/ui `sheet` (base-nova). Solo cambian los imports (alias de AgroNexo e íconos Material de react-icons).
 'use client';
 
 import * as React from 'react';
@@ -6,7 +6,7 @@ import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { cn } from '@/shared/utils/cn';
 
 import { Button } from './Button';
-import { XIcon } from '@phosphor-icons/react';
+import { MdClose } from 'react-icons/md';
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />;
@@ -65,7 +65,7 @@ function SheetContent({
             data-slot="sheet-close"
             render={<Button variant="ghost" className="absolute top-3 right-3" size="icon-sm" />}
           >
-            <XIcon />
+            <MdClose />
             <span className="sr-only">Cerrar</span>
           </SheetPrimitive.Close>
         )}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useId } from 'react';
-import { Check } from '@phosphor-icons/react';
+import { MdCheck } from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
 
 export interface ChoiceOption {
@@ -66,7 +66,7 @@ export default function ChoiceGroup({ label, options, value, onValueChange, mult
               />
               {multiple ? (
                 <>
-                  {active && <Check size={14} weight="bold" aria-hidden />}
+                  {active && <MdCheck size={14} aria-hidden />}
                   {o.label}
                 </>
               ) : (

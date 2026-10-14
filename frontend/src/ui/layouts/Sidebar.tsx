@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import type { Icon } from '@phosphor-icons/react';
+import type { IconType } from 'react-icons';
 import { cn } from '@/shared/utils/cn';
 
 export interface SidebarItem {
   href: string;
   label: string;
-  icon: Icon;
+  icon: IconType;
   active?: boolean;
   /** Contador al lado del ítem (por ejemplo, solicitudes esperando respuesta). Se oculta en 0. */
   count?: number;
@@ -56,7 +56,6 @@ export default function Sidebar({ brand, label, items, footer, className }: Side
           >
             <ItemIcon
               size={20}
-              weight={active ? 'fill' : 'regular'}
               aria-hidden
               className="shrink-0"
             />

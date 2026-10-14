@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useRef } from 'react';
-import { SealCheckIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdOutlineVerified } from 'react-icons/md';
 import { Badge } from '@/ui/components/Badge';
 import { Button } from '@/ui/components/Button';
 import { EXAMPLE_NEEDS } from '../config/catalog';
@@ -33,7 +33,7 @@ export default function SearchHero({ value, onChange, onSubmit }: SearchHeroProp
     >
       {/* Primera señal de confianza: antes que el nombre de la función, lo que le importa al productor. */}
       <Badge variant="success" className="text-body-sm h-7 px-3">
-        <SealCheckIcon data-icon="inline-start" size={14} aria-hidden />
+        <MdOutlineVerified data-icon="inline-start" size={14} aria-hidden />
         Primero, profesionales con matrícula verificada
       </Badge>
 

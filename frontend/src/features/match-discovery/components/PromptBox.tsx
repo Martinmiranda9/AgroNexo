@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, type FormEvent, type KeyboardEvent, type Ref } from 'react';
-import { ArrowRightIcon, MicrophoneIcon, StopIcon } from '@phosphor-icons/react';
+import { MdArrowForward, MdOutlineMic, MdStop } from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
 import { Badge, BadgeDot } from '@/ui/components/Badge';
 import { Button } from '@/ui/components/Button';
@@ -106,9 +106,9 @@ export default function PromptBox({ value, onChange, onSubmit, textareaRef }: Pr
                   onClick={dictation.toggle}
                 >
                   {dictation.listening ? (
-                    <StopIcon data-icon="inline-start" size={18} weight="fill" aria-hidden />
+                    <MdStop data-icon="inline-start" size={18} aria-hidden />
                   ) : (
-                    <MicrophoneIcon data-icon="inline-start" size={18} aria-hidden />
+                    <MdOutlineMic data-icon="inline-start" size={18} aria-hidden />
                   )}
                   {dictation.listening ? 'Detener' : 'Dictar'}
                 </Button>
@@ -135,7 +135,7 @@ export default function PromptBox({ value, onChange, onSubmit, textareaRef }: Pr
               <span>
                 Buscar<span className="max-sm:hidden"> profesionales</span>
               </span>
-              <ArrowRightIcon data-icon="inline-end" size={16} weight="bold" aria-hidden />
+              <MdArrowForward data-icon="inline-end" size={16} aria-hidden />
             </Button>
           </InputGroupAddon>
         </InputGroup>

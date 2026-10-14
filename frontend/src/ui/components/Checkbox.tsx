@@ -1,7 +1,7 @@
 'use client';
 
 import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox';
-import { CheckIcon } from '@phosphor-icons/react';
+import { MdCheck } from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
 
 // Código oficial: shadcn/ui `checkbox` (base-nova). Sin cambios de estilo: la marca sale del tema (globals.css).
@@ -19,7 +19,7 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
         data-slot="checkbox-indicator"
         className="grid place-content-center text-current transition-none [&>svg]:size-3.5"
       >
-        <CheckIcon weight="bold" />
+        <MdCheck />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   );

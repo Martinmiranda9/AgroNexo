@@ -3,14 +3,7 @@
 import { useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'motion/react';
-import {
-  ArrowRightIcon,
-  CaretDownIcon,
-  CheckIcon,
-  PencilSimpleIcon,
-  WarningCircleIcon,
-  XIcon,
-} from '@phosphor-icons/react';
+import { MdArrowForward, MdCheck, MdClose, MdErrorOutline, MdKeyboardArrowDown, MdOutlineEdit } from 'react-icons/md';
 import type { CreateMatchResult, NeedBrief } from '@/core/models/match.model';
 import { ROUTES } from '@/shared/constants/routes';
 import { cn } from '@/shared/utils/cn';
@@ -102,7 +95,7 @@ function CloseButton() {
         />
       }
     >
-      <XIcon size={16} aria-hidden />
+      <MdClose size={16} aria-hidden />
     </DrawerClose>
   );
 }
@@ -129,7 +122,7 @@ function SentView({
           transition={{ type: 'spring', stiffness: 380, damping: 22 }}
           className="bg-pine text-beige flex size-16 items-center justify-center rounded-full"
         >
-          <CheckIcon size={32} weight="bold" aria-hidden />
+          <MdCheck size={32} aria-hidden />
         </motion.span>
 
         <DrawerTitle className="text-heading-md tracking-heading text-pine max-w-[22ch] text-balance">
@@ -150,7 +143,7 @@ function SentView({
         </Button>
         <Button render={<Link href={ROUTES.matches} />} nativeButton={false} size="lg">
           Ver mis solicitudes
-          <ArrowRightIcon data-icon="inline-end" size={16} weight="bold" aria-hidden />
+          <MdArrowForward data-icon="inline-end" size={16} aria-hidden />
         </Button>
       </DrawerFooter>
     </>
@@ -232,12 +225,11 @@ function RequestForm({
               />
             }
           >
-            <PencilSimpleIcon data-icon="inline-start" size={16} aria-hidden />
+            <MdOutlineEdit data-icon="inline-start" size={16} aria-hidden />
             Editar mensaje
-            <CaretDownIcon
+            <MdKeyboardArrowDown
               data-icon="inline-end"
               size={14}
-              weight="bold"
               aria-hidden
               className="transition-transform group-data-panel-open/button:rotate-180"
             />
@@ -268,7 +260,7 @@ function RequestForm({
 
         {failure && (
           <Alert variant="destructive" role="alert">
-            <WarningCircleIcon aria-hidden />
+            <MdErrorOutline aria-hidden />
             <AlertDescription>{FAILURE_COPY[failure]}</AlertDescription>
           </Alert>
         )}
@@ -287,7 +279,7 @@ function RequestForm({
           loadingText="Enviando solicitud…"
         >
           Enviar solicitud
-          <ArrowRightIcon data-icon="inline-end" size={16} weight="bold" aria-hidden />
+          <MdArrowForward data-icon="inline-end" size={16} aria-hidden />
         </Button>
       </DrawerFooter>
     </>

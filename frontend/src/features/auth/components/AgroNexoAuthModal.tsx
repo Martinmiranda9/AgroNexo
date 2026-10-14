@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { EnvelopeSimple, Eye, EyeSlash, WarningCircle } from '@phosphor-icons/react';
+import { MdErrorOutline, MdOutlineMail, MdOutlineVisibility, MdOutlineVisibilityOff } from 'react-icons/md';
 import {
   Button,
   Field,
@@ -112,7 +112,7 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
               role="alert"
               className="mb-4 flex items-start gap-2 rounded-lg border border-danger/30 bg-danger/5 px-3.5 py-3 text-body-sm text-danger"
             >
-              <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
+              <MdErrorOutline size={16} className="mt-0.5 shrink-0" />
               {errorMessage}
             </p>
           )}
@@ -123,7 +123,7 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
                 <FieldLabel htmlFor={emailId}>Correo</FieldLabel>
                 <InputGroup>
                   <InputGroupAddon>
-                    <EnvelopeSimple />
+                    <MdOutlineMail />
                   </InputGroupAddon>
                   <InputGroupInput
                     id={emailId}
@@ -156,7 +156,7 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
                       className="text-neutral-warm hover:text-pine"
                       onClick={() => setShowPassword((v) => !v)}
                     >
-                      {showPassword ? <EyeSlash /> : <Eye />}
+                      {showPassword ? <MdOutlineVisibilityOff /> : <MdOutlineVisibility />}
                     </InputGroupButton>
                   </InputGroupAddon>
                 </InputGroup>

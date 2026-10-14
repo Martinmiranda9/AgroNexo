@@ -1,6 +1,6 @@
 'use client';
 
-import { CloudSlash } from '@phosphor-icons/react';
+import { MdOutlineCloudOff } from 'react-icons/md';
 import { BrandLogo, Button } from '@/ui/components';
 
 /**
@@ -12,7 +12,7 @@ export default function BackendUnavailable() {
     <main className="bg-bg-card text-pine flex min-h-[100dvh] w-full flex-col items-center justify-center px-6">
       <div role="alert" className="flex w-full max-w-[380px] flex-col items-center text-center">
         <BrandLogo />
-        <CloudSlash size={40} weight="regular" className="text-olive mt-10" aria-hidden />
+        <MdOutlineCloudOff size={40} className="text-olive mt-10" aria-hidden />
         <h1 className="text-heading-md tracking-heading mt-4">No pudimos conectarnos</h1>
         <p className="text-body-sm text-olive mt-2">
           Tu sesión está bien, pero el servidor no responde en este momento. Probá de nuevo en unos segundos.

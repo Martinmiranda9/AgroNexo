@@ -17,7 +17,7 @@ const TONES = {
   solid: 'bg-pine text-beige',
 } as const;
 
-/** Contenedor circular para iconos (Phosphor), tamaños fijos. */
+/** Contenedor circular para iconos (Material de react-icons), tamaños fijos. */
 export default function IconContainer({ size = 'md', tone = 'tint', className, children, ...props }: IconContainerProps) {
   return (
     <span

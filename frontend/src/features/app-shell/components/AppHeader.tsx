@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CaretDownIcon, SignOutIcon } from '@phosphor-icons/react';
+import { MdKeyboardArrowDown, MdLogout } from 'react-icons/md';
 import { ROUTES } from '@/shared/constants/routes';
 import { cn } from '@/shared/utils/cn';
 import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from '@/ui/components/AvatarShadcn';
@@ -104,7 +104,7 @@ export default function AppHeader({ user, pendingCount = 0 }: AppHeaderProps) {
                   </span>
                 )}
               </span>
-              <CaretDownIcon size={14} weight="bold" className="text-olive" aria-hidden />
+              <MdKeyboardArrowDown size={14} className="text-olive" aria-hidden />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="bg-surface min-w-56">
@@ -116,7 +116,7 @@ export default function AppHeader({ user, pendingCount = 0 }: AppHeaderProps) {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={signOut}>
-                <SignOutIcon size={16} aria-hidden />
+                <MdLogout size={16} aria-hidden />
                 Cerrar sesión
               </DropdownMenuItem>
             </DropdownMenuContent>

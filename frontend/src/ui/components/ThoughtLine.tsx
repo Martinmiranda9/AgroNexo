@@ -1,4 +1,4 @@
-// Código oficial: React Bits `ThoughtLine` (TS + CSS). Cambios: íconos Phosphor en lugar de Hugeicons y textos por
+// Código oficial: React Bits `ThoughtLine` (TS + CSS). Cambios: íconos Material (react-icons) en lugar de Hugeicons y textos por
 // defecto en español, con coma decimal. El resto, igual.
 'use client';
 
@@ -11,7 +11,7 @@ import React, {
   type ReactNode,
 } from 'react';
 import { animate, useReducedMotion, type AnimationPlaybackControls } from 'motion/react';
-import { CaretDownIcon, CheckIcon, SparkleIcon } from '@phosphor-icons/react';
+import { MdCheck, MdKeyboardArrowDown, MdOutlineAutoAwesome } from 'react-icons/md';
 import './ThoughtLine.css';
 
 export type ThoughtLineGlyph = 'sparkle' | 'dot' | 'none' | ReactNode;
@@ -220,7 +220,7 @@ const ThoughtLine: React.FC<ThoughtLineProps> = ({
       {glyph !== 'none' ? (
         <span ref={glyphRef} className="thought-line__glyph" aria-hidden="true">
           {glyph === 'sparkle' ? (
-            <SparkleIcon size="100%" weight="bold" />
+            <MdOutlineAutoAwesome size="100%" />
           ) : glyph === 'dot' ? (
             <span className="thought-line__dot" />
           ) : (
@@ -262,7 +262,7 @@ const ThoughtLine: React.FC<ThoughtLineProps> = ({
           data-on={hasTrace ? '' : undefined}
           aria-hidden="true"
         >
-          <CaretDownIcon size="1em" weight="bold" />
+          <MdKeyboardArrowDown size="1em" />
         </span>
       ) : null}
       <span className="thought-line__sr" role="status">
@@ -318,7 +318,7 @@ const ThoughtLine: React.FC<ThoughtLineProps> = ({
                   >
                     <span className="thought-line__mark" aria-hidden="true">
                       {done ? (
-                        <CheckIcon size="1em" weight="bold" />
+                        <MdCheck size="1em" />
                       ) : (
                         <i className="thought-line__pulse" />
                       )}

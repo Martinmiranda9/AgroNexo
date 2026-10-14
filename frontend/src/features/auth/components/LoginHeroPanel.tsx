@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from 'motion/react';
 import Image from 'next/image';
-import { Shield, Radio } from 'lucide-react';
+import { MdOutlineEco, MdOutlineLock, MdOutlineShield, MdTrendingUp } from 'react-icons/md';
 
 const HERO_IMAGE_URL =
   'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1400&q=90&fit=crop&auto=format';
@@ -91,7 +91,7 @@ export default function LoginHeroPanel() {
       <div className="relative z-10 flex w-full items-center justify-between">
         <StatusBadge 
           delay={0.1}
-          icon={<Shield className="h-3.5 w-3.5 opacity-80" strokeWidth={2} />}
+          icon={<MdOutlineShield className="h-3.5 w-3.5 opacity-80" />}
         >
           Tecnología de Campo Verificada
         </StatusBadge>
@@ -138,25 +138,19 @@ export default function LoginHeroPanel() {
       <div className="relative z-10 grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
         <FeatureCard
           delay={0.4}
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          }
+          icon={<MdOutlineLock size={14} />}
           title="Agricultura Inteligente"
           desc="Decisiones claras basadas en datos de suelo y clima."
         />
         <FeatureCard
           delay={0.5}
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c4-4 8-10 8-14a8 8 0 1 0-16 0c0 4 4 10 8 14z"/><path d="M12 22V12"/></svg>
-          }
+          icon={<MdOutlineEco size={14} />}
           title="Salud del Cultivo"
           desc="Monitoreo satelital y detección temprana de plagas."
         />
         <FeatureCard
           delay={0.6}
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-          }
+          icon={<MdTrendingUp size={14} />}
           title="Mayor Rendimiento"
           desc="Sustentabilidad y máxima eficiencia por hectárea."
         />

@@ -1,4 +1,4 @@
-import { CheckIcon, QuestionIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdCheck, MdOutlineHelpOutline } from 'react-icons/md';
 
 interface ReasonListProps {
   /** Lo que cumple, una línea cada uno. */
@@ -17,7 +17,7 @@ export default function ReasonList({ checks, missing }: ReasonListProps) {
         {checks.map((check) => (
           <li key={check} className="text-body-sm text-pine flex items-start gap-2.5">
             <span className="bg-fill-positive mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full">
-              <CheckIcon size={12} weight="bold" aria-hidden />
+              <MdCheck size={12} aria-hidden />
             </span>
             {check}
           </li>
@@ -30,7 +30,7 @@ export default function ReasonList({ checks, missing }: ReasonListProps) {
           <ul className="mt-2 flex flex-col gap-1.5">
             {missing.map((item) => (
               <li key={item} className="text-body-sm text-dark flex items-start gap-2">
-                <QuestionIcon size={16} className="text-olive mt-0.5 shrink-0" aria-hidden />
+                <MdOutlineHelpOutline size={16} className="text-olive mt-0.5 shrink-0" aria-hidden />
                 {capitalize(item)}
               </li>
             ))}

@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 import Link from 'next/link';
-import { EnvelopeSimple, WarningCircle } from '@phosphor-icons/react';
+import { MdErrorOutline, MdOutlineMail } from 'react-icons/md';
 import {
   Button,
   Checkbox,
@@ -120,7 +120,7 @@ export default function AccountStep() {
           role="alert"
           className="border-danger/30 bg-danger/5 text-danger flex items-start gap-2 rounded-lg border px-3.5 py-3 text-body-sm"
         >
-          <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
+          <MdErrorOutline size={16} className="mt-0.5 shrink-0" />
           {error}
         </p>
       )}
@@ -138,7 +138,7 @@ export default function AccountStep() {
           <FieldLabel htmlFor={emailId}>Correo</FieldLabel>
           <InputGroup>
             <InputGroupAddon>
-              <EnvelopeSimple />
+              <MdOutlineMail />
             </InputGroupAddon>
             <InputGroupInput
               id={emailId}

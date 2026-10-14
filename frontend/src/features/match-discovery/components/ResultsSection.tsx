@@ -1,4 +1,4 @@
-import { InfoIcon, MagnifyingGlassIcon, WarningCircleIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdErrorOutline, MdOutlineInfo, MdSearch } from 'react-icons/md';
 import { ROUTES } from '@/shared/constants/routes';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/Alert';
 import { Button } from '@/ui/components/Button';
@@ -79,7 +79,7 @@ export default function ResultsSection({
 
       {isSample && (
         <Alert role="note">
-          <InfoIcon aria-hidden />
+          <MdOutlineInfo aria-hidden />
           <AlertTitle>Profesionales de ejemplo</AlertTitle>
           <AlertDescription>
             Estás viendo datos ficticios porque el backend todavía no devolvió profesionales. Solo
@@ -90,7 +90,7 @@ export default function ResultsSection({
 
       {error ? (
         <Alert variant="destructive" role="alert">
-          <WarningCircleIcon aria-hidden />
+          <MdErrorOutline aria-hidden />
           <AlertTitle>{ERROR_COPY[error].title}</AlertTitle>
           <AlertDescription>{ERROR_COPY[error].description}</AlertDescription>
           <div className="col-start-2 mt-3">
@@ -126,7 +126,7 @@ export default function ResultsSection({
                   />
                 }
               >
-                <InfoIcon size={16} aria-hidden />
+                <MdOutlineInfo size={16} aria-hidden />
               </PopoverTrigger>
               <PopoverContent align="start" className="bg-surface w-80 p-4">
                 <PopoverTitle className="text-body-sm text-pine font-semibold">
@@ -147,7 +147,7 @@ export default function ResultsSection({
             <Empty className="rounded-card border-border-strong bg-surface/70 border py-14">
               <EmptyHeader>
                 <EmptyMedia variant="icon" className="bg-secondary text-pine size-10 rounded-full">
-                  <MagnifyingGlassIcon size={20} aria-hidden />
+                  <MdSearch size={20} aria-hidden />
                 </EmptyMedia>
                 <EmptyTitle className="text-body text-pine font-semibold">
                   Todavía no hay profesionales para esto cerca de {zoneLabel}

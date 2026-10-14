@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { SignOutIcon } from '@phosphor-icons/react';
+import { MdLogout } from 'react-icons/md';
 import { ROUTES } from '@/shared/constants/routes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/components/AvatarShadcn';
 import BrandLogo from '@/ui/components/BrandLogo';
@@ -56,7 +56,7 @@ export default function AppSidebar({ user, pendingCount = 0 }: AppSidebarProps) 
             title="Cerrar sesión"
             className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-sidebar-ring flex size-11 shrink-0 items-center justify-center rounded-lg transition-colors focus-visible:outline-2"
           >
-            <SignOutIcon size={20} aria-hidden />
+            <MdLogout size={20} aria-hidden />
           </button>
         </div>
       }

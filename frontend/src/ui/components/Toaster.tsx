@@ -1,7 +1,7 @@
 'use client';
 
 import { useSyncExternalStore, type ReactNode } from 'react';
-import { CheckCircleIcon, InfoIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { MdCheckCircle, MdError, MdInfo } from 'react-icons/md';
 import SwipeToast from './SwipeToast';
 
 type ToastTone = 'success' | 'info' | 'error';
@@ -18,9 +18,9 @@ interface ToastOptions {
 }
 
 const ICONS: Record<ToastTone, ReactNode> = {
-  success: <CheckCircleIcon weight="fill" className="text-accent-light" />,
-  info: <InfoIcon weight="fill" className="text-accent-light" />,
-  error: <WarningCircleIcon weight="fill" className="text-beige" />,
+  success: <MdCheckCircle className="text-accent-light" />,
+  info: <MdInfo className="text-accent-light" />,
+  error: <MdError className="text-beige" />,
 };
 
 // Cola de toasts fuera de React: cualquier componente llama a `toast()` sin necesitar un provider.

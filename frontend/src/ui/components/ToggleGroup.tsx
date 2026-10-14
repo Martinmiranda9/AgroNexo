@@ -1,4 +1,4 @@
-// Código oficial: shadcn/ui `toggle-group` (base-nova). Solo cambian los imports (alias de AgroNexo e íconos Phosphor).
+// Código oficial: shadcn/ui `toggle-group` (base-nova). Solo cambian los imports (alias de AgroNexo e íconos Material de react-icons).
 'use client';
 
 import * as React from 'react';

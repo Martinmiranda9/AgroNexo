@@ -1,4 +1,4 @@
-// Código oficial: shadcn/ui `dialog` (base-nova). Solo cambian los imports (alias de AgroNexo e íconos Phosphor).
+// Código oficial: shadcn/ui `dialog` (base-nova). Solo cambian los imports (alias de AgroNexo e íconos Material de react-icons).
 'use client';
 
 import * as React from 'react';
@@ -6,7 +6,7 @@ import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { cn } from '@/shared/utils/cn';
 
 import { Button } from './Button';
-import { XIcon } from '@phosphor-icons/react';
+import { MdClose } from 'react-icons/md';
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
@@ -62,7 +62,7 @@ function DialogContent({
             data-slot="dialog-close"
             render={<Button variant="ghost" className="absolute top-2 right-2" size="icon-sm" />}
           >
-            <XIcon />
+            <MdClose />
             <span className="sr-only">Cerrar</span>
           </DialogPrimitive.Close>
         )}

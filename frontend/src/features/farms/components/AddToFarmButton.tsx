@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckIcon, FarmIcon, PlusIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { MdAdd, MdCheck, MdErrorOutline, MdOutlineAgriculture } from 'react-icons/md';
 import { toast } from '@/ui/components/Toaster';
 import { addFarmMemberAction } from '@/core/actions/add-farm-member.action';
 import type { CreatedFarm, Workspace } from '@/core/models/farm.model';
@@ -43,7 +43,7 @@ function FarmRow({ farm, member, adding, disabled, onAdd }: FarmRowProps) {
     >
       <ItemMedia>
         <IconContainer>
-          <FarmIcon size={18} aria-hidden />
+          <MdOutlineAgriculture size={18} aria-hidden />
         </IconContainer>
       </ItemMedia>
       <ItemContent className="min-w-0 gap-0">
@@ -63,7 +63,7 @@ function FarmRow({ farm, member, adding, disabled, onAdd }: FarmRowProps) {
       <ItemActions>
         {member ? (
           <Badge variant="success">
-            <CheckIcon data-icon="inline-start" weight="bold" aria-hidden />
+            <MdCheck data-icon="inline-start" aria-hidden />
             En el equipo
           </Badge>
         ) : (
@@ -141,7 +141,7 @@ export default function AddToFarmButton({
         className="self-start"
         onClick={() => setPicking(true)}
       >
-        <FarmIcon data-icon="inline-start" size={16} aria-hidden />
+        <MdOutlineAgriculture data-icon="inline-start" size={16} aria-hidden />
         Sumar a un campo
       </Button>
 
@@ -179,7 +179,7 @@ export default function AddToFarmButton({
 
           {failure && (
             <Alert variant="destructive" role="alert">
-              <WarningCircleIcon aria-hidden />
+              <MdErrorOutline aria-hidden />
               <AlertDescription>{failure}</AlertDescription>
             </Alert>
           )}
@@ -196,7 +196,7 @@ export default function AddToFarmButton({
             }}
             disabled={addingTo !== null}
           >
-            <PlusIcon data-icon="inline-start" size={16} weight="bold" aria-hidden />
+            <MdAdd data-icon="inline-start" size={16} aria-hidden />
             Crear un campo nuevo
           </Button>
           <Button

@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import { ClockIcon, MapPinIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdOutlinePlace, MdOutlineSchedule } from 'react-icons/md';
 import type { VariantProps } from 'class-variance-authority';
 import type { NeedBrief } from '@/shared/types/need-brief';
 import { cn } from '@/shared/utils/cn';
@@ -35,8 +35,8 @@ const TAG_VARIANT: Record<NeedTag['variant'], NeedBriefBadgeVariant> = {
 };
 
 const ICONS = {
-  clock: <ClockIcon data-icon="inline-start" weight="bold" aria-hidden />,
-  pin: <MapPinIcon data-icon="inline-start" weight="bold" aria-hidden />,
+  clock: <MdOutlineSchedule data-icon="inline-start" aria-hidden />,
+  pin: <MdOutlinePlace data-icon="inline-start" aria-hidden />,
 } as const;
 
 /**

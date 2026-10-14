@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { MagnifyingGlassIcon, UsersThreeIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { MdErrorOutline, MdOutlineGroups, MdSearch } from 'react-icons/md';
 import { toast } from '@/ui/components/Toaster';
 import { addFarmMemberAction } from '@/core/actions/add-farm-member.action';
 import { getFarmCandidatesAction } from '@/core/actions/get-farm-candidates.action';
@@ -71,7 +71,7 @@ function NoCandidates() {
     <Empty className="rounded-card border-pine/10 border border-solid py-10">
       <EmptyHeader>
         <EmptyMedia variant="icon" className="bg-secondary text-pine size-11 rounded-full">
-          <UsersThreeIcon size={22} aria-hidden />
+          <MdOutlineGroups size={22} aria-hidden />
         </EmptyMedia>
         <EmptyTitle className="text-body text-pine font-semibold">
           No hay profesionales para sumar
@@ -88,7 +88,7 @@ function NoCandidates() {
           variant="outline"
           size="lg"
         >
-          <MagnifyingGlassIcon data-icon="inline-start" size={18} aria-hidden />
+          <MdSearch data-icon="inline-start" size={18} aria-hidden />
           Buscar un profesional
         </Button>
       </EmptyContent>
@@ -161,7 +161,7 @@ function InvitePanel({ target, onDone }: { target: InviteTarget; onDone: () => v
 
         {load.state === 'error' && (
           <Alert variant="destructive" role="alert">
-            <WarningCircleIcon aria-hidden />
+            <MdErrorOutline aria-hidden />
             <AlertDescription>{load.message}</AlertDescription>
           </Alert>
         )}
@@ -195,7 +195,7 @@ function InvitePanel({ target, onDone }: { target: InviteTarget; onDone: () => v
 
             {failure && (
               <Alert variant="destructive" role="alert">
-                <WarningCircleIcon aria-hidden />
+                <MdErrorOutline aria-hidden />
                 <AlertDescription>{failure}</AlertDescription>
               </Alert>
             )}

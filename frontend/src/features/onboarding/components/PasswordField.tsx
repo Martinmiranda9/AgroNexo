@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { Eye, EyeSlash } from '@phosphor-icons/react';
+import { MdOutlineVisibility, MdOutlineVisibilityOff } from 'react-icons/md';
 import {
   Field,
   FieldDescription,
@@ -50,7 +50,7 @@ export default function PasswordField({ field, value, error, onChange }: Passwor
             className="text-neutral-warm hover:text-pine"
             onClick={() => setVisible((v) => !v)}
           >
-            {visible ? <EyeSlash /> : <Eye />}
+            {visible ? <MdOutlineVisibilityOff /> : <MdOutlineVisibility />}
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>

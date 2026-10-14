@@ -1,4 +1,4 @@
-// Código oficial: shadcn/ui `skeleton` (base-nova). Solo cambian los imports (alias de AgroNexo e íconos Phosphor).
+// Código oficial: shadcn/ui `skeleton` (base-nova). Solo cambian los imports (alias de AgroNexo e íconos Material de react-icons).
 import { cn } from '@/shared/utils/cn';
 
 function Skeleton({ className, ...props }: React.ComponentProps<'div'>) {

@@ -32,7 +32,7 @@ export default function RoleStep({ value, onChange, labelledBy }: RoleStepProps)
               value={kind}
               title={title}
               description={description}
-              icon={<RoleIcon size={20} weight="regular" />}
+              icon={<RoleIcon size={20} />}
               checked={value === kind}
               onSelect={(v) => onChange(v as RegistrationKind)}
               layout={kind === 'producer' ? 'inline' : 'auto'}

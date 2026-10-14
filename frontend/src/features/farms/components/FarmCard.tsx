@@ -1,4 +1,4 @@
-import { FarmIcon, UserPlusIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdOutlineAgriculture, MdOutlinePersonAddAlt } from 'react-icons/md';
 import type { Workspace } from '@/core/models/farm.model';
 import { professionalRoleLabel } from '@/shared/constants/roles';
 import Avatar from '@/ui/components/Avatar';
@@ -38,7 +38,7 @@ export default function FarmCard({ workspace: w, onInvite }: FarmCardProps) {
       <header className="flex items-start gap-3">
         {/* En tinte: con un círculo pine por card, los íconos competían con el botón principal. */}
         <IconContainer>
-          <FarmIcon size={18} aria-hidden />
+          <MdOutlineAgriculture size={18} aria-hidden />
         </IconContainer>
         <div className="min-w-0 flex-1">
           <h2 className="text-body tracking-heading text-pine truncate font-semibold">{w.name}</h2>
@@ -85,7 +85,7 @@ export default function FarmCard({ workspace: w, onInvite }: FarmCardProps) {
 
         {onInvite && (
           <Button type="button" variant="outline" onClick={onInvite}>
-            <UserPlusIcon data-icon="inline-start" size={16} aria-hidden />
+            <MdOutlinePersonAddAlt data-icon="inline-start" size={16} aria-hidden />
             Invitar profesionales
           </Button>
         )}

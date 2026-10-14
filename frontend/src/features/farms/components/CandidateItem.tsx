@@ -1,12 +1,7 @@
 'use client';
 
 import { useId } from 'react';
-import {
-  BriefcaseIcon,
-  CheckIcon,
-  IdentificationCardIcon,
-  UserPlusIcon,
-} from '@phosphor-icons/react';
+import { MdCheck, MdOutlineBadge, MdOutlinePersonAddAlt, MdOutlineWorkOutline } from 'react-icons/md';
 import type { FarmCandidate } from '@/core/models/farm.model';
 import { professionalRoleLabel } from '@/shared/constants/roles';
 import Avatar from '@/ui/components/Avatar';
@@ -59,13 +54,13 @@ export default function CandidateItem({
           {c.licenseNumber && (
             <div className="flex items-center gap-1.5">
               <dt className="sr-only">Matrícula</dt>
-              <IdentificationCardIcon size={14} className="text-olive" aria-hidden />
+              <MdOutlineBadge size={14} className="text-olive" aria-hidden />
               <dd className="font-mono">{c.licenseNumber}</dd>
             </div>
           )}
           <div className="flex items-center gap-1.5">
             <dt className="sr-only">Experiencia</dt>
-            <BriefcaseIcon size={14} className="text-olive" aria-hidden />
+            <MdOutlineWorkOutline size={14} className="text-olive" aria-hidden />
             <dd>
               <span className="font-mono">{c.yearsExperience}</span> años
             </dd>
@@ -87,7 +82,7 @@ export default function CandidateItem({
       <ItemActions className="self-center">
         {added ? (
           <Badge variant="success">
-            <CheckIcon data-icon="inline-start" weight="bold" aria-hidden />
+            <MdCheck data-icon="inline-start" aria-hidden />
             En el equipo
           </Badge>
         ) : (
@@ -100,7 +95,7 @@ export default function CandidateItem({
             loadingText="Sumando…"
             aria-describedby={titleId}
           >
-            <UserPlusIcon data-icon="inline-start" size={16} aria-hidden />
+            <MdOutlinePersonAddAlt data-icon="inline-start" size={16} aria-hidden />
             Invitar
           </Button>
         )}

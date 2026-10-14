@@ -1,9 +1,4 @@
-import {
-  BriefcaseIcon,
-  MapPinIcon,
-  SealCheckIcon,
-  UsersThreeIcon,
-} from '@phosphor-icons/react/dist/ssr';
+import { MdOutlineGroups, MdOutlinePlace, MdOutlineVerified, MdOutlineWorkOutline } from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
 import { hasCapacity, type ResultView } from '../lib/build-results';
 
@@ -30,20 +25,20 @@ export default function ProfessionalMeta({
       ? {
           key: 'license',
           label: 'Matrícula',
-          icon: <SealCheckIcon size={iconSize} className="text-success" aria-hidden />,
+          icon: <MdOutlineVerified size={iconSize} className="text-success" aria-hidden />,
           value: 'Matrícula verificada',
         }
       : null,
     {
       key: 'zone',
       label: 'Zona',
-      icon: <MapPinIcon size={iconSize} className="text-olive" aria-hidden />,
+      icon: <MdOutlinePlace size={iconSize} className="text-olive" aria-hidden />,
       value: compact ? result.proximityShort : result.proximity,
     },
     {
       key: 'experience',
       label: 'Experiencia',
-      icon: <BriefcaseIcon size={iconSize} className="text-olive" aria-hidden />,
+      icon: <MdOutlineWorkOutline size={iconSize} className="text-olive" aria-hidden />,
       value: (
         <>
           <span className="font-mono">{r.yearsExperience}</span>
@@ -54,7 +49,7 @@ export default function ProfessionalMeta({
     {
       key: 'capacity',
       label: 'Cupo',
-      icon: <UsersThreeIcon size={iconSize} className="text-olive" aria-hidden />,
+      icon: <MdOutlineGroups size={iconSize} className="text-olive" aria-hidden />,
       value: hasCapacity(r) ? (
         compact ? (
           'Toma clientes'

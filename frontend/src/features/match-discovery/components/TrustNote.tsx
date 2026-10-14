@@ -1,4 +1,4 @@
-import { LockSimpleIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdOutlineLock } from 'react-icons/md';
 import { Alert, AlertDescription } from '@/ui/components/Alert';
 import { cn } from '@/shared/utils/cn';
 
@@ -14,7 +14,7 @@ interface TrustNoteProps {
 export default function TrustNote({ firstName, className }: TrustNoteProps) {
   return (
     <Alert role="note" className={cn('bg-surface-sunken border-transparent px-4 py-3', className)}>
-      <LockSimpleIcon className="text-olive" aria-hidden />
+      <MdOutlineLock className="text-olive" aria-hidden />
       <AlertDescription className="text-body-sm text-dark">
         Solicitar es gratis y no te compromete. {firstName} ve lo que necesitás y decide si acepta.
       </AlertDescription>

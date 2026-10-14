@@ -1,31 +1,20 @@
 'use client';
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import {
-  Briefcase,
-  Clock,
-  Compass,
-  IdentificationBadge,
-  Leaf,
-  MagnifyingGlass,
-  MapPin,
-  SealCheck,
-  UserCircle,
-  WhatsappLogo,
-} from '@phosphor-icons/react';
-import type { Icon } from '@phosphor-icons/react';
+import type { IconType } from 'react-icons';
+import { MdOutlineAccountCircle, MdOutlineBadge, MdOutlineEco, MdOutlineExplore, MdOutlinePlace, MdOutlineSchedule, MdOutlineWorkOutline, MdSearch, MdVerified, MdWhatsapp } from 'react-icons/md';
 import type { PreviewData, PreviewIcon } from '../config/types';
 
-const ICONS: Record<PreviewIcon, Icon> = {
-  map: MapPin,
-  briefcase: Briefcase,
-  clock: Clock,
-  users: UserCircle,
-  leaf: Leaf,
-  compass: Compass,
-  phone: WhatsappLogo,
-  badge: IdentificationBadge,
-  search: MagnifyingGlass,
+const ICONS: Record<PreviewIcon, IconType> = {
+  map: MdOutlinePlace,
+  briefcase: MdOutlineWorkOutline,
+  clock: MdOutlineSchedule,
+  users: MdOutlineAccountCircle,
+  leaf: MdOutlineEco,
+  compass: MdOutlineExplore,
+  phone: MdWhatsapp,
+  badge: MdOutlineBadge,
+  search: MdSearch,
 };
 
 const initials = (name?: string) =>
@@ -50,14 +39,14 @@ export default function ProfilePreviewCard({ data }: { data: PreviewData }) {
   return (
     <div className="w-[300px] rounded-xl border border-beige/10 bg-beige/[0.04] p-6 backdrop-blur-sm xl:w-[340px]">
       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-beige/10 text-body-lg font-semibold text-beige">
-        {initials(data.name) || <UserCircle size={28} weight="light" className="text-beige/50" />}
+        {initials(data.name) || <MdOutlineAccountCircle size={28} className="text-beige/50" />}
       </div>
 
       <div className="mt-4 flex min-h-6 items-center justify-center gap-1.5">
         {data.name ? (
           <>
             <span className="truncate text-body-sm font-medium text-beige">{data.name}</span>
-            <SealCheck size={16} weight="fill" className="shrink-0 text-accent-light" aria-label="Perfil verificado" />
+            <MdVerified size={16} className="shrink-0 text-accent-light" aria-label="Perfil verificado" />
           </>
         ) : (
           <Skeleton className="w-28" />

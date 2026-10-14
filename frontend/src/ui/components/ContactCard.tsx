@@ -1,4 +1,4 @@
-import { EnvelopeSimpleIcon, PhoneIcon, WhatsappLogoIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdOutlineMail, MdOutlinePhone, MdWhatsapp } from 'react-icons/md';
 import { Button } from './Button';
 
 export interface ContactCardProps {
@@ -26,13 +26,13 @@ export default function ContactCard({ name, phoneNumber, email }: ContactCardPro
       <dl className="text-body-sm text-dark flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
           <dt className="sr-only">Teléfono</dt>
-          <PhoneIcon size={16} className="text-olive shrink-0" aria-hidden />
+          <MdOutlinePhone size={16} className="text-olive shrink-0" aria-hidden />
           <dd className="font-mono select-all">{phoneNumber}</dd>
         </div>
         {email && (
           <div className="flex items-center gap-2">
             <dt className="sr-only">Correo</dt>
-            <EnvelopeSimpleIcon size={16} className="text-olive shrink-0" aria-hidden />
+            <MdOutlineMail size={16} className="text-olive shrink-0" aria-hidden />
             <dd className="min-w-0 break-all select-all">{email}</dd>
           </div>
         )}
@@ -43,17 +43,17 @@ export default function ContactCard({ name, phoneNumber, email }: ContactCardPro
           render={<a href={`https://wa.me/${digits}`} target="_blank" rel="noopener noreferrer" />}
           nativeButton={false}
         >
-          <WhatsappLogoIcon data-icon="inline-start" size={18} aria-hidden />
+          <MdWhatsapp data-icon="inline-start" size={18} aria-hidden />
           Escribir por WhatsApp
           <span className="sr-only"> (se abre en otra pestaña)</span>
         </Button>
         <Button render={<a href={`tel:${phoneNumber}`} />} nativeButton={false} variant="outline">
-          <PhoneIcon data-icon="inline-start" size={18} aria-hidden />
+          <MdOutlinePhone data-icon="inline-start" size={18} aria-hidden />
           Llamar
         </Button>
         {email && (
           <Button render={<a href={`mailto:${email}`} />} nativeButton={false} variant="outline">
-            <EnvelopeSimpleIcon data-icon="inline-start" size={18} aria-hidden />
+            <MdOutlineMail data-icon="inline-start" size={18} aria-hidden />
             Correo
           </Button>
         )}

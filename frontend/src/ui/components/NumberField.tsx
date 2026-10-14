@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { MinusIcon, PlusIcon } from '@phosphor-icons/react';
+import { MdAdd, MdRemove } from 'react-icons/md';
 import { Label, NumberField as NumberFieldPrimitive } from '@heroui/react';
 import { cn } from '@/shared/utils/cn';
 
@@ -62,7 +62,7 @@ const stepButton =
 function NumberFieldDecrementButton({ className, ...props }: StepProps) {
   return (
     <NumberFieldPrimitive.DecrementButton className={cn(stepButton, 'border-e', str(className))} {...props}>
-      <MinusIcon weight="bold" />
+      <MdRemove />
     </NumberFieldPrimitive.DecrementButton>
   );
 }
@@ -70,7 +70,7 @@ function NumberFieldDecrementButton({ className, ...props }: StepProps) {
 function NumberFieldIncrementButton({ className, ...props }: StepProps) {
   return (
     <NumberFieldPrimitive.IncrementButton className={cn(stepButton, 'border-s', str(className))} {...props}>
-      <PlusIcon weight="bold" />
+      <MdAdd />
     </NumberFieldPrimitive.IncrementButton>
   );
 }

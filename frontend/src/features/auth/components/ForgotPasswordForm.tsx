@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle, WarningCircle } from '@phosphor-icons/react';
+import { MdCheckCircle, MdErrorOutline } from 'react-icons/md';
 import { Button, Field, FieldLabel, Input, Spinner } from '@/ui/components';
 import BrandMark from '@/ui/components/BrandMark';
 import { sendPasswordReset } from '@/core/auth/firebase-actions';
@@ -42,14 +42,14 @@ export default function ForgotPasswordForm() {
 
       {status === 'sent' ? (
         <p role="status" className="mt-8 flex items-start gap-2 rounded-lg border border-olive/30 bg-olive/5 px-3.5 py-3 text-left text-body-sm">
-          <CheckCircle size={16} weight="fill" className="mt-0.5 shrink-0 text-success" />
+          <MdCheckCircle size={16} className="mt-0.5 shrink-0 text-success" />
           Si el correo tiene una cuenta, en unos minutos te llega el enlace. Revisá también el spam.
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="mt-8 flex w-full flex-col gap-3.5 text-left">
           {error && (
             <p role="alert" className="flex items-start gap-2 rounded-lg border border-danger/30 bg-danger/5 px-3.5 py-3 text-body-sm text-danger">
-              <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
+              <MdErrorOutline size={16} className="mt-0.5 shrink-0" />
               {error}
             </p>
           )}

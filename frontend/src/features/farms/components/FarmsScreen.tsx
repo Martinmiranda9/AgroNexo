@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PlusIcon } from '@phosphor-icons/react';
+import { MdAdd } from 'react-icons/md';
 import { toast } from '@/ui/components/Toaster';
 import type { CreatedFarm, Workspace } from '@/core/models/farm.model';
 import { Button } from '@/ui/components/Button';
@@ -52,7 +52,7 @@ export default function FarmsScreen({ workspaces, viewer }: FarmsScreenProps) {
         </div>
         {isProducer && workspaces.length > 0 && (
           <Button type="button" size="lg" onClick={() => setCreating(true)}>
-            <PlusIcon data-icon="inline-start" size={18} weight="bold" aria-hidden />
+            <MdAdd data-icon="inline-start" size={18} aria-hidden />
             Nuevo campo
           </Button>
         )}

@@ -1,12 +1,12 @@
-import { Calculator, ChartLineUp, Plant, Scales, Tractor } from '@phosphor-icons/react';
-import type { Icon } from '@phosphor-icons/react';
+import type { IconType } from 'react-icons';
+import { MdOutlineAgriculture, MdOutlineBalance, MdOutlineCalculate, MdOutlineGrass, MdTrendingUp } from 'react-icons/md';
 import type { RegistrationKind, StepDef } from './types';
 
 export interface RoleOption {
   kind: RegistrationKind;
   title: string;
   description: string;
-  icon: Icon;
+  icon: IconType;
 }
 
 /** Primer paso del registro: define qué flujo sigue el resto del formulario. */
@@ -22,30 +22,30 @@ export const ROLE_OPTIONS: RoleOption[] = [
     kind: 'producer',
     title: 'Productor',
     description: 'Tengo un campo y busco profesionales que me acompañen.',
-    icon: Tractor,
+    icon: MdOutlineAgriculture,
   },
   {
     kind: 'agronomist',
     title: 'Ingeniero agrónomo',
     description: 'Asesoro en cultivos, suelos y manejo del establecimiento.',
-    icon: Plant,
+    icon: MdOutlineGrass,
   },
   {
     kind: 'accountant',
     title: 'Contador',
     description: 'Llevo impuestos, balances y la contabilidad del campo.',
-    icon: Calculator,
+    icon: MdOutlineCalculate,
   },
   {
     kind: 'lawyer',
     title: 'Abogado',
     description: 'Trabajo contratos, arrendamientos y derecho agrario.',
-    icon: Scales,
+    icon: MdOutlineBalance,
   },
   {
     kind: 'investor',
     title: 'Inversionista',
     description: 'Financio campañas y proyectos productivos.',
-    icon: ChartLineUp,
+    icon: MdTrendingUp,
   },
 ];

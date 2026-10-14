@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, CaretLeft, CheckCircle, WarningCircle } from '@phosphor-icons/react';
+import { MdArrowForward, MdCheckCircle, MdErrorOutline, MdKeyboardArrowLeft } from 'react-icons/md';
 import { Button, Spinner } from '@/ui/components';
 import type { RegistrationAccount, RegistrationKind } from '../config/types';
 import { useRegistrationWizard } from '../hooks/useRegistrationWizard';
@@ -75,7 +75,7 @@ export default function RegistrationWizard({
 
             {account?.email && (
               <p className="border-pine/10 bg-beige text-olive mt-6 flex flex-wrap items-center gap-x-1.5 rounded-lg border px-3.5 py-2.5 text-body-sm">
-                <CheckCircle size={16} weight="fill" className="text-success shrink-0" />
+                <MdCheckCircle size={16} className="text-success shrink-0" />
                 <span>
                   Cuenta {account.provider === 'google.com' ? 'de Google' : ''}{' '}
                   <strong className="text-pine font-semibold">{account.email}</strong>
@@ -146,7 +146,7 @@ export default function RegistrationWizard({
                     role="alert"
                     className="border-danger/30 bg-danger/5 text-danger flex items-start gap-2 rounded-lg border px-3.5 py-3 text-body-sm"
                   >
-                    <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
+                    <MdErrorOutline size={16} className="mt-0.5 shrink-0" />
                     {submitError}
                   </p>
                 )}
@@ -165,7 +165,7 @@ export default function RegistrationWizard({
                         disabled={submitting}
                         className="w-14 shrink-0 px-0"
                       >
-                        <CaretLeft size={18} weight="bold" />
+                        <MdKeyboardArrowLeft size={18} />
                       </Button>
                     )}
                     <Button
@@ -176,7 +176,7 @@ export default function RegistrationWizard({
                     >
                       {submitting && <Spinner data-icon="inline-start" />}
                       {isLastStep && flow ? flow.submitLabel : 'Continuar'}
-                      {!isLastStep && <ArrowRight size={16} weight="bold" />}
+                      {!isLastStep && <MdArrowForward size={16} />}
                     </Button>
                   </div>
                 )}

@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ClockIcon, MapPinIcon, PencilSimpleIcon, XIcon } from '@phosphor-icons/react';
+import { MdClose, MdOutlineEdit, MdOutlinePlace, MdOutlineSchedule } from 'react-icons/md';
 import type { SearchableRole } from '@/core/models/identity.model';
 import type { SearchLocation } from '@/core/models/match.model';
 import { cn } from '@/shared/utils/cn';
@@ -56,7 +56,7 @@ function RemovableChip({
         aria-label={`Quitar ${label}`}
         onClick={onRemove}
       >
-        <XIcon size={12} weight="bold" aria-hidden />
+        <MdClose size={12} aria-hidden />
       </Button>
     </Badge>
   );
@@ -85,7 +85,7 @@ export default function NeedSummary({
           </p>
         </div>
         <Button type="button" variant="outline" onClick={onEdit}>
-          <PencilSimpleIcon data-icon="inline-start" size={16} aria-hidden />
+          <MdOutlineEdit data-icon="inline-start" size={16} aria-hidden />
           Editar búsqueda
         </Button>
       </div>
@@ -117,7 +117,7 @@ export default function NeedSummary({
         <span className="text-body-sm text-olive mr-1 font-semibold">Entendimos</span>
 
         <Badge variant="secondary" className={CHIP}>
-          <MapPinIcon data-icon="inline-start" size={14} aria-hidden />
+          <MdOutlinePlace data-icon="inline-start" size={14} aria-hidden />
           {location.label} · {fromPrompt ? 'zona buscada' : 'tu campo'}
         </Badge>
 
@@ -142,7 +142,7 @@ export default function NeedSummary({
         {need.urgency && (
           <RemovableChip
             label={need.urgency}
-            icon={<ClockIcon data-icon="inline-start" size={14} aria-hidden />}
+            icon={<MdOutlineSchedule data-icon="inline-start" size={14} aria-hidden />}
             onRemove={() => onClearDetail('urgency')}
           />
         )}

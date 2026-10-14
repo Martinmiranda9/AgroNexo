@@ -1,7 +1,7 @@
 'use client';
 
 import type { CSSProperties, ReactNode } from 'react';
-import { XIcon } from '@phosphor-icons/react';
+import { MdClose } from 'react-icons/md';
 import { useMediaQuery } from '@/shared/hooks/useMediaQuery';
 import { cn } from '@/shared/utils/cn';
 import { Button } from '@/ui/components/Button';
@@ -65,7 +65,7 @@ export function FarmDrawerCloseButton() {
         />
       }
     >
-      <XIcon size={16} aria-hidden />
+      <MdClose size={16} aria-hidden />
     </DrawerClose>
   );
 }

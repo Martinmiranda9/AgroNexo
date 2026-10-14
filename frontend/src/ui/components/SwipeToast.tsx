@@ -1,10 +1,10 @@
-// Código oficial: React Bits `SwipeToast` (TS + CSS). Cambios: ícono Phosphor en lugar de Hugeicons, `aria-label`
+// Código oficial: React Bits `SwipeToast` (TS + CSS). Cambios: ícono Material (react-icons) en lugar de Hugeicons, `aria-label`
 // en español y sin título de ejemplo por defecto. El resto, igual.
 'use client';
 
 import React, { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
-import { XIcon } from '@phosphor-icons/react';
+import { MdClose } from 'react-icons/md';
 
 import './SwipeToast.css';
 
@@ -380,7 +380,7 @@ const SwipeToast: React.FC<SwipeToastProps> = ({
                 aria-label="Cerrar"
                 onClick={() => close('close')}
               >
-                <XIcon size={12} weight="bold" />
+                <MdClose size={12} />
               </button>
             ) : null}
             <i ref={fuseRef} className="swipe-toast__fuse" aria-hidden="true" />

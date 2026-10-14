@@ -68,7 +68,7 @@ Auth se resuelve en `middleware.ts` + layouts, no con guards client-side.
 | Forms | React Hook Form + Zod |
 | Env vars | `@t3-oss/env-nextjs` + Zod |
 | Testing | Vitest + React Testing Library (unit), Playwright (E2E: buscar → ranking → aceptar match) |
-| Iconos / Motion | Phosphor Icons (`@phosphor-icons/react`) · `motion/react` |
+| Iconos / Motion | Google Material Icons (`react-icons/md`: `MdOutline*` por defecto, `Md*` relleno) · `motion/react` |
 | Diseño | Taste Skill (`frontend/.agents/skills/`, principal: `design-taste-frontend/SKILL.md`; también `brandkit`, `minimalist-ui`, `high-end-visual-design`) |
 
 ---
@@ -92,7 +92,7 @@ Taste Skill es la guía anti-slop obligatoria. Antes de diseñar una pantalla se
 3. **Motion**: nunca `useState` para valores continuos; usar `useMotionValue` + `useTransform`. `AnimatePresence` en estados loading/empty/error.
 4. **Inputs con label flotante**, sin placeholder-as-label.
 5. **CTA button-in-button**: flecha dentro de círculo interno con hover independiente. Sheen sutil en hover.
-6. **Iconos Phosphor**, stroke 1.5–1.75.
+6. **Iconos Google Material** (`react-icons/md`): variante `MdOutline*` por defecto y `Md*` (relleno) para estados activos o de éxito/error. Nada de `@phosphor-icons/react` ni `lucide-react`.
 7. **`min-h-[100dvh]`**, nunca `h-screen` (iOS Safari).
 8. **Grain/noise** solo en elementos `fixed` con `pointer-events: none`.
 

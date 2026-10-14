@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { ArrowRightIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { MdArrowForward, MdErrorOutline } from 'react-icons/md';
 import { createFarmAction } from '@/core/actions/create-farm.action';
 import {
   FARM_DESCRIPTION_MAX,
@@ -150,7 +150,7 @@ function CreateFarmForm({
 
         {failure && (
           <Alert variant="destructive" role="alert">
-            <WarningCircleIcon aria-hidden />
+            <MdErrorOutline aria-hidden />
             <AlertDescription>{FAILURE_COPY[failure]}</AlertDescription>
           </Alert>
         )}
@@ -162,7 +162,7 @@ function CreateFarmForm({
         </Button>
         <Button type="submit" size="lg" loading={pending} loadingText="Creando campo…">
           {submitLabel}
-          <ArrowRightIcon data-icon="inline-end" size={16} weight="bold" aria-hidden />
+          <MdArrowForward data-icon="inline-end" size={16} aria-hidden />
         </Button>
       </DrawerFooter>
     </form>

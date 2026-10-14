@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { Tray } from '@phosphor-icons/react/dist/ssr';
+import { MdOutlineInbox } from 'react-icons/md';
 import { Avatar, Badge, BrandLogo, Card, buttonVariants } from '@/ui/components';
 import { AppLayout } from '@/features/app-shell';
 import LogoutButton from '@/features/auth/components/LogoutButton';
@@ -50,7 +50,7 @@ export default async function DashboardPage() {
       </div>
 
       <Card className="mt-10 w-full" coreClassName="flex flex-col items-center gap-3 px-6 py-10">
-        <Tray size={32} weight="regular" className="text-olive" aria-hidden />
+        <MdOutlineInbox size={32} className="text-olive" aria-hidden />
         <p className="text-body text-pine font-medium">Solicitudes de match</p>
         <p className="text-body-sm text-olive max-w-sm">
           Mirá las solicitudes de los productores que quieren trabajar con vos: la zona, las

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { CaretDownIcon } from '@phosphor-icons/react';
+import { MdKeyboardArrowDown } from 'react-icons/md';
 import PhoneInputPrimitive, { getCountryCallingCode, type Country } from 'react-phone-number-input';
 import flags from 'react-phone-number-input/flags';
 import es from 'react-phone-number-input/locale/es.json';
@@ -41,7 +41,7 @@ function CountrySelect({ value, onChange, options, iconComponent: Icon, disabled
           <Icon country={value} label={es[value]} aspectRatio={1.5} />
         </span>
       )}
-      <CaretDownIcon className="size-4 text-muted-foreground" aria-hidden />
+      <MdKeyboardArrowDown className="size-4 text-muted-foreground" aria-hidden />
       <select
         aria-label="País del teléfono"
         value={value ?? ''}

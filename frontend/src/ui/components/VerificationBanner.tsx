@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { sendEmailVerification } from 'firebase/auth';
-import { CheckCircle, WarningCircle } from '@phosphor-icons/react';
+import { MdCheckCircle, MdError } from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
 import { firebaseAuth } from '@/core/auth/firebase-client';
 import { resolveVerificationBannerVisibility } from './verification-banner.logic';
@@ -84,9 +84,9 @@ export default function VerificationBanner({ provider, className }: Verification
     >
       <div className="flex items-start gap-2">
         {isVerified ? (
-          <CheckCircle size={20} weight="fill" className="text-success mt-0.5 shrink-0" aria-hidden />
+          <MdCheckCircle size={20} className="text-success mt-0.5 shrink-0" aria-hidden />
         ) : (
-          <WarningCircle size={20} weight="fill" className="text-danger mt-0.5 shrink-0" aria-hidden />
+          <MdError size={20} className="text-danger mt-0.5 shrink-0" aria-hidden />
         )}
         <p>
           {isVerified ? 'Tu correo está verificado.' : 'Todavía no verificaste tu correo.'}
