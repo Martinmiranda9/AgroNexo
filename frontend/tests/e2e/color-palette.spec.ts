@@ -18,8 +18,10 @@ const COLOR = {
 /** Crema y marfil de la paleta anterior: no deberían quedar como fondo de ninguna pantalla. */
 const OLD_CREAMS = ['rgb(254, 247, 229)', 'rgb(255, 251, 240)'];
 
-const style = (locator: Locator, property: 'backgroundColor' | 'color' | 'borderTopColor') =>
-  locator.evaluate((el, prop) => getComputedStyle(el)[prop], property);
+const style = (
+  locator: Locator,
+  property: 'backgroundColor' | 'color' | 'borderTopColor' | 'borderTopWidth' | 'boxShadow'
+) => locator.evaluate((el, prop) => getComputedStyle(el)[prop], property);
 
 /** Fondo que se ve detrás del elemento: el del primer ancestro que pinta un color (no transparente). */
 const visibleBackground = (locator: Locator) =>
@@ -34,7 +36,9 @@ const visibleBackground = (locator: Locator) =>
 test.describe('Paleta verde campo en las pantallas públicas', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test('el login tiene formulario blanco, botón verde campo y el panel de marca en pine', async ({ page }) => {
+  test('el login tiene formulario blanco, botón verde campo y el panel de marca en pine', async ({
+    page,
+  }) => {
     await page.goto('/login');
 
     const heading = page.getByRole('heading', { level: 1, name: /Bienvenido a/ });
@@ -49,8 +53,8 @@ test.describe('Paleta verde campo en las pantallas públicas', () => {
     expect(await style(submit, 'backgroundColor')).toBe(COLOR.primary);
     expect(await style(submit, 'color')).toBe(COLOR.white);
 
-    const emailGroup = page.getByLabel('Correo').locator('xpath=ancestor::*[@data-slot="input-group"][1]');
-    expect(await style(emailGroup, 'borderTopColor')).toBe(COLOR.controlBorder);
+    // EmailField (InlineValidation) pinta el borde en el propio input.
+    expect(await style(page.getByLabel('Correo'), 'borderTopColor')).toBe(COLOR.controlBorder);
 
     const showcase = page.getByRole('heading', { name: 'Tu campo, conectado.' });
     await expect(showcase).toBeVisible();
@@ -81,8 +85,11 @@ test.describe('Paleta verde campo en las pantallas públicas', () => {
     const intro = page.getByText('Ingresá con Google o con tu correo.');
     expect(await style(intro, 'color')).toBe(COLOR.secondaryText);
 
+    // "Continuar con Google" es el Button secondary de Cashmere: sin borde, el contorno es el anillo de sombra.
     const google = page.getByRole('button', { name: 'Continuar con Google' });
-    expect(await style(google, 'borderTopColor')).toBe(COLOR.controlBorder);
+    expect(await style(google, 'borderTopWidth')).toBe('0px');
+    expect(await style(google, 'boxShadow')).not.toBe('none');
+    expect(await style(google, 'backgroundColor')).not.toBe(COLOR.primary);
 
     const terms = page.getByRole('checkbox', { name: /Al continuar aceptás/ });
     await terms.click();
