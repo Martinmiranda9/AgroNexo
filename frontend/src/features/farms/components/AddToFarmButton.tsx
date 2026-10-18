@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckIcon, FarmIcon, PlusIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { MdAdd, MdCheck, MdErrorOutline, MdOutlineAgriculture } from 'react-icons/md';
 import { toast } from '@/ui/components/Toaster';
 import { addFarmMemberAction } from '@/core/actions/add-farm-member.action';
 import type { CreatedFarm, Workspace } from '@/core/models/farm.model';
@@ -39,18 +39,18 @@ function FarmRow({ farm, member, adding, disabled, onAdd }: FarmRowProps) {
     <Item
       render={<article aria-labelledby={titleId} />}
       variant="outline"
-      className="bg-surface rounded-card border-pine/10 flex-nowrap items-center gap-3 p-4"
+      className="flex-nowrap items-center"
     >
       <ItemMedia>
         <IconContainer>
-          <FarmIcon size={18} aria-hidden />
+          <MdOutlineAgriculture size={18} aria-hidden />
         </IconContainer>
       </ItemMedia>
       <ItemContent className="min-w-0 gap-0">
         <h3 id={titleId} className="text-body tracking-heading text-pine truncate font-semibold">
           {farm.name}
         </h3>
-        <p className="text-caption text-olive font-medium">
+        <p className="text-caption text-sage-600 font-medium">
           ID <span className="font-mono">{farm.publicId}</span>
           {hectares && (
             <>
@@ -63,7 +63,7 @@ function FarmRow({ farm, member, adding, disabled, onAdd }: FarmRowProps) {
       <ItemActions>
         {member ? (
           <Badge variant="success">
-            <CheckIcon data-icon="inline-start" weight="bold" aria-hidden />
+            <MdCheck data-icon="inline-start" aria-hidden />
             En el equipo
           </Badge>
         ) : (
@@ -141,16 +141,14 @@ export default function AddToFarmButton({
         className="self-start"
         onClick={() => setPicking(true)}
       >
-        <FarmIcon data-icon="inline-start" size={16} aria-hidden />
+        <MdOutlineAgriculture data-icon="inline-start" size={16} aria-hidden />
         Sumar a un campo
       </Button>
 
       <FarmDrawer open={picking} onClose={() => setPicking(false)}>
         <DrawerHeader className={DRAWER_HEADER}>
-          <DrawerTitle className="text-heading-sm tracking-heading text-pine pr-10">
-            Sumar a {professionalName} a un campo
-          </DrawerTitle>
-          <DrawerDescription className="text-body-sm text-dark">
+          <DrawerTitle className="pr-10">Sumar a {professionalName} a un campo</DrawerTitle>
+          <DrawerDescription>
             Va a ver la información general del campo y su propia sección con vos.
           </DrawerDescription>
           <FarmDrawerCloseButton />
@@ -158,7 +156,7 @@ export default function AddToFarmButton({
 
         <div className={DRAWER_BODY}>
           {usable.length === 0 ? (
-            <p className="text-body-sm text-dark">
+            <p className="text-body-sm text-sage-800">
               Todavía no tenés campos. Creá uno y lo sumamos ahí.
             </p>
           ) : (
@@ -179,7 +177,7 @@ export default function AddToFarmButton({
 
           {failure && (
             <Alert variant="destructive" role="alert">
-              <WarningCircleIcon aria-hidden />
+              <MdErrorOutline aria-hidden />
               <AlertDescription>{failure}</AlertDescription>
             </Alert>
           )}
@@ -196,7 +194,7 @@ export default function AddToFarmButton({
             }}
             disabled={addingTo !== null}
           >
-            <PlusIcon data-icon="inline-start" size={16} weight="bold" aria-hidden />
+            <MdAdd data-icon="inline-start" size={16} aria-hidden />
             Crear un campo nuevo
           </Button>
           <Button

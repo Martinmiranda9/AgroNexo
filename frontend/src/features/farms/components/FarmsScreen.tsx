@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PlusIcon } from '@phosphor-icons/react';
+import { MdAdd } from 'react-icons/md';
 import { toast } from '@/ui/components/Toaster';
 import type { CreatedFarm, Workspace } from '@/core/models/farm.model';
 import { Button } from '@/ui/components/Button';
@@ -44,7 +44,7 @@ export default function FarmsScreen({ workspaces, viewer }: FarmsScreenProps) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-heading-lg tracking-heading text-pine">Campos</h1>
-          <p className="text-body-sm text-olive mt-1">
+          <p className="text-body-sm text-sage-600 mt-1">
             {isProducer
               ? 'Tus campos y los profesionales que trabajan en cada uno.'
               : 'Los campos donde sos parte del equipo.'}
@@ -52,7 +52,7 @@ export default function FarmsScreen({ workspaces, viewer }: FarmsScreenProps) {
         </div>
         {isProducer && workspaces.length > 0 && (
           <Button type="button" size="lg" onClick={() => setCreating(true)}>
-            <PlusIcon data-icon="inline-start" size={18} weight="bold" aria-hidden />
+            <MdAdd data-icon="inline-start" size={18} aria-hidden />
             Nuevo campo
           </Button>
         )}

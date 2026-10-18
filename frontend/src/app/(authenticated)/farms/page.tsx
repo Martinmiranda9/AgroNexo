@@ -37,11 +37,9 @@ export default async function FarmsPage() {
         avatarUrl: sessionUser.picture,
       }}
     >
-      <div className="bg-paper min-h-[100dvh]">
-        <main className="mx-auto max-w-[1180px] px-4 pt-8 pb-16 sm:px-6">
-          <FarmsScreen workspaces={result.workspaces} viewer={viewer} />
-        </main>
-      </div>
+      <main className="mx-auto max-w-[1180px] pt-4 pb-10">
+        <FarmsScreen workspaces={result.workspaces} viewer={viewer} />
+      </main>
     </AppLayout>
   );
 }

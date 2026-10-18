@@ -1,7 +1,7 @@
 'use client';
 
 import type { CSSProperties, ReactNode } from 'react';
-import { XIcon } from '@phosphor-icons/react';
+import { MdClose } from 'react-icons/md';
 import { useMediaQuery } from '@/shared/hooks/useMediaQuery';
 import { cn } from '@/shared/utils/cn';
 import { Button } from '@/ui/components/Button';
@@ -12,7 +12,7 @@ export const DRAWER_HEADER =
   'relative px-6 pt-6 pb-4 text-left group-data-[swipe-axis=y]/drawer-popup:text-left';
 export const DRAWER_BODY = 'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 pb-6';
 export const DRAWER_FOOTER =
-  'border-border bg-surface mt-0 flex-col-reverse gap-2 border-t px-6 py-4 sm:flex-row sm:justify-end';
+  'border-border bg-card mt-0 flex-col-reverse gap-2 border-t px-6 py-4 sm:flex-row sm:justify-end';
 
 /** En escritorio entra desde la derecha como card flotante; en celular, como hoja desde abajo. */
 const RIGHT_PANEL_STYLE = {
@@ -41,10 +41,7 @@ export default function FarmDrawer({ open, onClose, children }: FarmDrawerProps)
     >
       <DrawerContent
         style={isDesktop ? RIGHT_PANEL_STYLE : undefined}
-        className={cn(
-          'bg-surface',
-          isDesktop && 'rounded-shell border-pine/10 ring-pine/5 border ring-4'
-        )}
+        className={cn(isDesktop && 'rounded-2xl border')}
       >
         {children}
       </DrawerContent>
@@ -65,7 +62,7 @@ export function FarmDrawerCloseButton() {
         />
       }
     >
-      <XIcon size={16} aria-hidden />
+      <MdClose size={16} aria-hidden />
     </DrawerClose>
   );
 }

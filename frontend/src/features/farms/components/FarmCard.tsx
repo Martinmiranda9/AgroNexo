@@ -1,11 +1,13 @@
-import { FarmIcon, UserPlusIcon } from '@phosphor-icons/react/dist/ssr';
+import { cn } from '@/shared/utils/cn';
+import Link from 'next/link';
+import { MdOutlineAgriculture, MdOutlinePersonAddAlt } from 'react-icons/md';
 import type { Workspace } from '@/core/models/farm.model';
 import { professionalRoleLabel } from '@/shared/constants/roles';
-import Avatar from '@/ui/components/Avatar';
-import { AvatarGroup } from '@/ui/components/AvatarShadcn';
+import { farmRoute } from '@/shared/constants/routes';
+import { AvatarGroup, InitialsAvatar } from '@/ui/components/Avatar';
 import { Badge } from '@/ui/components/Badge';
 import { Button } from '@/ui/components/Button';
-import Card from '@/ui/components/Card';
+import { Card } from '@/ui/components/Card';
 import IconContainer from '@/ui/components/IconContainer';
 import { fullName, hectaresLabel, initialsOf, teamCaption } from '../lib/farm-view';
 
@@ -29,20 +31,23 @@ export default function FarmCard({ workspace: w, onInvite }: FarmCardProps) {
   const faces = w.members.slice(0, MAX_FACES);
 
   return (
-    <Card
-      surface="paper"
-      muted={archived}
-      className="h-full"
-      coreClassName="flex h-full flex-col gap-4 p-5"
-    >
+    <Card className={cn('relative flex h-full flex-col gap-4 p-5', archived && 'bg-background')}>
       <header className="flex items-start gap-3">
         {/* En tinte: con un círculo pine por card, los íconos competían con el botón principal. */}
         <IconContainer>
-          <FarmIcon size={18} aria-hidden />
+          <MdOutlineAgriculture size={18} aria-hidden />
         </IconContainer>
         <div className="min-w-0 flex-1">
-          <h2 className="text-body tracking-heading text-pine truncate font-semibold">{w.name}</h2>
-          <p className="text-caption text-olive font-medium">
+          <h2 className="text-body tracking-heading text-pine truncate font-semibold">
+            {/* El link se estira sobre la card: toda la card abre el tablero, y el botón de invitar queda por encima. */}
+            <Link
+              href={farmRoute(w.farmId)}
+              className="focus-visible:outline-ring rounded-sm after:absolute after:inset-0 after:content-[''] hover:underline focus-visible:outline-2"
+            >
+              {w.name}
+            </Link>
+          </h2>
+          <p className="text-caption text-sage-600 font-medium">
             ID <span className="font-mono">{w.publicId}</span>
             {hectares && (
               <>
@@ -57,7 +62,7 @@ export default function FarmCard({ workspace: w, onInvite }: FarmCardProps) {
       </header>
 
       {w.description && (
-        <p className="text-body-sm text-dark line-clamp-3 whitespace-pre-line">{w.description}</p>
+        <p className="text-body-sm text-sage-800 line-clamp-3 whitespace-pre-line">{w.description}</p>
       )}
 
       <footer className="border-border mt-auto flex flex-wrap items-center justify-between gap-3 border-t pt-4">
@@ -65,11 +70,16 @@ export default function FarmCard({ workspace: w, onInvite }: FarmCardProps) {
           {faces.length > 0 && (
             <AvatarGroup aria-hidden>
               {faces.map((member) => (
-                <Avatar key={member.id} initials={initialsOf(member)} size="sm" tone="tint" />
+                <InitialsAvatar
+                  key={member.id}
+                  initials={initialsOf(member)}
+                  size="sm"
+                  tone="tint"
+                />
               ))}
             </AvatarGroup>
           )}
-          <p className="text-body-sm text-dark">
+          <p className="text-body-sm text-sage-800">
             {teamCaption(w)}
             {/* Para lectores de pantalla, quiénes son (las caras son decorativas). */}
             {w.members.length > 0 && (
@@ -84,8 +94,8 @@ export default function FarmCard({ workspace: w, onInvite }: FarmCardProps) {
         </div>
 
         {onInvite && (
-          <Button type="button" variant="outline" onClick={onInvite}>
-            <UserPlusIcon data-icon="inline-start" size={16} aria-hidden />
+          <Button type="button" variant="outline" onClick={onInvite} className="relative z-10">
+            <MdOutlinePersonAddAlt data-icon="inline-start" size={16} aria-hidden />
             Invitar profesionales
           </Button>
         )}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { MagnifyingGlassIcon, UsersThreeIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { MdErrorOutline, MdOutlineGroups, MdSearch } from 'react-icons/md';
 import { toast } from '@/ui/components/Toaster';
 import { addFarmMemberAction } from '@/core/actions/add-farm-member.action';
 import { getFarmCandidatesAction } from '@/core/actions/get-farm-candidates.action';
@@ -31,6 +31,7 @@ import FarmDrawer, {
   DRAWER_HEADER,
   FarmDrawerCloseButton,
 } from './FarmDrawer';
+import { Card } from '@/ui/components/Card';
 
 /** El campo al que se invita: lo justo para el título y la llamada. */
 export interface InviteTarget {
@@ -59,7 +60,7 @@ function LoadingList() {
     <ul aria-hidden className="flex flex-col gap-3">
       {[0, 1, 2].map((row) => (
         <li key={row}>
-          <Skeleton className="rounded-card h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
         </li>
       ))}
     </ul>
@@ -68,31 +69,31 @@ function LoadingList() {
 
 function NoCandidates() {
   return (
-    <Empty className="rounded-card border-pine/10 border border-solid py-10">
-      <EmptyHeader>
-        <EmptyMedia variant="icon" className="bg-secondary text-pine size-11 rounded-full">
-          <UsersThreeIcon size={22} aria-hidden />
-        </EmptyMedia>
-        <EmptyTitle className="text-body text-pine font-semibold">
-          No hay profesionales para sumar
-        </EmptyTitle>
-        <EmptyDescription className="text-body-sm text-olive">
-          Podés invitar a quienes aceptaron una solicitud tuya. Buscá un profesional y, cuando
-          acepte, lo vas a ver acá.
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
-        <Button
-          render={<Link href={ROUTES.matchDiscovery} />}
-          nativeButton={false}
-          variant="outline"
-          size="lg"
-        >
-          <MagnifyingGlassIcon data-icon="inline-start" size={18} aria-hidden />
-          Buscar un profesional
-        </Button>
-      </EmptyContent>
-    </Empty>
+    <Card>
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <MdOutlineGroups aria-hidden />
+          </EmptyMedia>
+          <EmptyTitle>No hay profesionales para sumar</EmptyTitle>
+          <EmptyDescription>
+            Podés invitar a quienes aceptaron una solicitud tuya. Buscá un profesional y, cuando
+            acepte, lo vas a ver acá.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button
+            render={<Link href={ROUTES.matchDiscovery} />}
+            nativeButton={false}
+            variant="outline"
+            size="lg"
+          >
+            <MdSearch data-icon="inline-start" size={18} aria-hidden />
+            Buscar un profesional
+          </Button>
+        </EmptyContent>
+      </Empty>
+    </Card>
   );
 }
 
@@ -146,10 +147,8 @@ function InvitePanel({ target, onDone }: { target: InviteTarget; onDone: () => v
   return (
     <>
       <DrawerHeader className={DRAWER_HEADER}>
-        <DrawerTitle className="text-heading-sm tracking-heading text-pine pr-10">
-          Invitar a {target.name}
-        </DrawerTitle>
-        <DrawerDescription className="text-body-sm text-dark">
+        <DrawerTitle className="pr-10">Invitar a {target.name}</DrawerTitle>
+        <DrawerDescription>
           Estos son los profesionales que aceptaron una solicitud tuya. Los que sumes van a ver la
           información general del campo.
         </DrawerDescription>
@@ -161,7 +160,7 @@ function InvitePanel({ target, onDone }: { target: InviteTarget; onDone: () => v
 
         {load.state === 'error' && (
           <Alert variant="destructive" role="alert">
-            <WarningCircleIcon aria-hidden />
+            <MdErrorOutline aria-hidden />
             <AlertDescription>{load.message}</AlertDescription>
           </Alert>
         )}
@@ -195,7 +194,7 @@ function InvitePanel({ target, onDone }: { target: InviteTarget; onDone: () => v
 
             {failure && (
               <Alert variant="destructive" role="alert">
-                <WarningCircleIcon aria-hidden />
+                <MdErrorOutline aria-hidden />
                 <AlertDescription>{failure}</AlertDescription>
               </Alert>
             )}

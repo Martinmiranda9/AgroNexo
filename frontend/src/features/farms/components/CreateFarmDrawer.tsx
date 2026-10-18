@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { ArrowRightIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { MdArrowForward, MdErrorOutline } from 'react-icons/md';
 import { createFarmAction } from '@/core/actions/create-farm.action';
 import {
   FARM_DESCRIPTION_MAX,
@@ -16,7 +16,7 @@ import { Button } from '@/ui/components/Button';
 import { DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/ui/components/Drawer';
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/ui/components/Field';
 import { Input } from '@/ui/components/Input';
-import { NumberField } from '@/ui/components/NumberField';
+import { NumberInput } from '@/ui/components/NumberInput';
 import { Textarea } from '@/ui/components/Textarea';
 import FarmDrawer, {
   DRAWER_BODY,
@@ -85,10 +85,8 @@ function CreateFarmForm({
   return (
     <form onSubmit={submit} noValidate className="flex min-h-0 flex-1 flex-col">
       <DrawerHeader className={DRAWER_HEADER}>
-        <DrawerTitle className="text-heading-sm tracking-heading text-pine pr-10">
-          Nuevo campo
-        </DrawerTitle>
-        <DrawerDescription className="text-body-sm text-dark">
+        <DrawerTitle className="pr-10">Nuevo campo</DrawerTitle>
+        <DrawerDescription>
           Es el espacio donde vas a sumar a tus profesionales. Le asignamos un ID para que lo
           reconozcan.
         </DrawerDescription>
@@ -131,26 +129,22 @@ function CreateFarmForm({
           </FieldDescription>
         </Field>
 
-        <NumberField
-          name="farm-hectares"
-          className="w-full max-w-64"
-          minValue={0}
-          maxValue={FARM_HECTARES_MAX}
-          value={hectares}
-          onChange={(value) => setHectares(value)}
-          isDisabled={pending}
-        >
-          <NumberField.Label>Hectáreas (opcional)</NumberField.Label>
-          <NumberField.Group>
-            <NumberField.DecrementButton />
-            <NumberField.Input />
-            <NumberField.IncrementButton />
-          </NumberField.Group>
-        </NumberField>
+        <Field className="max-w-64">
+          <FieldLabel htmlFor="farm-hectares">Hectáreas (opcional)</FieldLabel>
+          <NumberInput
+            id="farm-hectares"
+            name="farm-hectares"
+            min={0}
+            max={FARM_HECTARES_MAX}
+            value={hectares}
+            onValueChange={setHectares}
+            disabled={pending}
+          />
+        </Field>
 
         {failure && (
           <Alert variant="destructive" role="alert">
-            <WarningCircleIcon aria-hidden />
+            <MdErrorOutline aria-hidden />
             <AlertDescription>{FAILURE_COPY[failure]}</AlertDescription>
           </Alert>
         )}
@@ -162,7 +156,7 @@ function CreateFarmForm({
         </Button>
         <Button type="submit" size="lg" loading={pending} loadingText="Creando campo…">
           {submitLabel}
-          <ArrowRightIcon data-icon="inline-end" size={16} weight="bold" aria-hidden />
+          <MdArrowForward data-icon="inline-end" size={16} aria-hidden />
         </Button>
       </DrawerFooter>
     </form>

@@ -45,7 +45,7 @@ export interface RegisterUserResponse {
   publicId: number;
   tenantId: string;
   tenantName: string;
-  auth0UserId: string;
+  firebaseUid: string;
   userType: UserType | keyof typeof USER_TYPE;
   firstName: string;
   lastName: string;

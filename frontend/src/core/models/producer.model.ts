@@ -6,7 +6,7 @@ export interface ProducerProfile {
   id: string;
   publicId: number;
   tenantId: string;
-  auth0UserId: string;
+  firebaseUid: string;
   firstName: string;
   lastName: string;
   documentNumber: string;

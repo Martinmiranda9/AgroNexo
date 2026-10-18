@@ -1,4 +1,4 @@
-import { FarmIcon, PlusIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdAdd, MdOutlineAgriculture } from 'react-icons/md';
 import { Button } from '@/ui/components/Button';
 import {
   Empty,
@@ -8,6 +8,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/ui/components/Empty';
+import { Card } from '@/ui/components/Card';
 
 const COPY = {
   Producer: {
@@ -32,22 +33,24 @@ export default function FarmsEmpty({ viewer, onCreate }: FarmsEmptyProps) {
   const { title, description } = COPY[viewer];
 
   return (
-    <Empty className="rounded-shell border-pine/10 bg-surface border border-solid py-14">
-      <EmptyHeader>
-        <EmptyMedia variant="icon" className="bg-secondary text-pine size-11 rounded-full">
-          <FarmIcon size={22} aria-hidden />
-        </EmptyMedia>
-        <EmptyTitle className="text-body text-pine font-semibold">{title}</EmptyTitle>
-        <EmptyDescription className="text-body-sm text-olive">{description}</EmptyDescription>
-      </EmptyHeader>
-      {onCreate && (
-        <EmptyContent>
-          <Button type="button" size="lg" onClick={onCreate}>
-            <PlusIcon data-icon="inline-start" size={18} weight="bold" aria-hidden />
-            Crear mi primer campo
-          </Button>
-        </EmptyContent>
-      )}
-    </Empty>
+    <Card>
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <MdOutlineAgriculture aria-hidden />
+          </EmptyMedia>
+          <EmptyTitle>{title}</EmptyTitle>
+          <EmptyDescription>{description}</EmptyDescription>
+        </EmptyHeader>
+        {onCreate && (
+          <EmptyContent>
+            <Button type="button" size="lg" onClick={onCreate}>
+              <MdAdd data-icon="inline-start" size={18} aria-hidden />
+              Crear mi primer campo
+            </Button>
+          </EmptyContent>
+        )}
+      </Empty>
+    </Card>
   );
 }
