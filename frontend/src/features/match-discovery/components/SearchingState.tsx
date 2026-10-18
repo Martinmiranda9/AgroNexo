@@ -34,7 +34,7 @@ export default function SearchingState({ query }: SearchingStateProps) {
   return (
     <div className="mx-auto mt-20 flex max-w-[440px] flex-col gap-8 sm:mt-28">
       <div>
-        <p className="text-body-sm text-olive font-semibold">Buscando</p>
+        <p className="text-body-sm text-sage-600 font-semibold">Buscando</p>
         <p className="text-body-lg tracking-heading text-pine mt-1 line-clamp-3 font-medium">
           “{query}”
         </p>
@@ -48,7 +48,7 @@ export default function SearchingState({ query }: SearchingStateProps) {
         collapsible={false}
         showTimer
         fontSize={18}
-        glyphColor="var(--color-olive)"
+        glyphColor="var(--color-sage-600)"
         className="text-pine"
       />
     </div>

@@ -1,11 +1,19 @@
 import type * as React from 'react';
-import { ClockIcon, MapPinIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdOutlinePlace, MdOutlineSchedule } from 'react-icons/md';
 import type { VariantProps } from 'class-variance-authority';
 import type { NeedBrief } from '@/shared/types/need-brief';
 import { cn } from '@/shared/utils/cn';
-import Avatar from './Avatar';
+import { InitialsAvatar } from './Avatar';
 import { Badge, type badgeVariants } from './Badge';
-import Card from './Card';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from './Card';
 import { initialsOfName, needBriefTags, type NeedTag } from './need-brief-card.logic';
 
 export type NeedBriefBadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>;
@@ -35,14 +43,15 @@ const TAG_VARIANT: Record<NeedTag['variant'], NeedBriefBadgeVariant> = {
 };
 
 const ICONS = {
-  clock: <ClockIcon data-icon="inline-start" weight="bold" aria-hidden />,
-  pin: <MapPinIcon data-icon="inline-start" weight="bold" aria-hidden />,
+  clock: <MdOutlineSchedule data-icon="inline-start" aria-hidden />,
+  pin: <MdOutlinePlace data-icon="inline-start" aria-hidden />,
 } as const;
 
 /**
  * Ficha de necesidad de un pedido de match: quién pide, el texto que redactó la IA (y el productor revisó) y
- * etiquetas con lo más importante (urgencia, zona, hectáreas, cultivos, temas). Componente tonto del Design System:
- * Card con doble bisel, Badges pill y solo tokens. El texto se muestra como texto plano, nunca como HTML.
+ * etiquetas con lo más importante (urgencia, zona, hectáreas, cultivos, temas). Componente tonto del Design System,
+ * armado con las partes de la Card de Cashmere (`CardHeader`, `CardTitle`, `CardDescription`, `CardAction`,
+ * `CardContent`, `CardFooter`), `InitialsAvatar` y `Badge`. El texto se muestra como texto plano, nunca como HTML.
  */
 export default function NeedBriefCard({
   counterpartName,
@@ -58,32 +67,44 @@ export default function NeedBriefCard({
   const caption = [counterpartCaption, requestedAt].filter(Boolean).join(' · ');
 
   return (
-    <Card surface="paper" className={className} coreClassName="flex flex-col gap-4 p-5">
-      <header className="flex items-start gap-3">
-        <Avatar initials={initialsOfName(counterpartName)} size="md" />
-        <div className="min-w-0 flex-1">
-          <p className="text-body text-pine truncate font-semibold">{counterpartName}</p>
-          {caption && <p className="text-caption text-olive">{caption}</p>}
+    <Card className={className}>
+      <CardHeader className="pb-4">
+        <div className="flex min-w-0 items-start gap-3">
+          <InitialsAvatar initials={initialsOfName(counterpartName)} size="md" />
+          <div className="min-w-0 flex-1">
+            <CardTitle className="truncate">{counterpartName}</CardTitle>
+            {caption && <CardDescription>{caption}</CardDescription>}
+          </div>
         </div>
-        {statusLabel && <Badge variant={statusVariant}>{statusLabel}</Badge>}
-      </header>
+        {statusLabel && (
+          <CardAction>
+            <Badge variant={statusVariant}>{statusLabel}</Badge>
+          </CardAction>
+        )}
+      </CardHeader>
 
-      <p className="text-body text-pine whitespace-pre-line">{brief.summary}</p>
+      <CardContent className="flex flex-col gap-4">
+        <p className="text-body whitespace-pre-line">{brief.summary}</p>
 
-      {tags.length > 0 && (
-        <ul aria-label="Datos del pedido" className="flex flex-wrap gap-2">
-          {tags.map((tag) => (
-            <li key={tag.key}>
-              <Badge variant={TAG_VARIANT[tag.variant]} className={cn(tag.mono && 'font-mono')}>
-                {tag.icon && ICONS[tag.icon]}
-                {tag.label}
-              </Badge>
-            </li>
-          ))}
-        </ul>
+        {tags.length > 0 && (
+          <ul aria-label="Datos del pedido" className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <li key={tag.key}>
+                <Badge variant={TAG_VARIANT[tag.variant]} className={cn(tag.mono && 'font-mono')}>
+                  {tag.icon && ICONS[tag.icon]}
+                  {tag.label}
+                </Badge>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+
+      {footer && (
+        <CardFooter className="border-border mx-5 flex-col items-stretch gap-0 border-t px-0 pt-5">
+          {footer}
+        </CardFooter>
       )}
-
-      {footer && <div className="border-pine/10 border-t pt-4">{footer}</div>}
     </Card>
   );
 }

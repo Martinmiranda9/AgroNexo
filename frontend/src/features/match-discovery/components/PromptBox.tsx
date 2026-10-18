@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useId, useRef, type FormEvent, type KeyboardEvent, type Ref } from 'react';
-import { ArrowRightIcon, MicrophoneIcon, StopIcon } from '@phosphor-icons/react';
+import { useEffect, useId, useRef, type Ref } from 'react';
+import { MdErrorOutline, MdOutlineMic, MdStop } from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
+import { AiAgentInput, AiAgentInputIconButton } from '@/ui/components/AiAgentInput';
+import { Alert, AlertDescription } from '@/ui/components/Alert';
 import { Badge, BadgeDot } from '@/ui/components/Badge';
-import { Button } from '@/ui/components/Button';
-import { InputGroup, InputGroupAddon, InputGroupTextarea } from '@/ui/components/InputGroup';
+import { Kbd } from '@/ui/components/Kbd';
 import { Label } from '@/ui/components/Label';
-import { Kbd, KbdGroup } from '@/ui/components/Kbd';
 import { useMediaQuery } from '@/shared/hooks/useMediaQuery';
 import { useDictation, type DictationError } from '../hooks/useDictation';
 
@@ -31,7 +31,10 @@ interface PromptBoxProps {
   textareaRef?: Ref<HTMLTextAreaElement>;
 }
 
-/** Campo único donde el productor cuenta lo que necesita, con dictado por voz y envío con Ctrl/⌘ + Enter. */
+/**
+ * Campo único donde el productor cuenta lo que necesita (AI Agent Input de Cashmere), con dictado por voz en el
+ * micrófono de la izquierda y envío con Enter o con la flecha.
+ */
 export default function PromptBox({ value, onChange, onSubmit, textareaRef }: PromptBoxProps) {
   const id = useId();
   const hintId = `${id}-hint`;
@@ -51,18 +54,6 @@ export default function PromptBox({ value, onChange, onSubmit, textareaRef }: Pr
   const ready = value.trim().length >= MIN_LENGTH;
   const tooShort = value.trim().length > 0 && !ready;
 
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    if (ready) onSubmit(value.trim());
-  };
-
-  const submitWithKeyboard = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && (event.metaKey || event.ctrlKey) && ready) {
-      event.preventDefault();
-      onSubmit(value.trim());
-    }
-  };
-
   // La ayuda queda siempre a la vista: es la guía de qué contar, no un mensaje de error.
   let hint = HINT;
   if (dictation.listening) {
@@ -73,46 +64,36 @@ export default function PromptBox({ value, onChange, onSubmit, textareaRef }: Pr
 
   return (
     <div>
-      <form
-        onSubmit={submit}
-        className="bg-surface-sunken shadow-raised ring-pine/8 rounded-shell w-full p-1.5 ring-1"
-      >
-        <InputGroup className="bg-surface rounded-card">
-          {/* La pregunta se ve arriba del campo, en el titular de la pantalla; acá solo la lee el lector de pantalla. */}
-          <Label htmlFor={id} className="sr-only">
-            ¿Qué necesitás?
-          </Label>
+      {/* La pregunta se ve arriba del campo, en el titular de la pantalla; acá solo la lee el lector de pantalla. */}
+      <Label htmlFor={id} className="sr-only">
+        ¿Qué necesitás?
+      </Label>
 
-          <InputGroupTextarea
-            ref={textareaRef}
-            id={id}
-            rows={2}
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            onKeyDown={submitWithKeyboard}
-            aria-describedby={hintId}
-            placeholder="Ej.: necesito un contador que sepa de retenciones de granos. Tengo 350 ha de soja."
-            className="text-body-lg min-h-20 px-5 pt-4"
-          />
-
-          <InputGroupAddon align="block-end" className="justify-between gap-3 px-3 pb-3">
-            <div className="flex min-w-0 items-center gap-2">
-              {dictation.supported && (
-                // Con texto y no solo ícono: el productor dicta como manda un audio de WhatsApp, es una entrada principal.
-                <Button
-                  type="button"
-                  variant={dictation.listening ? 'default' : 'outline'}
-                  aria-pressed={dictation.listening}
-                  onClick={dictation.toggle}
-                >
-                  {dictation.listening ? (
-                    <StopIcon data-icon="inline-start" size={18} weight="fill" aria-hidden />
-                  ) : (
-                    <MicrophoneIcon data-icon="inline-start" size={18} aria-hidden />
-                  )}
-                  {dictation.listening ? 'Detener' : 'Dictar'}
-                </Button>
-              )}
+      <AiAgentInput
+        ref={textareaRef}
+        id={id}
+        value={value}
+        onValueChange={onChange}
+        onSubmit={() => ready && onSubmit(value.trim())}
+        canSubmit={ready}
+        submitLabel="Buscar profesionales"
+        aria-describedby={hintId}
+        placeholder="Ej.: necesito un contador que sepa de retenciones de granos. Tengo 350 ha de soja."
+        leading={
+          dictation.supported && (
+            <>
+              <AiAgentInputIconButton
+                aria-label={dictation.listening ? 'Detener el dictado' : 'Dictar'}
+                title={dictation.listening ? 'Detener el dictado' : 'Dictar'}
+                aria-pressed={dictation.listening}
+                onClick={dictation.toggle}
+              >
+                {dictation.listening ? (
+                  <MdStop size={20} aria-hidden />
+                ) : (
+                  <MdOutlineMic size={20} aria-hidden />
+                )}
+              </AiAgentInputIconButton>
               {/* La región existe siempre: así el lector de pantalla anuncia cuando aparece "Escuchando". */}
               <span role="status">
                 {dictation.listening && (
@@ -122,47 +103,39 @@ export default function PromptBox({ value, onChange, onSubmit, textareaRef }: Pr
                   </Badge>
                 )}
               </span>
-            </div>
-
-            {/* Sin `disabled` nativo: así el botón sigue en el orden de tabulación y el lector explica por qué no avanza. */}
-            <Button
-              type="submit"
-              className="min-w-0 data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-              disabled={!ready}
-              focusableWhenDisabled
-              aria-describedby={hintId}
-            >
-              <span>
-                Buscar<span className="max-sm:hidden"> profesionales</span>
-              </span>
-              <ArrowRightIcon data-icon="inline-end" size={16} weight="bold" aria-hidden />
-            </Button>
-          </InputGroupAddon>
-        </InputGroup>
-      </form>
+            </>
+          )
+        }
+      />
 
       <div className="mt-3 flex min-h-5 flex-wrap items-center justify-center gap-x-3 gap-y-1 px-3 text-center">
         <p
           id={hintId}
-          className={cn('text-body-sm text-olive', !dictation.listening && 'line-clamp-2')}
+          className={cn(
+            'text-body-sm text-muted-foreground',
+            !dictation.listening && 'line-clamp-2'
+          )}
         >
           {hint}
         </p>
         {finePointer && !dictation.listening && (
-          <span className="text-caption text-olive inline-flex items-center gap-1.5" aria-hidden>
-            <KbdGroup>
-              <Kbd>Ctrl</Kbd>
-              <Kbd>Enter</Kbd>
-            </KbdGroup>
+          <span
+            className="text-caption text-muted-foreground inline-flex items-center gap-1.5"
+            aria-hidden
+          >
+            <Kbd>Enter</Kbd>
             para buscar
           </span>
         )}
       </div>
 
       {dictation.error && (
-        <p role="alert" className="text-body-sm text-danger mt-1 px-3 text-center">
-          {DICTATION_ERROR[dictation.error]}
-        </p>
+        <Alert variant="destructive" className="mt-2">
+          <MdErrorOutline aria-hidden />
+          <AlertDescription className="text-destructive">
+            {DICTATION_ERROR[dictation.error]}
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   );

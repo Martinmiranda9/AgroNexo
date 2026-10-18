@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, CaretLeft, CheckCircle, WarningCircle } from '@phosphor-icons/react';
-import { Button, Spinner } from '@/ui/components';
+import { MdArrowForward, MdCheckCircle, MdErrorOutline, MdKeyboardArrowLeft } from 'react-icons/md';
+import { Alert, AlertDescription, Button, Spinner } from '@/ui/components';
 import type { RegistrationAccount, RegistrationKind } from '../config/types';
 import { useRegistrationWizard } from '../hooks/useRegistrationWizard';
 import AccountStep from './AccountStep';
@@ -65,7 +65,7 @@ export default function RegistrationWizard({
   }, []);
 
   return (
-    <main className="bg-bg-card text-pine flex min-h-[100dvh] w-full flex-col md:flex-row">
+    <main className="bg-card text-pine flex min-h-[100dvh] w-full flex-col md:flex-row">
       <section className="flex min-h-[100dvh] w-full flex-col px-6 pt-8 pb-8 sm:px-12 md:w-[46%] md:px-12 lg:px-16">
         {/* Bloque centrado en vertical. La altura mínima es la del paso más alto (rol), así el header
             y los botones no se mueven al pasar entre pasos de distinto largo. */}
@@ -74,8 +74,8 @@ export default function RegistrationWizard({
             <OnboardingHeader current={displayStep} total={displayTotal} />
 
             {account?.email && (
-              <p className="border-pine/10 bg-beige text-olive mt-6 flex flex-wrap items-center gap-x-1.5 rounded-lg border px-3.5 py-2.5 text-body-sm">
-                <CheckCircle size={16} weight="fill" className="text-success shrink-0" />
+              <p className="border-pine/10 bg-sage-50 text-sage-600 text-body-sm mt-6 flex flex-wrap items-center gap-x-1.5 rounded-lg border px-3.5 py-2.5">
+                <MdCheckCircle size={16} className="text-success shrink-0" />
                 <span>
                   Cuenta {account.provider === 'google.com' ? 'de Google' : ''}{' '}
                   <strong className="text-pine font-semibold">{account.email}</strong>
@@ -106,7 +106,7 @@ export default function RegistrationWizard({
                   >
                     {step.title}
                   </h1>
-                  <p className="text-olive mt-2 text-body-sm">{step.subtitle}</p>
+                  <p className="text-sage-600 text-body-sm mt-2">{step.subtitle}</p>
                 </motion.div>
               </AnimatePresence>
 
@@ -142,13 +142,10 @@ export default function RegistrationWizard({
                 </AnimatePresence>
 
                 {submitError && (
-                  <p
-                    role="alert"
-                    className="border-danger/30 bg-danger/5 text-danger flex items-start gap-2 rounded-lg border px-3.5 py-3 text-body-sm"
-                  >
-                    <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
-                    {submitError}
-                  </p>
+                  <Alert variant="destructive">
+                    <MdErrorOutline aria-hidden />
+                    <AlertDescription className="text-destructive">{submitError}</AlertDescription>
+                  </Alert>
                 )}
 
                 {/* El paso de cuenta tiene sus propios botones (Google / correo, cada uno abre un popup);
@@ -165,7 +162,7 @@ export default function RegistrationWizard({
                         disabled={submitting}
                         className="w-14 shrink-0 px-0"
                       >
-                        <CaretLeft size={18} weight="bold" />
+                        <MdKeyboardArrowLeft size={18} />
                       </Button>
                     )}
                     <Button
@@ -176,7 +173,7 @@ export default function RegistrationWizard({
                     >
                       {submitting && <Spinner data-icon="inline-start" />}
                       {isLastStep && flow ? flow.submitLabel : 'Continuar'}
-                      {!isLastStep && <ArrowRight size={16} weight="bold" />}
+                      {!isLastStep && <MdArrowForward size={16} />}
                     </Button>
                   </div>
                 )}
@@ -185,11 +182,11 @@ export default function RegistrationWizard({
           </div>
         </div>
 
-        <footer className="text-olive mt-auto pt-8 text-center text-body-sm">
+        <footer className="text-sage-600 text-body-sm mt-auto pt-8 text-center">
           ¿Ya tenés una cuenta?{' '}
           <Link
             href="/login"
-            className="text-pine hover:text-olive font-semibold underline underline-offset-4 transition-colors"
+            className="text-pine hover:text-sage-600 font-semibold underline underline-offset-4 transition-colors"
           >
             Iniciá sesión
           </Link>

@@ -57,36 +57,34 @@ export default async function MatchesPage() {
       }}
       pendingCount={waiting}
     >
-      <div className="bg-paper min-h-[100dvh]">
-        <main className="mx-auto max-w-[1180px] px-4 pt-8 pb-16 sm:px-6">
-          <h1 className="text-heading-lg tracking-heading text-pine">
-            {viewer === 'Producer' ? 'Mis solicitudes' : 'Solicitudes de match'}
-          </h1>
-          <p className="text-body-sm text-olive mt-1">{subtitle}</p>
+      <main className="mx-auto max-w-[1180px] pt-4 pb-10">
+        <h1 className="text-heading-lg tracking-heading text-pine">
+          {viewer === 'Producer' ? 'Mis solicitudes' : 'Solicitudes de match'}
+        </h1>
+        <p className="text-body-sm text-sage-600 mt-1">{subtitle}</p>
 
-          <div className="mt-8">
-            {matches.length > 0 ? (
-              <MatchRequestList
-                matches={matches}
-                viewer={viewer}
-                renderActiveAction={
-                  farms?.status === 'ok'
-                    ? (match) => (
-                        <AddToFarmButton
-                          professionalId={match.professionalId}
-                          professionalName={match.professionalName}
-                          farms={farms.workspaces}
-                        />
-                      )
-                    : undefined
-                }
-              />
-            ) : (
-              <MatchRequestsEmpty viewer={viewer} />
-            )}
-          </div>
-        </main>
-      </div>
+        <div className="mt-8">
+          {matches.length > 0 ? (
+            <MatchRequestList
+              matches={matches}
+              viewer={viewer}
+              renderActiveAction={
+                farms?.status === 'ok'
+                  ? (match) => (
+                      <AddToFarmButton
+                        professionalId={match.professionalId}
+                        professionalName={match.professionalName}
+                        farms={farms.workspaces}
+                      />
+                    )
+                  : undefined
+              }
+            />
+          ) : (
+            <MatchRequestsEmpty viewer={viewer} />
+          )}
+        </div>
+      </main>
     </AppLayout>
   );
 }

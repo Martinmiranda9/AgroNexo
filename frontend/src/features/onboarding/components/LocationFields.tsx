@@ -3,7 +3,14 @@
 import { useId, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { City, Country, State } from 'country-state-city';
-import { Field, FieldError, FieldLabel, Input, NativeSelect, NativeSelectOption } from '@/ui/components';
+import {
+  Field,
+  FieldError,
+  FieldLabel,
+  Input,
+  NativeSelect,
+  NativeSelectOption,
+} from '@/ui/components';
 import type { FormValues, LocationField } from '../config/types';
 import type { FieldErrors } from '../lib/validation';
 
@@ -39,18 +46,25 @@ export default function LocationFields({ field, values, errors, onChange }: Loca
         const c = Country.getCountryByCode(code);
         return c ? [{ value: c.isoCode, label: c.name }] : [];
       }).sort((a, b) => a.label.localeCompare(b.label, 'es')),
-    [],
+    []
   );
   const provinces = useMemo(
     () => State.getStatesOfCountry(countryCode).map((s) => ({ value: s.isoCode, label: s.name })),
-    [countryCode],
+    [countryCode]
   );
   const cities = useMemo(
-    () => (provinceCode ? City.getCitiesOfState(countryCode, provinceCode).map((c) => ({ value: c.name, label: c.name })) : []),
-    [countryCode, provinceCode],
+    () =>
+      provinceCode
+        ? City.getCitiesOfState(countryCode, provinceCode).map((c) => ({
+            value: c.name,
+            label: c.name,
+          }))
+        : [],
+    [countryCode, provinceCode]
   );
 
-  const labelOf = (list: { value: string; label: string }[], code: string) => list.find((o) => o.value === code)?.label ?? '';
+  const labelOf = (list: { value: string; label: string }[], code: string) =>
+    list.find((o) => o.value === code)?.label ?? '';
 
   return (
     <motion.div
@@ -69,7 +83,13 @@ export default function LocationFields({ field, values, errors, onChange }: Loca
             value={countryCode}
             onChange={(e) => {
               const code = e.target.value;
-              onChange({ countryCode: code, country: labelOf(countries, code), provinceCode: '', province: '', city: '' });
+              onChange({
+                countryCode: code,
+                country: labelOf(countries, code),
+                provinceCode: '',
+                province: '',
+                city: '',
+              });
             }}
           >
             <NativeSelectOption value="">Elegí un país</NativeSelectOption>

@@ -1,128 +1,105 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CaretDownIcon, SignOutIcon } from '@phosphor-icons/react';
-import { ROUTES } from '@/shared/constants/routes';
-import { cn } from '@/shared/utils/cn';
-import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from '@/ui/components/AvatarShadcn';
-import BrandLogo from '@/ui/components/BrandLogo';
-import { Button } from '@/ui/components/Button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/ui/components/DropdownMenu';
-import { NAV, ROLE_CAPTION, displayNameOf, initialsOf, signOut } from '../navigation';
+  MdOutlineInfo,
+  MdOutlineMenu,
+  MdOutlineNotifications,
+  MdOutlineNotificationsNone,
+} from 'react-icons/md';
+import BrandLogo from '@/ui/components/BrandLogo';
+import { Drawer, DrawerContent, DrawerTitle } from '@/ui/components/Drawer';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/ui/components/Empty';
+import { IconButton } from '@/ui/components/IconButton';
+import { PopoverHeader, PopoverTitle } from '@/ui/components/Popover';
 import type { AppUser } from '../types';
+import AppSidebar from './AppSidebar';
+import HeaderPopoverButton from './HeaderPopoverButton';
+import ScreenGuideContent from './ScreenGuideContent';
+import SearchCommand from './SearchCommand';
+import UserMenu from './UserMenu';
 
 interface AppHeaderProps {
   user: AppUser;
-  /** Solicitudes esperando respuesta: se muestra como contador junto a "Solicitudes". */
+  /** Solicitudes esperando respuesta: contador junto a "Solicitudes" en el menú del celular. */
   pendingCount?: number;
 }
 
+/** Pastilla blanca del encabezado, como las de la referencia. */
+const PILL =
+  'border-border bg-card flex h-12 items-center rounded-full border [box-shadow:var(--shadow-s)]';
+
 /**
- * Encabezado de las pantallas autenticadas: logo, navegación principal (Buscar ↔ Mis solicitudes ↔ Campos) y menú
- * de cuenta.
- * Arriba de todo es transparente y deja ver el brillo; al bajar toma fondo y borde.
+ * Encabezado del marco: logo a la izquierda y, a la derecha, la pastilla de búsqueda, avisos y ayuda, y el perfil.
+ * En celular y tablet suma el botón que abre el sidebar en un panel lateral.
  */
 export default function AppHeader({ user, pendingCount = 0 }: AppHeaderProps) {
   const pathname = usePathname();
-  const name = displayNameOf(user);
-  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  // Al elegir una sección en el panel del celular, el panel se cierra.
+  useEffect(() => setMenuOpen(false), [pathname]);
 
   return (
-    <header
-      className={cn(
-        'sticky top-0 z-30 border-b transition-colors',
-        scrolled ? 'border-border bg-paper/80 backdrop-blur-xl' : 'border-transparent'
-      )}
-    >
-      <div className="mx-auto flex h-16 max-w-[1180px] items-center justify-between gap-3 px-4 sm:px-6">
+    <header className="bg-canvas/85 sticky top-0 z-30 backdrop-blur-xl">
+      <div className="flex h-19 items-center gap-2 px-4 sm:gap-3 sm:px-6">
+        <div className={`${PILL} px-1 lg:hidden`}>
+          <IconButton
+            variant="ghost"
+            size="lg"
+            shape="round"
+            aria-label="Abrir menú"
+            onClick={() => setMenuOpen(true)}
+          >
+            <MdOutlineMenu aria-hidden />
+          </IconButton>
+        </div>
+
         {/* BrandLogo ya es un link al inicio: no se envuelve en otro. */}
-        <BrandLogo />
+        <div className={`${PILL} px-1.5 sm:pr-4`}>
+          <BrandLogo compactOnMobile />
+        </div>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          <nav aria-label="Principal" className="flex items-center gap-1">
-            {NAV[user.role].map(({ href, label, icon: ItemIcon }) => {
-              const active = pathname === href;
-              const showCount = href === ROUTES.matches && pendingCount > 0;
-              return (
-                <Button
-                  key={href}
-                  variant={active ? 'secondary' : 'ghost'}
-                  render={<Link href={href} aria-current={active ? 'page' : undefined} />}
-                  nativeButton={false}
-                  className="max-sm:px-3"
-                >
-                  <ItemIcon data-icon="inline-start" size={18} aria-hidden />
-                  <span className="max-sm:sr-only">{label}</span>
-                  {showCount && (
-                    <span className="bg-pine text-beige text-caption rounded-pill min-w-5 px-1.5 font-mono">
-                      {pendingCount}
-                      <span className="sr-only"> esperando respuesta</span>
-                    </span>
-                  )}
-                </Button>
-              );
-            })}
-          </nav>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              aria-label={`Menú de ${name}`}
-              className="rounded-pill border-border bg-surface hover:bg-secondary focus-visible:border-ring focus-visible:ring-ring/50 flex h-12 items-center gap-2.5 border py-1 pr-3 pl-1 text-left transition-colors outline-none focus-visible:ring-3"
-            >
-              {/* La foto es la de la cuenta (Google); sin foto o si no carga, quedan las iniciales. El punto indica sesión activa. */}
-              <Avatar size="lg">
-                <AvatarImage src={user.avatarUrl} alt="" referrerPolicy="no-referrer" />
-                <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                  {initialsOf(user)}
-                </AvatarFallback>
-                <AvatarBadge aria-hidden className="bg-accent-mid ring-surface" />
-              </Avatar>
-              <span className="hidden min-w-0 flex-col leading-tight md:flex">
-                <span className="text-body-sm text-pine max-w-[16ch] truncate font-semibold">
-                  {name}
-                </span>
-                {user.publicId !== null && (
-                  <span className="text-caption text-dark font-medium tabular-nums">
-                    ID {user.publicId}
-                  </span>
-                )}
-              </span>
-              <CaretDownIcon size={14} weight="bold" className="text-olive" aria-hidden />
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end" className="bg-surface min-w-56">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel className="flex flex-col gap-0.5 py-2">
-                  <span className="text-body-sm text-pine font-semibold">{name}</span>
-                  <span className="text-caption text-olive">{ROLE_CAPTION[user.role]}</span>
-                </DropdownMenuLabel>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={signOut}>
-                <SignOutIcon size={16} aria-hidden />
-                Cerrar sesión
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <div className={`${PILL} gap-0.5 px-1`}>
+            <SearchCommand user={user} />
+            <HeaderPopoverButton label="Avisos" icon={<MdOutlineNotifications aria-hidden />}>
+              <PopoverHeader>
+                <PopoverTitle>Avisos</PopoverTitle>
+              </PopoverHeader>
+              <Empty className="p-4">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <MdOutlineNotificationsNone aria-hidden />
+                  </EmptyMedia>
+                  <EmptyTitle>Sin novedades</EmptyTitle>
+                  <EmptyDescription>
+                    Acá vas a ver los avisos de tus campos y solicitudes.
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            </HeaderPopoverButton>
+            <HeaderPopoverButton label="Ayuda" icon={<MdOutlineInfo aria-hidden />}>
+              <ScreenGuideContent pathname={pathname} />
+            </HeaderPopoverButton>
+          </div>
+          <UserMenu user={user} />
         </div>
       </div>
+
+      <Drawer open={menuOpen} onOpenChange={setMenuOpen} swipeDirection="left">
+        <DrawerContent className="bg-canvas p-4">
+          <DrawerTitle className="sr-only">Menú</DrawerTitle>
+          <AppSidebar user={user} pendingCount={pendingCount} />
+        </DrawerContent>
+      </Drawer>
     </header>
   );
 }

@@ -1,65 +1,145 @@
 'use client';
 
+import type { ReactElement, ReactNode } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { SignOutIcon } from '@phosphor-icons/react';
+import {
+  MdOutlineHelpOutline,
+  MdOutlineLogout,
+  MdOutlineMenu,
+  MdOutlineMenuOpen,
+} from 'react-icons/md';
 import { ROUTES } from '@/shared/constants/routes';
-import { Avatar, AvatarFallback, AvatarImage } from '@/ui/components/AvatarShadcn';
-import BrandLogo from '@/ui/components/BrandLogo';
-import Sidebar from '@/ui/layouts/Sidebar';
-import { NAV, ROLE_CAPTION, displayNameOf, initialsOf, signOut } from '../navigation';
+import { Popover, PopoverContent, PopoverTrigger } from '@/ui/components/Popover';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarItem,
+} from '@/ui/components/Sidebar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/Tooltip';
+import { NAV, isActiveHref, signOut } from '../navigation';
 import type { AppUser } from '../types';
+import ScreenGuideContent from './ScreenGuideContent';
 
 interface AppSidebarProps {
   user: AppUser;
   /** Solicitudes esperando respuesta: contador junto a "Solicitudes". */
   pendingCount?: number;
+  /** Solo los íconos. En el panel del celular siempre va expandido. */
+  collapsed?: boolean;
+  /** Botón de arriba para colapsar o expandir. Sin él (celular) no se muestra. */
+  onToggle?: () => void;
 }
 
-/** Barra lateral de escritorio: la misma navegación del encabezado, con la cuenta y el cierre de sesión abajo. */
-export default function AppSidebar({ user, pendingCount = 0 }: AppSidebarProps) {
-  const pathname = usePathname();
-  const name = displayNameOf(user);
+/** Con la barra colapsada, el nombre de la sección aparece en un tooltip a la derecha del ícono. */
+function WithLabel({
+  label,
+  show,
+  children,
+}: {
+  label: string;
+  show: boolean;
+  children: ReactElement;
+}) {
+  return (
+    <Tooltip disabled={!show}>
+      <TooltipTrigger render={children} />
+      <TooltipContent side="right" sideOffset={10}>
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
 
-  const items = NAV[user.role].map((item) => ({
-    ...item,
-    active: pathname === item.href,
-    count: item.href === ROUTES.matches ? pendingCount : undefined,
-    countLabel: 'esperando respuesta',
-  }));
+/**
+ * Sidebar del marco: tres pastillas blancas (colapsar, secciones, ayuda y cierre de sesión), como la columna de la
+ * referencia. Colapsado quedan los íconos con su nombre en tooltip; el ítem activo va en pine.
+ */
+export default function AppSidebar({
+  user,
+  pendingCount = 0,
+  collapsed = false,
+  onToggle,
+}: AppSidebarProps) {
+  const pathname = usePathname();
+  const toggleLabel = collapsed ? 'Expandir menú' : 'Contraer menú';
+
+  const counter = (count: number): ReactNode =>
+    count > 0 ? (
+      <span className="bg-field-700 text-caption flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 font-semibold text-white tabular-nums">
+        {count}
+        <span className="sr-only"> esperando respuesta</span>
+      </span>
+    ) : undefined;
 
   return (
-    <Sidebar
-      brand={<BrandLogo variant="dark" />}
-      label="Principal"
-      items={items}
-      footer={
-        <div className="flex items-center gap-3 px-2">
-          <Avatar size="lg">
-            <AvatarImage src={user.avatarUrl} alt="" referrerPolicy="no-referrer" />
-            <AvatarFallback className="bg-sidebar-foreground text-sidebar font-semibold">
-              {initialsOf(user)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex min-w-0 flex-1 flex-col leading-tight">
-            <span className="text-body-sm text-sidebar-primary-foreground truncate font-semibold">
-              {name}
-            </span>
-            <span className="text-caption text-field-300 truncate tabular-nums">
-              {ROLE_CAPTION[user.role]}
-              {user.publicId !== null && ` · ID ${user.publicId}`}
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={signOut}
-            aria-label="Cerrar sesión"
-            title="Cerrar sesión"
-            className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-sidebar-ring flex size-11 shrink-0 items-center justify-center rounded-lg transition-colors focus-visible:outline-2"
-          >
-            <SignOutIcon size={20} aria-hidden />
-          </button>
-        </div>
-      }
-    />
+    <Sidebar variant="floating" collapsed={collapsed} aria-label="Barra lateral">
+      {onToggle && (
+        <SidebarHeader>
+          <WithLabel label={toggleLabel} show={collapsed}>
+            <SidebarItem
+              onClick={onToggle}
+              aria-expanded={!collapsed}
+              icon={
+                collapsed ? (
+                  <MdOutlineMenu size={20} aria-hidden />
+                ) : (
+                  <MdOutlineMenuOpen size={20} aria-hidden />
+                )
+              }
+            >
+              {toggleLabel}
+            </SidebarItem>
+          </WithLabel>
+        </SidebarHeader>
+      )}
+
+      <SidebarContent>
+        <nav aria-label="Principal">
+          <SidebarGroup>
+            {NAV[user.role].map(({ href, label, icon: ItemIcon }) => {
+              const active = isActiveHref(pathname, href);
+              return (
+                <WithLabel key={href} label={label} show={collapsed}>
+                  <SidebarItem
+                    asChild
+                    active={active}
+                    icon={<ItemIcon size={20} aria-hidden />}
+                    badge={href === ROUTES.matches ? counter(pendingCount) : undefined}
+                  >
+                    <Link href={href} aria-current={active ? 'page' : undefined}>
+                      {label}
+                    </Link>
+                  </SidebarItem>
+                </WithLabel>
+              );
+            })}
+          </SidebarGroup>
+        </nav>
+      </SidebarContent>
+
+      <SidebarFooter>
+        <Popover>
+          <WithLabel label="Ayuda" show={collapsed}>
+            <PopoverTrigger
+              render={<SidebarItem icon={<MdOutlineHelpOutline size={20} aria-hidden />} />}
+            >
+              Ayuda
+            </PopoverTrigger>
+          </WithLabel>
+          <PopoverContent side="right" align="end" sideOffset={10}>
+            <ScreenGuideContent pathname={pathname} />
+          </PopoverContent>
+        </Popover>
+        <WithLabel label="Cerrar sesión" show={collapsed}>
+          <SidebarItem onClick={signOut} icon={<MdOutlineLogout size={20} aria-hidden />}>
+            Cerrar sesión
+          </SidebarItem>
+        </WithLabel>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

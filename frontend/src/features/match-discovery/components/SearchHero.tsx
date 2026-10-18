@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useRef } from 'react';
-import { SealCheckIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdOutlineVerified } from 'react-icons/md';
 import { Badge } from '@/ui/components/Badge';
 import { Button } from '@/ui/components/Button';
 import { EXAMPLE_NEEDS } from '../config/catalog';
@@ -32,15 +32,17 @@ export default function SearchHero({ value, onChange, onSubmit }: SearchHeroProp
       className="flex flex-col items-center pt-10 text-center sm:pt-16"
     >
       {/* Primera señal de confianza: antes que el nombre de la función, lo que le importa al productor. */}
-      <Badge variant="success" className="text-body-sm h-7 px-3">
-        <SealCheckIcon data-icon="inline-start" size={14} aria-hidden />
+      <Badge variant="success">
+        <MdOutlineVerified data-icon="inline-start" size={14} aria-hidden />
         Primero, profesionales con matrícula verificada
       </Badge>
 
       <h1 id="search-hero-title" className="text-display text-pine mt-6 max-w-[14ch] text-balance">
-        Encontremos al profesional que tu campo necesita.
+        Encontremos al profesional que{' '}
+        {/* Lo que importa resalta en un verde campo oscuro y con más peso, como un llamado a la acción. */}
+        <span className="text-field-800 font-extrabold">tu campo necesita.</span>
       </h1>
-      <p className="text-body-lg text-dark mt-6 max-w-[46ch]">
+      <p className="text-body-lg text-sage-800 mt-6 max-w-[46ch]">
         Contalo como se lo dirías a un vecino. Te mostramos quién encaja y por qué.
       </p>
 
@@ -49,7 +51,7 @@ export default function SearchHero({ value, onChange, onSubmit }: SearchHeroProp
       </div>
 
       <div className="mt-8 flex max-w-[660px] flex-col items-center gap-3">
-        <span id={examplesLabelId} className="text-body-sm text-olive">
+        <span id={examplesLabelId} className="text-body-sm text-sage-600">
           Por ejemplo:
         </span>
         <div
@@ -63,7 +65,7 @@ export default function SearchHero({ value, onChange, onSubmit }: SearchHeroProp
               type="button"
               variant="outline"
               size="sm"
-              className="rounded-pill bg-surface/70"
+              className="bg-card/70 rounded-full"
               onClick={() => fillExample(example.full)}
             >
               {example.short}

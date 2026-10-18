@@ -7,7 +7,14 @@ import { Spinner } from './Spinner';
 
 function GoogleIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      className="shrink-0"
+    >
       <path
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
         fill="#4285F4"
@@ -33,8 +40,8 @@ export type GoogleButtonProps = Omit<React.ComponentProps<typeof Button>, 'varia
 };
 
 /**
- * "Continuar con Google": mismo botón en login y registro. Es `outline` a propósito: el CTA primario
- * (Pine) es siempre el envío del formulario de correo. La lógica del popup vive en `core/auth/firebase-actions`.
+ * "Continuar con Google" en estilo Cashmere: pill `secondary` (el primario es siempre el envío del formulario de
+ * correo). Mismo botón en login y registro. La lógica del popup vive en `core/auth/firebase-actions`.
  */
 export default function GoogleButton({
   loading = false,
@@ -46,10 +53,10 @@ export default function GoogleButton({
   return (
     <Button
       type="button"
-      variant="outline"
+      variant="secondary"
       size="lg"
       disabled={disabled || loading}
-      className={cn('w-full border-input', className)}
+      className={cn('w-full', className)}
       {...props}
     >
       {loading ? <Spinner data-icon="inline-start" /> : <GoogleIcon />}

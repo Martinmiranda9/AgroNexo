@@ -1,8 +1,9 @@
 'use client';
 
 import { useId } from 'react';
-import { Check } from '@phosphor-icons/react';
-import { cn } from '@/shared/utils/cn';
+import { CheckboxCard } from './Checkbox';
+import { FieldDescription, FieldError, FieldLegend, FieldSet } from './Field';
+import { RadioCard, RadioGroup } from './RadioGroup';
 
 export interface ChoiceOption {
   value: string;
@@ -16,83 +17,73 @@ interface ChoiceGroupProps {
   /** Valores seleccionados (uno solo si `multiple` es falso). */
   value: string[];
   onValueChange: (value: string[]) => void;
-  /** Selección múltiple: se muestran chips en lugar de cards. */
+  /** Selección múltiple: checkboxes en card en lugar de radios. */
   multiple?: boolean;
   hint?: string;
   error?: string;
 }
 
 /**
- * Opción única (cards) o múltiple (chips pill). Activo = Pine + Beige.
- * Opción única usa radios nativos (flechas, un solo tab-stop y semántica gratis); múltiple, checkboxes nativos.
+ * Pregunta de opciones del formulario armada con componentes de Cashmere: opción única con `RadioGroup` +
+ * `RadioCard` y múltiple con `CheckboxCard` (las "Checkbox Cards" de Cashmere). Activo = pine.
  */
-export default function ChoiceGroup({ label, options, value, onValueChange, multiple, hint, error }: ChoiceGroupProps) {
-  const name = useId();
-  const messageId = `${name}-message`;
-
-  const toggle = (option: string) => {
-    if (!multiple) return onValueChange([option]);
-    onValueChange(value.includes(option) ? value.filter((v) => v !== option) : [...value, option]);
-  };
+export default function ChoiceGroup({
+  label,
+  options,
+  value,
+  onValueChange,
+  multiple,
+  hint,
+  error,
+}: ChoiceGroupProps) {
+  const id = useId();
+  const legendId = `${id}-legend`;
+  const messageId = `${id}-message`;
+  const describedBy = error || hint ? messageId : undefined;
 
   return (
-    <fieldset aria-describedby={error || hint ? messageId : undefined} data-invalid={error ? true : undefined} className="flex min-w-0 flex-col gap-2">
-      {label && <legend className="mb-2 text-body-sm font-medium text-pine">{label}</legend>}
+    <FieldSet aria-describedby={describedBy} data-invalid={error ? true : undefined}>
+      {label && (
+        <FieldLegend id={legendId} variant="label">
+          {label}
+        </FieldLegend>
+      )}
 
-      <div className={multiple ? 'flex flex-wrap gap-2' : 'flex flex-col gap-2'}>
-        {options.map((o) => {
-          const active = value.includes(o.value);
-          return (
-            <label
+      {multiple ? (
+        <div
+          role="group"
+          aria-labelledby={label ? legendId : undefined}
+          className="flex flex-wrap gap-2"
+        >
+          {options.map((o) => (
+            <CheckboxCard
               key={o.value}
-              className={cn(
-                'relative cursor-pointer border text-left transition-all duration-200',
-                'has-focus-visible:ring-2 has-focus-visible:ring-pine has-focus-visible:ring-offset-2 has-focus-visible:ring-offset-bg-card',
-                multiple
-                  ? 'flex h-11 items-center gap-1.5 rounded-full px-4 text-body-sm font-medium'
-                  : 'flex flex-col items-start rounded-lg px-4 py-3',
-                active
-                  ? 'border-pine bg-pine text-beige'
-                  : 'border-neutral-warm bg-beige text-pine hover:border-pine',
-              )}
-            >
-              <input
-                type={multiple ? 'checkbox' : 'radio'}
-                name={multiple ? undefined : name}
-                value={o.value}
-                checked={active}
-                onChange={() => toggle(o.value)}
-                className="sr-only"
-              />
-              {multiple ? (
-                <>
-                  {active && <Check size={14} weight="bold" aria-hidden />}
-                  {o.label}
-                </>
-              ) : (
-                <>
-                  <span className="text-body-sm font-semibold">{o.label}</span>
-                  {o.description && (
-                    <span className={cn('mt-0.5 text-body-sm', active ? 'text-beige/80' : 'text-olive')}>{o.description}</span>
-                  )}
-                </>
-              )}
-            </label>
-          );
-        })}
-      </div>
+              title={o.label}
+              description={o.description}
+              checked={value.includes(o.value)}
+              onCheckedChange={(checked) =>
+                onValueChange(checked ? [...value, o.value] : value.filter((v) => v !== o.value))
+              }
+            />
+          ))}
+        </div>
+      ) : (
+        <RadioGroup
+          aria-labelledby={label ? legendId : undefined}
+          value={value[0] ?? null}
+          onValueChange={(next) => onValueChange([next as string])}
+        >
+          {options.map((o) => (
+            <RadioCard key={o.value} value={o.value} title={o.label} description={o.description} />
+          ))}
+        </RadioGroup>
+      )}
 
       {error ? (
-        <p id={messageId} role="alert" className="text-body-sm text-danger">
-          {error}
-        </p>
+        <FieldError id={messageId}>{error}</FieldError>
       ) : (
-        hint && (
-          <p id={messageId} className="text-body-sm text-olive">
-            {hint}
-          </p>
-        )
+        hint && <FieldDescription id={messageId}>{hint}</FieldDescription>
       )}
-    </fieldset>
+    </FieldSet>
   );
 }

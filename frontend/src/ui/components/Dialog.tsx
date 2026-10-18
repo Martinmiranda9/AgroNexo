@@ -1,4 +1,4 @@
-// Código oficial: shadcn/ui `dialog` (base-nova). Solo cambian los imports (alias de AgroNexo e íconos Phosphor).
+// Código oficial: shadcn/ui `dialog` (base-nova). Solo cambian los imports (alias de AgroNexo e íconos Material de react-icons).
 'use client';
 
 import * as React from 'react';
@@ -6,7 +6,7 @@ import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { cn } from '@/shared/utils/cn';
 
 import { Button } from './Button';
-import { XIcon } from '@phosphor-icons/react';
+import { MdClose } from 'react-icons/md';
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
@@ -29,7 +29,7 @@ function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) 
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        'data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs',
+        'fixed inset-0 isolate z-50 bg-black/70 backdrop-blur-sm transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
         className
       )}
       {...props}
@@ -51,7 +51,7 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          'bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl p-4 text-sm ring-1 duration-100 outline-none sm:max-w-sm',
+          'bg-popover text-popover-foreground border-border fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl border p-6 text-sm [box-shadow:var(--shadow-l)] transition-[opacity,scale] duration-200 outline-none data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 sm:max-w-lg',
           className
         )}
         {...props}
@@ -60,9 +60,9 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            render={<Button variant="ghost" className="absolute top-2 right-2" size="icon-sm" />}
+            render={<Button variant="ghost" className="absolute top-4 right-4" size="icon-sm" />}
           >
-            <XIcon />
+            <MdClose />
             <span className="sr-only">Cerrar</span>
           </DialogPrimitive.Close>
         )}
@@ -73,7 +73,11 @@ function DialogContent({
 
 function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot="dialog-header" className={cn('flex flex-col gap-2', className)} {...props} />
+    <div
+      data-slot="dialog-header"
+      className={cn('flex flex-col gap-1.5 text-left', className)}
+      {...props}
+    />
   );
 }
 
@@ -88,10 +92,7 @@ function DialogFooter({
   return (
     <div
       data-slot="dialog-footer"
-      className={cn(
-        'bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:justify-end',
-        className
-      )}
+      className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
       {...props}
     >
       {children}
@@ -106,7 +107,7 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn('cn-font-heading text-base leading-none font-medium', className)}
+      className={cn('text-lg leading-none font-semibold tracking-tight', className)}
       {...props}
     />
   );
@@ -117,7 +118,7 @@ function DialogDescription({ className, ...props }: DialogPrimitive.Description.
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
-        'text-muted-foreground *:[a]:hover:text-foreground text-sm *:[a]:underline *:[a]:underline-offset-3',
+        'text-muted-foreground *:[a]:hover:text-foreground text-sm leading-relaxed *:[a]:underline *:[a]:underline-offset-3',
         className
       )}
       {...props}

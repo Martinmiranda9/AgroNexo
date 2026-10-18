@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { MagnifyingGlassIcon, TrayIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdOutlineInbox, MdSearch } from 'react-icons/md';
 import { ROUTES } from '@/shared/constants/routes';
 import { Button } from '@/ui/components/Button';
 import {
@@ -10,6 +10,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/ui/components/Empty';
+import { Card } from '@/ui/components/Card';
 
 interface MatchRequestsEmptyProps {
   viewer: 'Producer' | 'Professional';
@@ -33,22 +34,24 @@ export default function MatchRequestsEmpty({ viewer }: MatchRequestsEmptyProps) 
   const { title, description } = COPY[viewer];
 
   return (
-    <Empty className="rounded-shell border-pine/10 bg-surface border border-solid py-14">
-      <EmptyHeader>
-        <EmptyMedia variant="icon" className="bg-secondary text-pine size-11 rounded-full">
-          <TrayIcon size={22} aria-hidden />
-        </EmptyMedia>
-        <EmptyTitle className="text-body text-pine font-semibold">{title}</EmptyTitle>
-        <EmptyDescription className="text-body-sm text-olive">{description}</EmptyDescription>
-      </EmptyHeader>
-      {viewer === 'Producer' && (
-        <EmptyContent>
-          <Button render={<Link href={ROUTES.matchDiscovery} />} nativeButton={false} size="lg">
-            <MagnifyingGlassIcon data-icon="inline-start" size={18} aria-hidden />
-            Buscar un profesional
-          </Button>
-        </EmptyContent>
-      )}
-    </Empty>
+    <Card>
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <MdOutlineInbox aria-hidden />
+          </EmptyMedia>
+          <EmptyTitle>{title}</EmptyTitle>
+          <EmptyDescription>{description}</EmptyDescription>
+        </EmptyHeader>
+        {viewer === 'Producer' && (
+          <EmptyContent>
+            <Button render={<Link href={ROUTES.matchDiscovery} />} nativeButton={false} size="lg">
+              <MdSearch data-icon="inline-start" size={18} aria-hidden />
+              Buscar un profesional
+            </Button>
+          </EmptyContent>
+        )}
+      </Empty>
+    </Card>
   );
 }

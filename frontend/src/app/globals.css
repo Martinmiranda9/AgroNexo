@@ -7,7 +7,7 @@
 
 /* ─────────────────────────────────────────────────────────────────────────────
    PALETA AGRONEXO v4 · "Verde campo" (ver ia/frontend_implementation_plan.md › Paleta)
-   `static`: emite todas las variables aunque ninguna utilidad las use directo, porque los alias y el tema
+   `static`: emite todas las variables aunque ninguna utilidad las use directo, porque el tema
    shadcn de más abajo las referencian con var().
    ───────────────────────────────────────────────────────────────────────────── */
 @theme static {
@@ -49,46 +49,11 @@
   --color-status-orange-ink: #9a3412;
   --color-status-red: #b91c1c;
 
-  /* ── Superficies de marca: la combinación del login/brandboard, solo en piezas puntuales (avisos, estados
-     vacíos, logros, invitaciones). Nunca como fondo de página. Ver `ui/components/BrandSurface.tsx`. ── */
-  --color-cream: #fef7e5;
-  --color-cream-border: #ede0c4;
-  --color-sand: #fff3d5;
-  --color-sand-border: #efdcab;
-  --color-moss: #4d694e; /* bajada y rótulo sobre cream/sand (5,5:1) */
-  --color-loam: #24301e; /* cuerpo sobre cream/sand (12,6:1) */
-  --color-sprout: #99a474; /* bajada sobre pine (5,4:1) */
-
-  /* ── Nombres heredados → paleta v4. Los componentes existentes los siguen usando y toman los colores
-     nuevos sin cambiar de clase. En código nuevo usar la escala (field/sage) o los tokens semánticos. ── */
+  /* ── Pine = field-950: lo importante (selección activa, títulos, dato clave). ── */
   --color-pine: #00311e;
-  --color-pine-hover: #002617;
-  --color-beige: #f4f6f4; /* = sage-50: fondo claro y texto sobre pine */
-  --color-beige-dark: #ecefec; /* = sage-100 */
-  --color-beige-deeper: #e0e4e1; /* = sage-200 */
-  --color-bg-page: #f4f6f4; /* = sage-50 */
-  --color-bg-hero: #f4fcf3; /* = field-50 */
-  --color-bg-card: #ffffff;
-  --color-paper: #f4f6f4; /* = sage-50: lienzo de las pantallas de producto */
-  --color-surface: #ffffff;
-  --color-olive: #5a5f5b; /* = sage-600: texto secundario, íconos */
-  --color-olive-hover: #434844; /* = sage-700 */
-  --color-accent-mid: #63b070; /* = field-500 */
-  --color-accent-light: #ade1b2; /* = field-300: acentos sobre pine (9,7:1) */
-  --color-dark: #2c302c; /* = sage-800: texto de apoyo */
-  --color-neutral-warm: #8a8f8b; /* = sage-400: bordes de control, íconos inactivos */
-  --color-danger: #b91c1c; /* = status-red */
 
-  --shadow-raised: 0 1px 2px rgb(0 49 30 / 0.05), 0 24px 48px -24px rgb(0 49 30 / 0.22);
-
-  --radius-card: 16px;
-  /* Bisel externo de los contenedores protagonistas (ficha, diálogo, buscador): 16 + 6 de padding. */
-  --radius-shell: 22px;
-  --radius-input: 12px;
-  --radius-pill: 9999px;
-
-  /* ── Tipografía · Design System AgroNexo (Geist / Geist Mono) ── */
-  --font-sans: var(--font-geist-sans), "Geist", system-ui, sans-serif;
+  /* ── Tipografía · Inter (la de Cashmere) y Geist Mono solo para cifras ── */
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
 
   --text-caption: 12px;
@@ -124,13 +89,14 @@
    Proporción buscada: ~60% lienzo salvia, ~28% superficies blancas, ~8% pine/verde, ~4% estados.
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  --radius: 0.75rem; /* 12px: base de la escala sm/md/lg/xl */
+  /* Cashmere: base de 1rem, redondeado generoso (escala sm 8 · md 12 · lg 16 · xl 22 · 2xl 28 · 3xl 40). */
+  --radius: 1rem;
 
   --background: var(--color-sage-50);
   --foreground: var(--color-pine);
-  --card: var(--color-surface);
+  --card: #ffffff;
   --card-foreground: var(--color-pine);
-  --popover: var(--color-surface);
+  --popover: #ffffff;
   --popover-foreground: var(--color-pine);
 
   /* Acción principal: verde campo 700 con texto blanco (5,2:1). Hover: 800. Lo activo/seleccionado
@@ -145,6 +111,7 @@
   --accent: var(--color-sage-100);
   --accent-foreground: var(--color-pine);
   --destructive: var(--color-status-red);
+  --destructive-foreground: #ffffff;
   /* No son de shadcn: estados positivo / pendiente de los tags (Badge success / warning).
      Los estados van siempre como pill clara con texto 800; el verde de marca va siempre sólido. Así
      "Aceptada" y el botón principal no se confunden aunque compartan familia de verde. */
@@ -160,8 +127,11 @@
   --fill-caution: color-mix(in oklab, var(--color-status-orange) 12%, transparent);
 
   --border: var(--color-sage-200);
-  /* Borde de controles: sage-400 (3,3:1 sobre blanco, 3,0:1 sobre el lienzo; WCAG 1.4.11). */
-  --input: var(--color-sage-400);
+  /* En Cashmere `--input` es el FONDO del campo (no el borde, como en shadcn): blanco sobre el lienzo. */
+  --input: #ffffff;
+  /* Borde de controles: sage-400 (3,3:1 sobre blanco, 3,0:1 sobre el lienzo; WCAG 1.4.11). Token propio de
+     AgroNexo: la combinación campo blanco + borde sage-400 es parte de la identidad. */
+  --input-border: var(--color-sage-400);
   /* Foco: Pine pleno. Los componentes usan border-ring (13:1) y ring-ring/50 (halo ≈3:1, WCAG 2.4.7/1.4.11). */
   --ring: var(--color-pine);
 
@@ -171,15 +141,77 @@
   --chart-4: var(--color-sage-400);
   --chart-5: var(--color-field-950);
 
-  /* Sidebar fuerte: pine con texto verde claro; hover un paso más claro, activo en verde 800. */
-  --sidebar: var(--color-pine);
-  --sidebar-foreground: var(--color-field-200);
-  --sidebar-primary: var(--color-field-800);
+  /* Colores "pop" de Cashmere (Badge, chips): tinte claro + texto profundo. AgroNexo no tiene azul, violeta ni
+     amarillo: verde y naranja son los estados reales; amarillo (warning en Cashmere) va al naranja de pendiente;
+     azul y violeta quedan en neutro salvia. */
+  --pop-green: color-mix(in oklab, var(--color-status-green) 10%, white);
+  --pop-green-foreground: var(--color-status-green-ink);
+  --pop-orange: color-mix(in oklab, var(--color-status-orange) 10%, white);
+  --pop-orange-foreground: var(--color-status-orange-ink);
+  --pop-yellow: color-mix(in oklab, var(--color-status-orange) 10%, white);
+  --pop-yellow-foreground: var(--color-status-orange-ink);
+  --pop-blue: var(--color-sage-100);
+  --pop-blue-foreground: var(--color-sage-700);
+  --pop-purple: var(--color-sage-100);
+  --pop-purple-foreground: var(--color-sage-700);
+
+  /* Sombras de Cashmere (suaves, con hairline), teñidas de pine en vez del gris cálido original. */
+  --shadow-xs: 0 0.0625rem 0.125rem color-mix(in oklch, var(--color-pine) 5%, transparent);
+  --shadow-sm:
+    0 0 0 0.0625rem color-mix(in oklch, var(--color-pine) 5%, transparent),
+    0 0.0625rem 0.125rem color-mix(in oklch, var(--color-pine) 5%, transparent);
+  --shadow-md:
+    0 0 0 0.0625rem color-mix(in oklch, var(--color-pine) 4%, transparent),
+    0 0.125rem 0.375rem -0.0625rem color-mix(in oklch, var(--color-pine) 6%, transparent),
+    0 0.5rem 1.5rem -0.375rem color-mix(in oklch, var(--color-pine) 8%, transparent);
+  --shadow-lg:
+    0 0 0 0.0625rem color-mix(in oklch, var(--color-pine) 3.5%, transparent),
+    0 0.375rem 1rem -0.625rem color-mix(in oklch, var(--color-pine) 6%, transparent),
+    0 1rem 2.75rem -1.25rem color-mix(in oklch, var(--color-pine) 8%, transparent);
+  --shadow-xl:
+    0 0 0 0.0625rem color-mix(in oklch, var(--color-pine) 3.5%, transparent),
+    0 0.75rem 1.75rem -0.875rem color-mix(in oklch, var(--color-pine) 7%, transparent),
+    0 1.75rem 4rem -1.625rem color-mix(in oklch, var(--color-pine) 10%, transparent);
+  /* Alias que leen los componentes de Cashmere ([box-shadow:var(--shadow-s)] etc.). */
+  --shadow-s: var(--shadow-sm);
+  --shadow-m: var(--shadow-md);
+  --shadow-l: var(--shadow-lg);
+  --shadow-inset:
+    inset 0 0 0 0.0625rem color-mix(in oklch, var(--color-pine) 4%, transparent),
+    inset 0 0.0625rem 0.0625rem color-mix(in oklch, var(--color-pine) 3%, transparent);
+  --shadow-button:
+    0 0 0 0.0625rem color-mix(in oklch, var(--color-pine) 5%, transparent),
+    0 0.0625rem 0.0625rem color-mix(in oklch, var(--color-pine) 4%, transparent);
+  --shadow-button-hover:
+    0 0 0 0.0625rem color-mix(in oklch, var(--color-pine) 6%, transparent),
+    0 0.125rem 0.375rem -0.0625rem color-mix(in oklch, var(--color-pine) 8%, transparent);
+  --shadow-primary: 0 0.0625rem 0.125rem color-mix(in oklch, var(--color-pine) 12%, transparent);
+  --shadow-primary-hover: 0 0.125rem 0.375rem -0.0625rem color-mix(in oklch, var(--color-pine) 18%, transparent);
+
+  /* Motion de Cashmere (perfil estándar): lo leen las clases transition-* y ease-*. */
+  --transition-duration-fast: 150ms;
+  --transition-duration-base: 200ms;
+  --transition-duration-slow: 280ms;
+  --ease-out: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --default-transition-duration: var(--transition-duration-fast);
+  --default-transition-timing-function: var(--ease-out);
+
+  /* Lienzo del marco autenticado: gris salvia medio, para que las cards y el sidebar blancos se despeguen. */
+  --canvas: var(--color-sage-100);
+
+  /* Sidebar del marco: pastillas blancas sobre el lienzo; hover en verde campo claro y el activo en pine pleno
+     (el círculo oscuro de la referencia). Para probar otra paleta se cambian solo estas variables. */
+  --sidebar: #ffffff;
+  --sidebar-foreground: var(--color-sage-600);
+  --sidebar-label: var(--color-sage-500);
+  --sidebar-primary: var(--color-pine);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: var(--color-field-900);
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: var(--color-field-900);
-  --sidebar-ring: var(--color-field-300);
+  --sidebar-accent: var(--color-field-100);
+  --sidebar-accent-foreground: var(--color-field-800);
+  --sidebar-border: var(--color-sage-200);
+  --sidebar-ring: var(--color-field-700);
 }
 
 @theme inline {
@@ -199,6 +231,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
@@ -209,14 +242,27 @@
   --color-fill-caution: var(--fill-caution);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-input-border: var(--input-border);
   --color-ring: var(--ring);
+  --color-pop-green: var(--pop-green);
+  --color-pop-green-foreground: var(--pop-green-foreground);
+  --color-pop-orange: var(--pop-orange);
+  --color-pop-orange-foreground: var(--pop-orange-foreground);
+  --color-pop-yellow: var(--pop-yellow);
+  --color-pop-yellow-foreground: var(--pop-yellow-foreground);
+  --color-pop-blue: var(--pop-blue);
+  --color-pop-blue-foreground: var(--pop-blue-foreground);
+  --color-pop-purple: var(--pop-purple);
+  --color-pop-purple-foreground: var(--pop-purple-foreground);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-canvas: var(--canvas);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-label: var(--sidebar-label);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
@@ -224,16 +270,51 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 0.5rem);
+  --radius-md: calc(var(--radius) - 0.25rem);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-xl: calc(var(--radius) + 0.375rem);
+  --radius-2xl: calc(var(--radius) + 0.75rem);
+  --radius-3xl: calc(var(--radius) + 1.5rem);
+
+  --shadow-s: var(--shadow-s);
+  --shadow-m: var(--shadow-m);
+  --shadow-l: var(--shadow-l);
+  --shadow-inset: var(--shadow-inset);
+  --shadow-button: var(--shadow-button);
+  --shadow-button-hover: var(--shadow-button-hover);
+  --shadow-primary: var(--shadow-primary);
+  --shadow-primary-hover: var(--shadow-primary-hover);
 }
 
 @layer base {
   * {
     border-color: var(--border);
+  }
+
+  /* Base de Cashmere: selección con el color de acción, textarea que crece con el contenido y gutter
+     estable para que la página no salte cuando aparece la barra de scroll o se abre un diálogo. */
+  ::selection {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+  textarea {
+    resize: vertical;
+  }
+  @supports (field-sizing: content) {
+    textarea {
+      field-sizing: content;
+      max-height: 20lh;
+      overflow-y: auto;
+    }
+  }
+  html {
+    scrollbar-gutter: stable;
+  }
+  @supports (scrollbar-gutter: stable) {
+    html body[data-scroll-locked] {
+      margin-right: 0 !important;
+    }
   }
 }
 
@@ -264,135 +345,12 @@ body {
   h6 { font-size: 16px; line-height: 24px; font-weight: 600; }
 }
 
-/* Cifras (qq/ha, $/ha, fechas) */
+/* Cifras (qq/ha, $/ha, fechas): Inter con números tabulares, para que las columnas alineen. */
 @utility text-figure {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
   font-size: 16px;
   line-height: 24px;
   font-weight: 500;
 }
 
-/* Display: titular de pantallas de entrada (tracking apretado). Más grande que heading-xl. */
-@utility text-display {
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  line-height: 1;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-}
-
-/* Overline: rótulos de sección en mayúsculas */
-@utility text-overline {
-  font-size: 13px;
-  line-height: 16px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-/* Deriva lenta del fondo animado del login (solo transform: barato y sin layout) */
-@keyframes agro-drift {
-  from {
-    transform: translate3d(-2.5%, 1.5%, 0) scale(1.03);
-  }
-  to {
-    transform: translate3d(2.5%, -1.5%, 0) scale(1.08);
-  }
-}
-
-.agro-drift {
-  animation: agro-drift 18s ease-in-out infinite alternate;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .agro-drift {
-    animation: none;
-  }
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   ESCALA DE CONTROLES AGRONEXO (regla global)
-   shadcn trae controles compactos (h-8). AgroNexo usa alturas más cómodas y semibold. En vez de
-   retocar cada componente, se fija acá por `data-slot`/`data-size` (los emiten los componentes
-   oficiales). Va SIN @layer a propósito: le gana a las utilidades de Tailwind (h-8, px-2.5…).
-   Alturas: xs 28 · sm 36 · default 44 · lg 48; inputs/selects 48.
-   ───────────────────────────────────────────────────────────────────────────── */
-[data-slot='input'],
-[data-slot='native-select'],
-[data-slot='number-field-group'],
-[data-slot='phone-country'],
-[data-slot='input-group']:not(:has(> [data-align^='block'], > textarea)) {
-  height: 3rem;
-}
-[data-slot='input'],
-[data-slot='native-select'] {
-  padding-inline-start: 0.875rem;
-}
-/* 16px siempre: shadcn baja a 14px en md+, chico para el público de AgroNexo. También evita el zoom de iOS.
-   `input-group-control` es el `data-slot` que usa InputGroupInput (correo/contraseña con ícono). */
-[data-slot='input'],
-[data-slot='input-group-control'],
-[data-slot='native-select'] {
-  font-size: 1rem;
-}
-[data-slot='native-select'] {
-  padding-inline-end: 2.25rem;
-}
-[data-slot='native-select'][data-size='sm'] {
-  height: 2.25rem;
-}
-
-[data-slot='button'] {
-  font-weight: 600;
-}
-[data-slot='button'][data-size='default'] {
-  height: 2.75rem;
-  padding-inline: 1.25rem;
-  gap: 0.5rem;
-  font-size: 1rem;
-}
-[data-slot='button'][data-size='lg'] {
-  height: 3rem;
-  padding-inline: 1.5rem;
-  gap: 0.5rem;
-  font-size: 1rem;
-}
-[data-slot='button'][data-size='sm'] {
-  height: 2.25rem;
-  padding-inline: 1rem;
-  font-size: 0.875rem;
-}
-[data-slot='button'][data-size='xs'] {
-  height: 1.75rem;
-  padding-inline: 0.625rem;
-}
-[data-slot='button'][data-size='icon'] {
-  width: 2.75rem;
-  height: 2.75rem;
-  padding: 0;
-}
-[data-slot='button'][data-size='icon-lg'] {
-  width: 3rem;
-  height: 3rem;
-  padding: 0;
-}
-[data-slot='button'][data-size='icon-sm'] {
-  width: 2.25rem;
-  height: 2.25rem;
-  padding: 0;
-}
-[data-slot='button'][data-size='icon-xs'] {
-  width: 1.75rem;
-  height: 1.75rem;
-  padding: 0;
-}
-/* Botón de ícono dentro de un campo (ojo de contraseña): 44px de área táctil en vez de 28px. */
-[data-slot='input-group'] [data-slot='button'][data-size='icon-xs'] {
-  width: 2.75rem;
-  height: 2.75rem;
-}
-[data-slot='button']:has([data-icon='inline-start']) {
-  padding-inline-start: 1rem;
-}
-[data-slot='button']:has([data-icon='inline-end']) {
-  padding-inline-end: 1rem;
-}

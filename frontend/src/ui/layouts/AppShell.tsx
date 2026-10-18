@@ -1,22 +1,27 @@
 import type { ReactNode } from 'react';
 
 interface AppShellProps {
-  /** Barra lateral: se muestra desde `lg`. */
+  /** Encabezado fijo arriba, a todo el ancho. */
+  header: ReactNode;
+  /** Barra lateral: se muestra desde `lg`, debajo del encabezado. En celular vive en el panel del menú. */
   sidebar: ReactNode;
-  /** Encabezado para celular y tablet: se oculta desde `lg`, donde la navegación vive en la barra lateral. */
-  header?: ReactNode;
   children: ReactNode;
 }
 
-/** Marco de las pantallas autenticadas: barra lateral fija a la izquierda y el contenido sobre el lienzo. */
-export default function AppShell({ sidebar, header, children }: AppShellProps) {
+/**
+ * Marco de las pantallas autenticadas (estructura de la referencia del tablero): lienzo gris, encabezado arriba y la
+ * columna de pastillas del sidebar a la izquierda, fija mientras el contenido scrollea.
+ */
+export default function AppShell({ header, sidebar, children }: AppShellProps) {
   return (
-    <div className="lg:grid lg:min-h-[100dvh] lg:grid-cols-[256px_minmax(0,1fr)]">
-      {/* Por encima del brillo de fondo (`BrandGlow` es fixed) para que la barra quede limpia. */}
-      <div className="relative z-20 hidden lg:block">{sidebar}</div>
-      <div className="min-w-0">
-        {header && <div className="contents lg:hidden">{header}</div>}
-        {children}
+    <div className="bg-canvas min-h-[100dvh]">
+      {header}
+      <div className="flex gap-6 px-4 pb-6 sm:px-6">
+        {/* z-20: por encima de los brillos `fixed` de algunas pantallas (BrandGlow en Buscar). */}
+        <div className="sticky top-19 z-20 hidden h-[calc(100dvh-6.25rem)] shrink-0 self-start lg:block">
+          {sidebar}
+        </div>
+        <div className="min-w-0 flex-1">{children}</div>
       </div>
     </div>
   );

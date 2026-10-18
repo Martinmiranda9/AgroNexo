@@ -13,11 +13,11 @@ const SIZES = {
 } as const;
 
 const TONES = {
-  tint: 'bg-beige-dark text-olive',
-  solid: 'bg-pine text-beige',
+  tint: 'bg-sage-100 text-sage-600',
+  solid: 'bg-pine text-sage-50',
 } as const;
 
-/** Contenedor circular para iconos (Phosphor), tamaños fijos. */
+/** Contenedor circular para iconos (Material de react-icons), tamaños fijos. */
 export default function IconContainer({ size = 'md', tone = 'tint', className, children, ...props }: IconContainerProps) {
   return (
     <span

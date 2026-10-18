@@ -1,34 +1,35 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useController, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { EnvelopeSimple, Eye, EyeSlash, WarningCircle } from '@phosphor-icons/react';
+import { MdErrorOutline } from 'react-icons/md';
 import {
+  Alert,
+  AlertDescription,
   Button,
   Field,
   FieldError,
-  FieldGroup,
   FieldLabel,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
+  PasswordInput,
+  Separator,
   Spinner,
 } from '@/ui/components';
 import BrandMark from '@/ui/components/BrandMark';
+import EmailField from '@/ui/components/EmailField';
 import GoogleButton from '@/ui/components/GoogleButton';
 import { AUTH_CONTINUE_PATH } from '@/core/auth/config';
-import { firebaseErrorMessage, isUserCancelled, signInWithEmail, signInWithGoogle } from '@/core/auth/firebase-actions';
+import {
+  firebaseErrorMessage,
+  isUserCancelled,
+  signInWithEmail,
+  signInWithGoogle,
+} from '@/core/auth/firebase-actions';
 import BrandShowcasePanel from './BrandShowcasePanel';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// AGRONEXO BRAND SYSTEM — PALETA v4 "VERDE CAMPO" (ver globals.css y el plan de frontend)
-// Columna del formulario en blanco · panel de marca en pine · texto pine con secundario sage-600
-// Acción principal en verde campo 700 (bg-primary) · bordes de control sage-400
-// ─────────────────────────────────────────────────────────────────────────────
+// Login con Cashmere (paleta v4 e Inter): columna del formulario en blanco y panel de marca en pine.
 
 const COPY = {
   title: 'Bienvenido a AgroNexo',
@@ -54,18 +55,22 @@ const ERROR_MESSAGES: Record<string, string> = {
  * Firebase con el SDK de cliente: sin redirección a una pantalla ajena, el formulario es el nuestro.
  */
 export default function AgroNexoAuthModal({ error }: { error?: string }) {
-  const emailId = useId();
   const passwordId = useId();
-  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
+  } = useForm<LoginValues>({ resolver: zodResolver(loginSchema), defaultValues: { email: '' } });
+  const { field: emailField } = useController({ name: 'email', control });
   const [formError, setFormError] = useState<string>();
   const [googleLoading, setGoogleLoading] = useState(false);
   const copy = COPY;
-  const errorMessage = formError ?? (error ? (ERROR_MESSAGES[error] ?? 'Ocurrió un error al ingresar. Probá de nuevo.') : undefined);
+  const errorMessage =
+    formError ??
+    (error
+      ? (ERROR_MESSAGES[error] ?? 'Ocurrió un error al ingresar. Probá de nuevo.')
+      : undefined);
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
@@ -90,8 +95,8 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
   };
 
   return (
-    <div className="flex min-h-[100dvh] w-full flex-col bg-bg-card text-pine md:flex-row">
-      <section className="flex min-h-[100dvh] w-full flex-col px-8 pb-8 pt-10 sm:px-12 md:w-[46%] md:px-14 lg:px-20">
+    <div className="bg-card text-foreground flex min-h-[100dvh] w-full flex-col md:flex-row">
+      <section className="flex min-h-[100dvh] w-full flex-col px-8 pt-10 pb-8 sm:px-12 md:w-[46%] md:px-14 lg:px-20">
         <div className="mx-auto flex w-full max-w-[380px] flex-1 flex-col justify-center text-center">
           <div className="mb-8 flex flex-col items-center text-center">
             <Link
@@ -101,96 +106,76 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
             >
               <BrandMark variant="light" tile className="h-full w-full" />
             </Link>
-            <h1 className="text-heading-lg tracking-heading text-pine">
-              {copy.title}
-            </h1>
-            <p className="mt-2 text-body-sm text-olive">{copy.subtitle}</p>
+            <h1 className="text-heading-lg tracking-heading">{copy.title}</h1>
+            <p className="text-body-sm text-muted-foreground mt-2">{copy.subtitle}</p>
           </div>
 
           {errorMessage && (
-            <p
-              role="alert"
-              className="mb-4 flex items-start gap-2 rounded-lg border border-danger/30 bg-danger/5 px-3.5 py-3 text-body-sm text-danger"
-            >
-              <WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" />
-              {errorMessage}
-            </p>
+            <Alert variant="destructive" className="mb-4 text-left">
+              <MdErrorOutline aria-hidden />
+              <AlertDescription className="text-destructive">{errorMessage}</AlertDescription>
+            </Alert>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} noValidate className="text-left">
-            <FieldGroup className="gap-3.5">
-              <Field data-invalid={errors.email ? true : undefined}>
-                <FieldLabel htmlFor={emailId}>Correo</FieldLabel>
-                <InputGroup>
-                  <InputGroupAddon>
-                    <EnvelopeSimple />
-                  </InputGroupAddon>
-                  <InputGroupInput
-                    id={emailId}
-                    type="email"
-                    autoComplete="email"
-                    inputMode="email"
-                    placeholder="tu@correo.com"
-                    aria-invalid={!!errors.email}
-                    {...register('email')}
-                  />
-                </InputGroup>
-                <FieldError>{errors.email?.message}</FieldError>
-              </Field>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            className="flex flex-col gap-4 text-left"
+          >
+            <EmailField
+              name={emailField.name}
+              value={emailField.value}
+              onChange={emailField.onChange}
+              error={errors.email?.message}
+            />
 
-              <Field data-invalid={errors.password ? true : undefined}>
-                <FieldLabel htmlFor={passwordId}>Contraseña</FieldLabel>
-                <InputGroup>
-                  <InputGroupInput
-                    id={passwordId}
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="current-password"
-                    placeholder="••••••••"
-                    aria-invalid={!!errors.password}
-                    {...register('password')}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      size="icon-xs"
-                      aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                      className="text-neutral-warm hover:text-pine"
-                      onClick={() => setShowPassword((v) => !v)}
-                    >
-                      {showPassword ? <EyeSlash /> : <Eye />}
-                    </InputGroupButton>
-                  </InputGroupAddon>
-                </InputGroup>
-                <FieldError>{errors.password?.message}</FieldError>
-                <Link
-                  href="/forgot-password"
-                  className="self-end py-1.5 text-body-sm font-medium text-olive underline-offset-4 transition-colors hover:text-pine hover:underline"
-                >
-                  Olvidé mi contraseña
-                </Link>
-              </Field>
-
-              <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-                {isSubmitting && <Spinner data-icon="inline-start" />}
-                {copy.emailCta}
+            <Field data-invalid={errors.password ? true : undefined}>
+              <FieldLabel htmlFor={passwordId}>Contraseña</FieldLabel>
+              <PasswordInput
+                id={passwordId}
+                autoComplete="current-password"
+                placeholder="••••••••"
+                aria-invalid={!!errors.password}
+                {...register('password')}
+              />
+              <FieldError>{errors.password?.message}</FieldError>
+              <Button
+                asChild
+                variant="link"
+                size="sm"
+                className="text-muted-foreground self-end px-0"
+              >
+                <Link href="/forgot-password">Olvidé mi contraseña</Link>
               </Button>
-            </FieldGroup>
+            </Field>
+
+            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+              {isSubmitting && <Spinner data-icon="inline-start" />}
+              {copy.emailCta}
+            </Button>
           </form>
 
           <div className="my-6 flex items-center gap-3" aria-hidden="true">
-            <div className="h-px flex-1 bg-pine/10" />
-            <span className="text-caption font-medium uppercase tracking-widest text-olive">o</span>
-            <div className="h-px flex-1 bg-pine/10" />
+            <Separator className="flex-1" />
+            <span className="text-body-sm text-muted-foreground">o</span>
+            <Separator className="flex-1" />
           </div>
 
           <GoogleButton loading={googleLoading} onClick={handleGoogle} />
 
-          <p className="mt-8 text-body-sm text-olive">
+          <p className="text-body-sm text-muted-foreground mt-8">
             Al continuar aceptás la{' '}
-            <Link href="/privacy" className="text-olive underline underline-offset-2 transition-colors hover:text-pine">
+            <Link
+              href="/privacy"
+              className="hover:text-foreground underline underline-offset-2 transition-colors"
+            >
               Política de Privacidad
             </Link>{' '}
             y los{' '}
-            <Link href="/terms" className="text-olive underline underline-offset-2 transition-colors hover:text-pine">
+            <Link
+              href="/terms"
+              className="hover:text-foreground underline underline-offset-2 transition-colors"
+            >
               Términos de Servicio
             </Link>
             .
@@ -198,14 +183,11 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
         </div>
 
         <footer className="mt-auto pt-8 text-center">
-          <p className="text-body-sm text-olive">
+          <p className="text-body-sm text-muted-foreground">
             {copy.footerText}{' '}
-            <Link
-              href={copy.footerHref}
-              className="font-semibold text-pine underline underline-offset-4 transition-colors hover:text-olive"
-            >
-              {copy.footerLink}
-            </Link>
+            <Button asChild variant="link" size="sm" className="px-1 font-semibold">
+              <Link href={copy.footerHref}>{copy.footerLink}</Link>
+            </Button>
           </p>
         </footer>
       </section>

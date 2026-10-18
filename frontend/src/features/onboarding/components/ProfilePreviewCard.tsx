@@ -1,31 +1,31 @@
 'use client';
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import type { IconType } from 'react-icons';
 import {
-  Briefcase,
-  Clock,
-  Compass,
-  IdentificationBadge,
-  Leaf,
-  MagnifyingGlass,
-  MapPin,
-  SealCheck,
-  UserCircle,
-  WhatsappLogo,
-} from '@phosphor-icons/react';
-import type { Icon } from '@phosphor-icons/react';
+  MdOutlineAccountCircle,
+  MdOutlineBadge,
+  MdOutlineEco,
+  MdOutlineExplore,
+  MdOutlinePlace,
+  MdOutlineSchedule,
+  MdOutlineWorkOutline,
+  MdSearch,
+  MdVerified,
+  MdWhatsapp,
+} from 'react-icons/md';
 import type { PreviewData, PreviewIcon } from '../config/types';
 
-const ICONS: Record<PreviewIcon, Icon> = {
-  map: MapPin,
-  briefcase: Briefcase,
-  clock: Clock,
-  users: UserCircle,
-  leaf: Leaf,
-  compass: Compass,
-  phone: WhatsappLogo,
-  badge: IdentificationBadge,
-  search: MagnifyingGlass,
+const ICONS: Record<PreviewIcon, IconType> = {
+  map: MdOutlinePlace,
+  briefcase: MdOutlineWorkOutline,
+  clock: MdOutlineSchedule,
+  users: MdOutlineAccountCircle,
+  leaf: MdOutlineEco,
+  compass: MdOutlineExplore,
+  phone: MdWhatsapp,
+  badge: MdOutlineBadge,
+  search: MdSearch,
 };
 
 const initials = (name?: string) =>
@@ -37,7 +37,7 @@ const initials = (name?: string) =>
     .join('');
 
 const Skeleton = ({ className }: { className: string }) => (
-  <span className={`block h-2 rounded-full bg-beige/10 ${className}`} aria-hidden />
+  <span className={`bg-sage-50/10 block h-2 rounded-full ${className}`} aria-hidden />
 );
 
 /** Ilustración del panel derecho: el perfil se va completando a medida que avanza el registro. */
@@ -45,19 +45,28 @@ export default function ProfilePreviewCard({ data }: { data: PreviewData }) {
   const reduce = useReducedMotion();
   const fade = reduce
     ? {}
-    : { initial: { opacity: 0, y: 4 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0 }, transition: { duration: 0.25 } };
+    : {
+        initial: { opacity: 0, y: 4 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0 },
+        transition: { duration: 0.25 },
+      };
 
   return (
-    <div className="w-[300px] rounded-xl border border-beige/10 bg-beige/[0.04] p-6 backdrop-blur-sm xl:w-[340px]">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-beige/10 text-body-lg font-semibold text-beige">
-        {initials(data.name) || <UserCircle size={28} weight="light" className="text-beige/50" />}
+    <div className="border-sage-50/10 bg-sage-50/[0.04] w-[300px] rounded-xl border p-6 backdrop-blur-sm xl:w-[340px]">
+      <div className="bg-sage-50/10 text-body-lg text-sage-50 mx-auto flex h-16 w-16 items-center justify-center rounded-xl font-semibold">
+        {initials(data.name) || <MdOutlineAccountCircle size={28} className="text-sage-50/50" />}
       </div>
 
       <div className="mt-4 flex min-h-6 items-center justify-center gap-1.5">
         {data.name ? (
           <>
-            <span className="truncate text-body-sm font-medium text-beige">{data.name}</span>
-            <SealCheck size={16} weight="fill" className="shrink-0 text-accent-light" aria-label="Perfil verificado" />
+            <span className="text-body-sm text-sage-50 truncate font-medium">{data.name}</span>
+            <MdVerified
+              size={16}
+              className="text-field-300 shrink-0"
+              aria-label="Perfil verificado"
+            />
           </>
         ) : (
           <Skeleton className="w-28" />
@@ -68,7 +77,7 @@ export default function ProfilePreviewCard({ data }: { data: PreviewData }) {
         <motion.span
           key={data.badge}
           {...fade}
-          className="mx-auto mt-2 block w-fit rounded-full bg-beige/10 px-2.5 py-0.5 text-caption font-medium text-beige/80"
+          className="bg-sage-50/10 text-caption text-sage-50/80 mx-auto mt-2 block w-fit rounded-full px-2.5 py-0.5 font-medium"
         >
           {data.badge}
         </motion.span>
@@ -79,10 +88,13 @@ export default function ProfilePreviewCard({ data }: { data: PreviewData }) {
           const RowIcon = ICONS[row.icon];
           return (
             <li key={i} className="flex h-5 items-center gap-2.5">
-              <RowIcon size={14} className={row.text ? 'shrink-0 text-accent-light' : 'shrink-0 text-beige/25'} />
+              <RowIcon
+                size={14}
+                className={row.text ? 'text-field-300 shrink-0' : 'text-sage-50/25 shrink-0'}
+              />
               <AnimatePresence mode="wait" initial={false}>
                 {row.text ? (
-                  <motion.span key="text" {...fade} className="truncate text-caption text-beige/80">
+                  <motion.span key="text" {...fade} className="text-caption text-sage-50/80 truncate">
                     {row.text}
                   </motion.span>
                 ) : (

@@ -4,13 +4,13 @@ import { useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'motion/react';
 import {
-  ArrowRightIcon,
-  CaretDownIcon,
-  CheckIcon,
-  PencilSimpleIcon,
-  WarningCircleIcon,
-  XIcon,
-} from '@phosphor-icons/react';
+  MdArrowForward,
+  MdCheck,
+  MdClose,
+  MdErrorOutline,
+  MdKeyboardArrowDown,
+  MdOutlineEdit,
+} from 'react-icons/md';
 import type { CreateMatchResult, NeedBrief } from '@/core/models/match.model';
 import { ROUTES } from '@/shared/constants/routes';
 import { cn } from '@/shared/utils/cn';
@@ -57,7 +57,7 @@ type Sent = 'created' | 'conflict';
 const HEADER = 'relative px-6 pt-6 pb-4 text-left group-data-[swipe-axis=y]/drawer-popup:text-left';
 const BODY = 'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 pb-6';
 const FOOTER =
-  'border-border bg-surface mt-0 flex-col-reverse gap-2 border-t px-6 py-4 sm:flex-row sm:justify-end';
+  'border-border bg-card mt-0 flex-col-reverse gap-2 border-t px-6 py-4 sm:flex-row sm:justify-end';
 
 /**
  * En escritorio el panel entra desde la derecha como una card flotante (separada del borde, con radio de bisel) y
@@ -102,7 +102,7 @@ function CloseButton() {
         />
       }
     >
-      <XIcon size={16} aria-hidden />
+      <MdClose size={16} aria-hidden />
     </DrawerClose>
   );
 }
@@ -127,17 +127,17 @@ function SentView({
           initial={reduceMotion ? false : { scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-          className="bg-pine text-beige flex size-16 items-center justify-center rounded-full"
+          className="bg-pine text-sage-50 flex size-16 items-center justify-center rounded-full"
         >
-          <CheckIcon size={32} weight="bold" aria-hidden />
+          <MdCheck size={32} aria-hidden />
         </motion.span>
 
-        <DrawerTitle className="text-heading-md tracking-heading text-pine max-w-[22ch] text-balance">
+        <DrawerTitle className="max-w-[22ch] text-balance">
           {sent === 'created'
             ? `Listo, le enviamos tu solicitud a ${fullName(r)}`
             : `Ya le habías enviado una solicitud a ${fullName(r)}`}
         </DrawerTitle>
-        <DrawerDescription className="text-body text-dark max-w-[40ch]">
+        <DrawerDescription className="max-w-[40ch]">
           {sent === 'created'
             ? `Cuando ${r.firstName} responda, lo vas a ver en Mis solicitudes.`
             : `Sigue esperando respuesta. La podés seguir en Mis solicitudes.`}
@@ -150,7 +150,7 @@ function SentView({
         </Button>
         <Button render={<Link href={ROUTES.matches} />} nativeButton={false} size="lg">
           Ver mis solicitudes
-          <ArrowRightIcon data-icon="inline-end" size={16} weight="bold" aria-hidden />
+          <MdArrowForward data-icon="inline-end" size={16} aria-hidden />
         </Button>
       </DrawerFooter>
     </>
@@ -201,10 +201,8 @@ function RequestForm({
   return (
     <>
       <DrawerHeader className={HEADER}>
-        <DrawerTitle className="text-heading-sm tracking-heading text-pine pr-10">
-          Solicitar match con {fullName(r)}
-        </DrawerTitle>
-        <DrawerDescription className="text-body-sm text-dark">
+        <DrawerTitle className="pr-10">Solicitar match con {fullName(r)}</DrawerTitle>
+        <DrawerDescription>
           Esto es lo que le va a llegar a {r.firstName}. Revisalo antes de enviarlo.
         </DrawerDescription>
         <CloseButton />
@@ -232,12 +230,11 @@ function RequestForm({
               />
             }
           >
-            <PencilSimpleIcon data-icon="inline-start" size={16} aria-hidden />
+            <MdOutlineEdit data-icon="inline-start" size={16} aria-hidden />
             Editar mensaje
-            <CaretDownIcon
+            <MdKeyboardArrowDown
               data-icon="inline-end"
               size={14}
-              weight="bold"
               aria-hidden
               className="transition-transform group-data-panel-open/button:rotate-180"
             />
@@ -258,7 +255,7 @@ function RequestForm({
               aria-busy={composing}
               disabled={pending}
             />
-            <p id="need-brief-summary-hint" className="text-caption text-olive" aria-live="polite">
+            <p id="need-brief-summary-hint" className="text-caption text-sage-600" aria-live="polite">
               {hint}
             </p>
           </CollapsibleContent>
@@ -268,7 +265,7 @@ function RequestForm({
 
         {failure && (
           <Alert variant="destructive" role="alert">
-            <WarningCircleIcon aria-hidden />
+            <MdErrorOutline aria-hidden />
             <AlertDescription>{FAILURE_COPY[failure]}</AlertDescription>
           </Alert>
         )}
@@ -287,7 +284,7 @@ function RequestForm({
           loadingText="Enviando solicitud…"
         >
           Enviar solicitud
-          <ArrowRightIcon data-icon="inline-end" size={16} weight="bold" aria-hidden />
+          <MdArrowForward data-icon="inline-end" size={16} aria-hidden />
         </Button>
       </DrawerFooter>
     </>
@@ -332,10 +329,7 @@ export default function MatchRequestDialog({
     >
       <DrawerContent
         style={right ? RIGHT_PANEL_STYLE : undefined}
-        className={cn(
-          'bg-surface',
-          right && 'rounded-shell border-pine/10 ring-pine/5 border ring-4'
-        )}
+        className={cn(right && 'rounded-2xl border')}
       >
         {view &&
           (sent ? (

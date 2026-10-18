@@ -71,11 +71,11 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
 
   return (
     <AppLayout user={user}>
-      <div className="bg-paper relative min-h-[100dvh]">
+      <div className="relative">
         <BrandGlow quiet={phase === 'results'} />
 
         <div className="relative z-10">
-          <main className="mx-auto max-w-[1180px] px-4 pb-16 sm:px-6">
+          <main className="mx-auto max-w-[1180px] pb-16">
             <AnimatePresence mode="wait" initial={false}>
               {phase === 'describe' && (
                 <motion.div key="describe" {...fade}>
@@ -104,7 +104,7 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
                     steps={SEARCH_STEPS}
                     glyph="sparkle"
                     fontSize={14}
-                    className="text-olive mb-5"
+                    className="text-sage-600 mb-5"
                   />
                   <NeedSummary
                     need={need}
@@ -149,7 +149,7 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
           showSwipeHandle
         >
           <DrawerContent
-            className="bg-surface"
+            className="bg-card"
             aria-labelledby={selected ? detailTitleId(selected.recommendation.id) : undefined}
           >
             {selected && (

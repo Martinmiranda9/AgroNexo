@@ -11,13 +11,14 @@ import {
   Input,
   NativeSelect,
   NativeSelectOption,
-  NumberField,
+  NumberInput,
   PhoneInput,
 } from '@/ui/components';
 import PasswordField from './PasswordField';
 import type { FieldDef, FormValues } from '../config/types';
 import { joinMulti, parseMulti } from '../lib/values';
 import type { FieldErrors } from '../lib/validation';
+import EmailField from '@/ui/components/EmailField';
 
 // country-state-city pesa bastante: se carga solo en los pasos que lo usan.
 // El skeleton reserva 3 filas (el máximo: país + provincia + ciudad) para que al llegar los
@@ -28,7 +29,7 @@ const LocationFields = dynamic(() => import('./LocationFields'), {
     <div className="flex flex-col gap-4" aria-hidden>
       {[0, 1, 2].map((i) => (
         // 74px ≈ altura real de un campo con label (ver ui/components/NativeSelect.tsx).
-        <div key={i} className="h-[74px] animate-pulse rounded-lg bg-pine/5" />
+        <div key={i} className="bg-pine/5 h-[74px] animate-pulse rounded-lg" />
       ))}
     </div>
   ),
@@ -49,7 +50,15 @@ export default function StepFields({ fields, values, errors, onChange }: StepFie
     <div className="flex flex-col gap-4">
       {fields.map((field, i) => {
         if (field.kind === 'location') {
-          return <LocationFields key={`location-${i}`} field={field} values={values} errors={errors} onChange={onChange} />;
+          return (
+            <LocationFields
+              key={`location-${i}`}
+              field={field}
+              values={values}
+              errors={errors}
+              onChange={onChange}
+            />
+          );
         }
 
         const id = `${baseId}-${field.name}`;
@@ -62,7 +71,9 @@ export default function StepFields({ fields, values, errors, onChange }: StepFie
         const footer = (
           <>
             <FieldError id={errorId}>{error}</FieldError>
-            {field.hint && !error && field.kind !== 'choice' && <FieldDescription id={hintId}>{field.hint}</FieldDescription>}
+            {field.hint && !error && field.kind !== 'choice' && (
+              <FieldDescription id={hintId}>{field.hint}</FieldDescription>
+            )}
           </>
         );
 
@@ -79,7 +90,9 @@ export default function StepFields({ fields, values, errors, onChange }: StepFie
                   value={values[field.name] ?? ''}
                   onChange={(e) => onChange({ [field.name]: e.target.value })}
                 >
-                  {field.placeholder && <NativeSelectOption value="">{field.placeholder}</NativeSelectOption>}
+                  {field.placeholder && (
+                    <NativeSelectOption value="">{field.placeholder}</NativeSelectOption>
+                  )}
                   {field.options.map((o) => (
                     <NativeSelectOption key={o.value} value={o.value}>
                       {o.label}
@@ -101,45 +114,38 @@ export default function StepFields({ fields, values, errors, onChange }: StepFie
             );
           case 'email':
             return (
-              <Field key={field.name} data-invalid={error ? true : undefined}>
-                <FieldLabel htmlFor={id}>{field.label}</FieldLabel>
-                <Input
-                  id={id}
-                  type="email"
-                  inputMode="email"
-                  placeholder={field.placeholder}
-                  autoComplete={field.autoComplete}
-                  maxLength={254}
-                  disabled={field.readOnly}
-                  aria-invalid={!!error}
-                  aria-describedby={describedBy}
-                  value={values[field.name] ?? ''}
-                  onChange={(e) => onChange({ [field.name]: e.target.value })}
-                />
-                {footer}
-              </Field>
+              <EmailField
+                key={field.name}
+                id={id}
+                label={field.label}
+                placeholder={field.placeholder}
+                autoComplete={field.autoComplete}
+                disabled={field.readOnly}
+                hint={field.hint}
+                error={error}
+                value={values[field.name] ?? ''}
+                onChange={(value) => onChange({ [field.name]: value })}
+              />
             );
           case 'counter': {
             const parsed = Number(values[field.name]);
             return (
-              <NumberField
-                key={field.name}
-                name={field.name}
-                className="w-full max-w-64"
-                minValue={field.min}
-                maxValue={field.max}
-                isInvalid={!!error}
-                value={values[field.name] === '' || !Number.isFinite(parsed) ? NaN : parsed}
-                onChange={(n) => onChange({ [field.name]: Number.isNaN(n) ? '' : String(n) })}
-              >
-                <NumberField.Label>{field.label}</NumberField.Label>
-                <NumberField.Group>
-                  <NumberField.DecrementButton />
-                  <NumberField.Input />
-                  <NumberField.IncrementButton />
-                </NumberField.Group>
+              <Field key={field.name} className="max-w-64" data-invalid={error ? true : undefined}>
+                <FieldLabel htmlFor={id}>{field.label}</FieldLabel>
+                <NumberInput
+                  id={id}
+                  name={field.name}
+                  min={field.min}
+                  max={field.max}
+                  aria-invalid={!!error}
+                  aria-describedby={describedBy}
+                  value={values[field.name] === '' || !Number.isFinite(parsed) ? NaN : parsed}
+                  onValueChange={(n) =>
+                    onChange({ [field.name]: Number.isNaN(n) ? '' : String(n) })
+                  }
+                />
                 {footer}
-              </NumberField>
+              </Field>
             );
           }
           case 'choice':

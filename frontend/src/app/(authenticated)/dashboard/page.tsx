@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { Tray } from '@phosphor-icons/react/dist/ssr';
-import { Avatar, Badge, BrandLogo, Card, buttonVariants } from '@/ui/components';
+import { MdOutlineInbox } from 'react-icons/md';
+import { Badge, BrandLogo, Button, Card, InitialsAvatar } from '@/ui/components';
 import { AppLayout } from '@/features/app-shell';
 import LogoutButton from '@/features/auth/components/LogoutButton';
 import BackendUnavailable from '@/features/auth/components/BackendUnavailable';
@@ -38,9 +38,9 @@ export default async function DashboardPage() {
 
   const content = (
     <div className="mx-auto flex w-full max-w-2xl flex-col items-center px-6 pt-6 pb-16 text-center">
-      <Avatar initials={initialsOf(displayName)} size="lg" />
+      <InitialsAvatar initials={initialsOf(displayName)} size="lg" />
       <h1 className="text-heading-lg tracking-heading text-pine mt-4">Hola, {displayName}</h1>
-      <p className="text-body-sm text-olive mt-2">
+      <p className="text-body-sm text-sage-600 mt-2">
         Tu sesión está activa y tu perfil ya quedó registrado.
       </p>
 
@@ -49,16 +49,16 @@ export default async function DashboardPage() {
         {user.publicId && <Badge variant="secondary">ID #{user.publicId}</Badge>}
       </div>
 
-      <Card className="mt-10 w-full" coreClassName="flex flex-col items-center gap-3 px-6 py-10">
-        <Tray size={32} weight="regular" className="text-olive" aria-hidden />
+      <Card className="mt-10 flex w-full flex-col items-center gap-3 px-6 py-10">
+        <MdOutlineInbox size={32} className="text-sage-600" aria-hidden />
         <p className="text-body text-pine font-medium">Solicitudes de match</p>
-        <p className="text-body-sm text-olive max-w-sm">
+        <p className="text-body-sm text-sage-600 max-w-sm">
           Mirá las solicitudes de los productores que quieren trabajar con vos: la zona, las
           hectáreas, la urgencia y lo que necesitan.
         </p>
-        <Link href={ROUTES.matches} className={cn(buttonVariants({ size: 'lg' }), 'mt-3')}>
-          Ver solicitudes
-        </Link>
+        <Button asChild size="lg" className="mt-3">
+          <Link href={ROUTES.matches}>Ver solicitudes</Link>
+        </Button>
       </Card>
     </div>
   );
@@ -75,13 +75,13 @@ export default async function DashboardPage() {
           avatarUrl: sessionUser.picture,
         }}
       >
-        <main className="bg-paper min-h-[100dvh] w-full lg:pt-8">{content}</main>
+        <main className="w-full pt-4">{content}</main>
       </AppLayout>
     );
   }
 
   return (
-    <main className="bg-beige min-h-[100dvh] w-full">
+    <main className="bg-sage-50 min-h-[100dvh] w-full">
       <header className="flex items-center justify-between px-6 py-5 sm:px-10">
         <BrandLogo />
         <LogoutButton />

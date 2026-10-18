@@ -41,7 +41,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
   throw new ApiError(response.status, STATUS_MESSAGES[response.status] ?? 'Ocurrió un error inesperado.', detail, code);
 }
 
-/** Token JWT de desarrollo (solo entornos no productivos, hasta integrar Auth0). */
+/** Token JWT de desarrollo (solo entornos no productivos). */
 export async function getDevToken(role: 'Producer' | 'Professional', userId: string): Promise<string> {
   const query = new URLSearchParams({ role, userId });
   try {
@@ -54,7 +54,7 @@ export async function getDevToken(role: 'Producer' | 'Professional', userId: str
 }
 
 /**
- * Registra un productor o profesional. En desarrollo, sin token de Auth0,
+ * Registra un productor o profesional. En desarrollo, sin token de Firebase,
  * pide uno de prueba con un usuario único por registro.
  */
 export async function registerUser(data: RegisterUserRequest, token?: string): Promise<RegisterUserResponse> {
@@ -77,7 +77,7 @@ export async function registerUser(data: RegisterUserRequest, token?: string): P
   return handleResponse<RegisterUserResponse>(response);
 }
 
-/** Registro con la sesión de Auth0 (el token lo agrega el proxy del servidor de Next). */
+/** Registro con la sesión de Firebase (el token lo agrega el proxy del servidor de Next). */
 export async function registerWithSession(data: RegisterUserRequest): Promise<RegisterUserResponse> {
   const response = await fetch('/api/identity/register', {
     method: 'POST',

@@ -6,26 +6,27 @@ import { useRender } from '@base-ui/react/use-render';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/shared/utils/cn';
 
+/*
+ * Cashmere Badge (registro `cashmere/badge`): chip redondeado con tinte suave y texto profundo. AgroNexo conserva
+ * sus variantes: los estados van siempre como pill clara (verde/naranja/rojo con texto -ink); `primary` es el
+ * único relleno de marca e `inverse` va sobre pine.
+ */
 const badgeVariants = cva(
-  'group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!',
+  'group/badge inline-flex w-fit shrink-0 items-center gap-1 overflow-hidden rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 [&>svg]:pointer-events-none [&>svg]:size-3!',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground [a]:hover:bg-primary/80',
-        secondary: 'bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80',
-        // Tags de estado (ss-components badge-18 / 16 / 17): positivo, pendiente y negativo.
-        // El texto usa el tono -ink (800) para llegar a 4,5:1; el tinte y el punto siguen en el 600.
-        success:
-          'border-none bg-success/10 text-success-foreground focus-visible:ring-success/20 focus-visible:outline-none dark:focus-visible:ring-success/40 [a]:hover:bg-success/5',
-        warning:
-          'border-none bg-warning/10 text-warning-foreground focus-visible:ring-warning/20 focus-visible:outline-none dark:focus-visible:ring-warning/40 [a]:hover:bg-warning/5',
-        destructive:
-          'border-none bg-destructive/10 text-destructive focus-visible:ring-destructive/20 focus-visible:outline-none dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/5',
-        outline: 'border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground',
-        ghost: 'hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50',
-        link: 'text-primary underline-offset-4 hover:underline',
-        /** AgroNexo: sobre fondos Pine / gradiente. */
-        inverse: 'bg-beige/10 text-beige ring-1 ring-beige/25 backdrop-blur-md',
+        default: 'bg-secondary text-secondary-foreground',
+        primary: 'bg-primary text-primary-foreground',
+        secondary: 'bg-muted text-muted-foreground',
+        outline: 'bg-transparent text-foreground ring-1 ring-inset ring-border',
+        success: 'bg-pop-green text-pop-green-foreground',
+        warning: 'bg-pop-yellow text-pop-yellow-foreground',
+        destructive: 'bg-destructive/10 text-destructive',
+        ghost: 'bg-transparent text-muted-foreground hover:bg-muted',
+        link: 'text-foreground underline-offset-4 hover:underline',
+        /** AgroNexo: sobre fondos pine. */
+        inverse: 'bg-sage-50/10 text-sage-50 ring-1 ring-sage-50/25 backdrop-blur-md',
       },
     },
     defaultVariants: {

@@ -17,9 +17,9 @@ export default function PreviewPanel({ data, stepKey, caption }: PreviewPanelPro
   return (
     <section
       aria-hidden
-      className="relative hidden flex-col items-center overflow-hidden rounded-l-[2.5rem] bg-pine px-12 pb-12 pt-12 md:flex md:w-[54%] xl:rounded-l-[3.5rem] xl:px-16 xl:pb-14"
+      className="bg-pine relative hidden flex-col items-center overflow-hidden rounded-l-[2.5rem] px-12 pt-12 pb-12 md:flex md:w-[54%] xl:rounded-l-[3.5rem] xl:px-16 xl:pb-14"
     >
-      <div className="pointer-events-none absolute inset-0 bg-radial-[at_50%_45%] from-beige/10 to-transparent to-60%" />
+      <div className="from-sage-50/10 pointer-events-none absolute inset-0 bg-radial-[at_50%_45%] to-transparent to-60%" />
 
       <div className="relative flex flex-1 items-center">
         <ProfilePreviewCard data={data} />
@@ -33,7 +33,7 @@ export default function PreviewPanel({ data, stepKey, caption }: PreviewPanelPro
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="text-body-sm text-beige/60"
+            className="text-body-sm text-sage-50/60"
           >
             {caption}
           </motion.p>

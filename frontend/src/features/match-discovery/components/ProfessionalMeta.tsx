@@ -1,9 +1,9 @@
 import {
-  BriefcaseIcon,
-  MapPinIcon,
-  SealCheckIcon,
-  UsersThreeIcon,
-} from '@phosphor-icons/react/dist/ssr';
+  MdOutlineGroups,
+  MdOutlinePlace,
+  MdOutlineVerified,
+  MdOutlineWorkOutline,
+} from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
 import { hasCapacity, type ResultView } from '../lib/build-results';
 
@@ -30,20 +30,20 @@ export default function ProfessionalMeta({
       ? {
           key: 'license',
           label: 'Matrícula',
-          icon: <SealCheckIcon size={iconSize} className="text-success" aria-hidden />,
+          icon: <MdOutlineVerified size={iconSize} className="text-success" aria-hidden />,
           value: 'Matrícula verificada',
         }
       : null,
     {
       key: 'zone',
       label: 'Zona',
-      icon: <MapPinIcon size={iconSize} className="text-olive" aria-hidden />,
+      icon: <MdOutlinePlace size={iconSize} className="text-sage-600" aria-hidden />,
       value: compact ? result.proximityShort : result.proximity,
     },
     {
       key: 'experience',
       label: 'Experiencia',
-      icon: <BriefcaseIcon size={iconSize} className="text-olive" aria-hidden />,
+      icon: <MdOutlineWorkOutline size={iconSize} className="text-sage-600" aria-hidden />,
       value: (
         <>
           <span className="font-mono">{r.yearsExperience}</span>
@@ -54,7 +54,7 @@ export default function ProfessionalMeta({
     {
       key: 'capacity',
       label: 'Cupo',
-      icon: <UsersThreeIcon size={iconSize} className="text-olive" aria-hidden />,
+      icon: <MdOutlineGroups size={iconSize} className="text-sage-600" aria-hidden />,
       value: hasCapacity(r) ? (
         compact ? (
           'Toma clientes'
@@ -75,8 +75,8 @@ export default function ProfessionalMeta({
       className={cn(
         'flex flex-wrap',
         compact
-          ? 'text-caption text-dark gap-x-4 gap-y-1'
-          : 'border-border text-body-sm text-dark gap-x-6 gap-y-2 border-y py-4',
+          ? 'text-caption text-sage-800 gap-x-4 gap-y-1'
+          : 'border-border text-body-sm text-sage-800 gap-x-6 gap-y-2 border-y py-4',
         className
       )}
     >

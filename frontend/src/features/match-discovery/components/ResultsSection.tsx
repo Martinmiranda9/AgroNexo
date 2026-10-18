@@ -1,8 +1,8 @@
-import { InfoIcon, MagnifyingGlassIcon, WarningCircleIcon } from '@phosphor-icons/react/dist/ssr';
+import { MdErrorOutline, MdOutlineInfo, MdSearch } from 'react-icons/md';
 import { ROUTES } from '@/shared/constants/routes';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/Alert';
 import { Button } from '@/ui/components/Button';
-import Card from '@/ui/components/Card';
+import { Card } from '@/ui/components/Card';
 import {
   Empty,
   EmptyContent,
@@ -79,7 +79,7 @@ export default function ResultsSection({
 
       {isSample && (
         <Alert role="note">
-          <InfoIcon aria-hidden />
+          <MdOutlineInfo aria-hidden />
           <AlertTitle>Profesionales de ejemplo</AlertTitle>
           <AlertDescription>
             Estás viendo datos ficticios porque el backend todavía no devolvió profesionales. Solo
@@ -90,7 +90,7 @@ export default function ResultsSection({
 
       {error ? (
         <Alert variant="destructive" role="alert">
-          <WarningCircleIcon aria-hidden />
+          <MdErrorOutline aria-hidden />
           <AlertTitle>{ERROR_COPY[error].title}</AlertTitle>
           <AlertDescription>{ERROR_COPY[error].description}</AlertDescription>
           <div className="col-start-2 mt-3">
@@ -108,7 +108,7 @@ export default function ResultsSection({
       ) : (
         <>
           <div className="flex items-center gap-1.5">
-            <p aria-live="polite" className="text-body-sm text-olive">
+            <p aria-live="polite" className="text-body-sm text-sage-600">
               <span className="text-pine font-mono font-semibold">{results.length}</span>{' '}
               {results.length === 1 ? 'profesional' : 'profesionales'} · primero los que mejor
               encajan
@@ -126,13 +126,11 @@ export default function ResultsSection({
                   />
                 }
               >
-                <InfoIcon size={16} aria-hidden />
+                <MdOutlineInfo size={16} aria-hidden />
               </PopoverTrigger>
-              <PopoverContent align="start" className="bg-surface w-80 p-4">
-                <PopoverTitle className="text-body-sm text-pine font-semibold">
-                  Cómo ordenamos
-                </PopoverTitle>
-                <p className="text-body-sm text-dark">
+              <PopoverContent align="start" className="w-80">
+                <PopoverTitle>Cómo ordenamos</PopoverTitle>
+                <p className="text-body-sm text-sage-800">
                   Arriba van quienes trabajan en lo que pediste, cubren tu zona y tienen lugar.
                   Después pesan, en este orden: cercanía, matrícula verificada, especialidad,
                   experiencia y cupo.
@@ -144,29 +142,31 @@ export default function ResultsSection({
           {refreshing ? (
             <ResultsSkeleton />
           ) : results.length === 0 ? (
-            <Empty className="rounded-card border-border-strong bg-surface/70 border py-14">
-              <EmptyHeader>
-                <EmptyMedia variant="icon" className="bg-secondary text-pine size-10 rounded-full">
-                  <MagnifyingGlassIcon size={20} aria-hidden />
-                </EmptyMedia>
-                <EmptyTitle className="text-body text-pine font-semibold">
-                  Todavía no hay profesionales para esto cerca de {zoneLabel}
-                </EmptyTitle>
-                <EmptyDescription className="text-body-sm text-dark">
-                  Probá con otra profesión, quitá algún tema o contalo de otra forma.
-                </EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent className="flex-row flex-wrap justify-center">
-                {!allRoles && (
-                  <Button type="button" size="lg" onClick={onShowAllRoles}>
-                    Ver todas las profesiones
+            <Card>
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <MdSearch aria-hidden />
+                  </EmptyMedia>
+                  <EmptyTitle>
+                    Todavía no hay profesionales para esto cerca de {zoneLabel}
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    Probá con otra profesión, quitá algún tema o contalo de otra forma.
+                  </EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>
+                  {!allRoles && (
+                    <Button type="button" size="lg" onClick={onShowAllRoles}>
+                      Ver todas las profesiones
+                    </Button>
+                  )}
+                  <Button type="button" variant="outline" size="lg" onClick={onEdit}>
+                    Editar búsqueda
                   </Button>
-                )}
-                <Button type="button" variant="outline" size="lg" onClick={onEdit}>
-                  Editar búsqueda
-                </Button>
-              </EmptyContent>
-            </Empty>
+                </EmptyContent>
+              </Empty>
+            </Card>
           ) : (
             <div className="grid gap-6 lg:grid-cols-[400px_minmax(0,1fr)]">
               <ol className="flex min-w-0 flex-col gap-3">
@@ -192,7 +192,7 @@ export default function ResultsSection({
                     aria-live="polite"
                     className="sticky top-24"
                   >
-                    <Card surface="paper">
+                    <Card>
                       <ProfessionalDetail
                         key={selected.recommendation.id}
                         result={selected}

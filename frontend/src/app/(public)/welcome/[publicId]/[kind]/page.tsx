@@ -22,7 +22,7 @@ export default async function WelcomePage({ params }: WelcomePageProps) {
   const firstName = (current?.status === 'registered' ? current.user.firstName : undefined) ?? user?.firstName;
 
   return (
-    <div className="bg-beige">
+    <div className="bg-sage-50">
       {user && (
         <div className="mx-auto w-full max-w-md px-6 pt-6">
           <VerificationBanner provider={user.provider} />

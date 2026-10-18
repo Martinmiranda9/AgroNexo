@@ -6,10 +6,10 @@ import CampoFigure from './CampoFigure';
 // van rellenas para tapar lo que queda detrás.
 const HAIRLINE_THEME = {
   '--hairline-plate': 'var(--color-pine)',
-  '--hairline-hi': 'var(--color-beige)',
-  '--hairline-edge': 'color-mix(in oklab, var(--color-beige) 62%, var(--color-pine))',
-  '--hairline-mid': 'color-mix(in oklab, var(--color-accent-light) 55%, var(--color-pine))',
-  '--hairline-lo': 'color-mix(in oklab, var(--color-beige) 16%, var(--color-pine))',
+  '--hairline-hi': 'var(--color-sage-50)',
+  '--hairline-edge': 'color-mix(in oklab, var(--color-sage-50) 62%, var(--color-pine))',
+  '--hairline-mid': 'color-mix(in oklab, var(--color-field-300) 55%, var(--color-pine))',
+  '--hairline-lo': 'color-mix(in oklab, var(--color-sage-50) 16%, var(--color-pine))',
   '--hairline-stroke': '1',
 } as CSSProperties;
 
@@ -19,20 +19,20 @@ const HAIRLINE_THEME = {
  */
 export default function BrandShowcasePanel() {
   return (
-    <section className="relative isolate hidden flex-col overflow-hidden rounded-l-[2.5rem] bg-pine px-10 pb-12 pt-10 text-beige md:flex md:w-[54%] xl:rounded-l-[3.5rem] xl:px-14 xl:pb-14 xl:pt-12">
+    <section className="relative isolate hidden flex-col overflow-hidden rounded-l-[2.5rem] bg-pine px-10 pb-12 pt-10 text-sage-50 md:flex md:w-[54%] xl:rounded-l-[3.5rem] xl:px-14 xl:pb-14 xl:pt-12">
       {/* Retícula de puntos muy tenue + glow salvia arriba: da profundidad sin competir con las líneas */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(var(--color-beige)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_45%,black,transparent)]"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(var(--color-sage-50)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_45%,black,transparent)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-96 w-[36rem] -translate-x-1/2 rounded-full bg-accent-light/20 blur-3xl"
+        className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-96 w-[36rem] -translate-x-1/2 rounded-full bg-field-300/20 blur-3xl"
       />
 
       <div className="relative z-10">
         <Badge variant="inverse" className="h-auto gap-1.5 px-3.5 py-1.5 text-caption font-medium tracking-wide">
-          <BadgeDot className="animate-pulse bg-accent-light motion-reduce:animate-none" />
+          <BadgeDot className="animate-pulse bg-field-300 motion-reduce:animate-none" />
           Campaña 25/26
         </Badge>
       </div>
@@ -46,7 +46,7 @@ export default function BrandShowcasePanel() {
 
       <div className="relative z-10 mx-auto flex max-w-md flex-col items-center text-center">
         <h2 className="text-heading-md tracking-heading xl:text-heading-lg">Tu campo, conectado.</h2>
-        <p className="mt-3 max-w-sm text-body-sm text-beige/70">
+        <p className="mt-3 max-w-sm text-body-sm text-sage-50/70">
           Productores, agrónomos y contadores en una misma red. Encontrá al profesional que tu lote necesita.
         </p>
       </div>

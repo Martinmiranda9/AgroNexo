@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { MdCheck, MdErrorOutline } from 'react-icons/md';
 import { toast } from '@/ui/components/Toaster';
 import { updateMatchStatusAction } from '@/core/actions/update-match-status.action';
 import type {
@@ -80,7 +80,7 @@ export default function MatchRequestActions({ matchId, requesterName }: MatchReq
     return (
       <div className="flex flex-col gap-4">
         <Alert variant={answered === 'Active' ? 'success' : 'default'} role="status">
-          <CheckIcon aria-hidden />
+          <MdCheck aria-hidden />
           <AlertTitle>
             {answered === 'Active' ? 'Aceptaste esta solicitud' : 'Rechazaste esta solicitud'}
           </AlertTitle>
@@ -105,7 +105,7 @@ export default function MatchRequestActions({ matchId, requesterName }: MatchReq
     <div className="flex flex-col gap-3">
       {failure && !confirmReject && (
         <Alert variant="destructive" role="alert">
-          <WarningCircleIcon aria-hidden />
+          <MdErrorOutline aria-hidden />
           <AlertDescription>{FAILURE_COPY[failure]}</AlertDescription>
         </Alert>
       )}
@@ -128,30 +128,28 @@ export default function MatchRequestActions({ matchId, requesterName }: MatchReq
           loading={deciding === 'Active'}
           loadingText="Aceptando…"
         >
-          <CheckIcon data-icon="inline-start" size={16} weight="bold" aria-hidden />
+          <MdCheck data-icon="inline-start" size={16} aria-hidden />
           Aceptar
         </Button>
       </div>
 
       <Dialog open={confirmReject} onOpenChange={(open) => !pending && setConfirmReject(open)}>
-        <DialogContent className="bg-surface sm:max-w-md">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-heading-sm tracking-heading text-pine">
-              ¿Rechazar la solicitud de {requesterName}?
-            </DialogTitle>
-            <DialogDescription className="text-body-sm text-dark">
+            <DialogTitle>¿Rechazar la solicitud de {requesterName}?</DialogTitle>
+            <DialogDescription>
               No vas a poder deshacerlo. El productor va a ver que no aceptaste la solicitud.
             </DialogDescription>
           </DialogHeader>
 
           {failure && (
             <Alert variant="destructive" role="alert">
-              <WarningCircleIcon aria-hidden />
+              <MdErrorOutline aria-hidden />
               <AlertDescription>{FAILURE_COPY[failure]}</AlertDescription>
             </Alert>
           )}
 
-          <DialogFooter className="bg-transparent">
+          <DialogFooter>
             <Button
               type="button"
               variant="outline"

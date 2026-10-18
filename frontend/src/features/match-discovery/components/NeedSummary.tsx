@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ClockIcon, MapPinIcon, PencilSimpleIcon, XIcon } from '@phosphor-icons/react';
+import { MdClose, MdOutlineEdit, MdOutlinePlace, MdOutlineSchedule } from 'react-icons/md';
 import type { SearchableRole } from '@/core/models/identity.model';
 import type { SearchLocation } from '@/core/models/match.model';
 import { cn } from '@/shared/utils/cn';
@@ -56,7 +56,7 @@ function RemovableChip({
         aria-label={`Quitar ${label}`}
         onClick={onRemove}
       >
-        <XIcon size={12} weight="bold" aria-hidden />
+        <MdClose size={12} aria-hidden />
       </Button>
     </Badge>
   );
@@ -79,13 +79,13 @@ export default function NeedSummary({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="max-w-[72ch] min-w-0">
-          <p className="text-body-sm text-olive font-semibold">Buscaste</p>
+          <p className="text-body-sm text-sage-600 font-semibold">Buscaste</p>
           <p className="text-body-lg tracking-heading text-pine mt-1 line-clamp-2 font-medium">
             “{need.text}”
           </p>
         </div>
         <Button type="button" variant="outline" onClick={onEdit}>
-          <PencilSimpleIcon data-icon="inline-start" size={16} aria-hidden />
+          <MdOutlineEdit data-icon="inline-start" size={16} aria-hidden />
           Editar búsqueda
         </Button>
       </div>
@@ -114,10 +114,10 @@ export default function NeedSummary({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-body-sm text-olive mr-1 font-semibold">Entendimos</span>
+        <span className="text-body-sm text-sage-600 mr-1 font-semibold">Entendimos</span>
 
         <Badge variant="secondary" className={CHIP}>
-          <MapPinIcon data-icon="inline-start" size={14} aria-hidden />
+          <MdOutlinePlace data-icon="inline-start" size={14} aria-hidden />
           {location.label} · {fromPrompt ? 'zona buscada' : 'tu campo'}
         </Badge>
 
@@ -142,14 +142,14 @@ export default function NeedSummary({
         {need.urgency && (
           <RemovableChip
             label={need.urgency}
-            icon={<ClockIcon data-icon="inline-start" size={14} aria-hidden />}
+            icon={<MdOutlineSchedule data-icon="inline-start" size={14} aria-hidden />}
             onRemove={() => onClearDetail('urgency')}
           />
         )}
       </div>
 
       {unresolvedPlace && (
-        <p className="text-body-sm text-olive" role="status">
+        <p className="text-body-sm text-sage-600" role="status">
           No encontramos “{unresolvedPlace}” en el mapa. Buscamos cerca de tu campo.
         </p>
       )}

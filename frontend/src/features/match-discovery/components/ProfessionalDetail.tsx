@@ -1,11 +1,11 @@
 import {
-  ArrowRightIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  SealCheckIcon,
-} from '@phosphor-icons/react/dist/ssr';
+  MdArrowForward,
+  MdOutlineCheckCircle,
+  MdOutlineSchedule,
+  MdOutlineVerified,
+} from 'react-icons/md';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/Alert';
-import Avatar from '@/ui/components/Avatar';
+import { InitialsAvatar } from '@/ui/components/Avatar';
 import { Badge } from '@/ui/components/Badge';
 import { Button } from '@/ui/components/Button';
 import { roleLabel } from '../config/catalog';
@@ -39,9 +39,9 @@ export default function ProfessionalDetail({
     <div className="flex max-h-[calc(100dvh-8rem)] min-h-0 flex-col">
       <div className="flex min-h-0 flex-col gap-6 overflow-y-auto p-5 sm:p-8">
         <header className="flex items-start gap-4">
-          <Avatar initials={initialsOf(r)} size="lg" tone="solid" />
+          <InitialsAvatar initials={initialsOf(r)} size="lg" tone="solid" />
           <div className="min-w-0 flex-1">
-            <p className="text-body-sm text-olive font-medium">{roleLabel(r.role)}</p>
+            <p className="text-body-sm text-sage-600 font-medium">{roleLabel(r.role)}</p>
             <h2 id={detailTitleId(r.id)} className="text-heading-md tracking-heading text-pine">
               {fullName(r)}
             </h2>
@@ -57,12 +57,12 @@ export default function ProfessionalDetail({
           </span>
           {r.isVerified ? (
             <Badge variant="success">
-              <SealCheckIcon data-icon="inline-start" size={12} aria-hidden />
+              <MdOutlineVerified data-icon="inline-start" size={12} aria-hidden />
               Matrícula verificada
             </Badge>
           ) : (
             <Badge variant="warning">
-              <ClockIcon data-icon="inline-start" size={12} aria-hidden />
+              <MdOutlineSchedule data-icon="inline-start" size={12} aria-hidden />
               Matrícula sin verificar
             </Badge>
           )}
@@ -75,7 +75,7 @@ export default function ProfessionalDetail({
           <h3 id={`why-${r.id}`} className="text-body text-pine font-semibold">
             Por qué aparece
           </h3>
-          <p className="text-body-lg text-dark max-w-[58ch]">{result.why}</p>
+          <p className="text-body-lg text-sage-800 max-w-[58ch]">{result.why}</p>
           <ReasonList checks={result.checks} missing={result.missing} />
         </section>
       </div>
@@ -87,11 +87,11 @@ export default function ProfessionalDetail({
             variant="success"
             className="border-border-strong border-dashed px-4 py-3"
           >
-            <CheckCircleIcon aria-hidden />
+            <MdOutlineCheckCircle aria-hidden />
             <AlertTitle className="text-body-sm text-pine font-semibold">
               Solicitud enviada
             </AlertTitle>
-            <AlertDescription className="text-body-sm text-dark">
+            <AlertDescription className="text-body-sm text-sage-800">
               Cuando {r.firstName} la acepte, el match queda activo. La seguís en Mis solicitudes.
             </AlertDescription>
           </Alert>
@@ -99,7 +99,7 @@ export default function ProfessionalDetail({
           <>
             <Button type="button" size="lg" className="self-start" onClick={onRequest}>
               Solicitar match
-              <ArrowRightIcon data-icon="inline-end" size={16} weight="bold" aria-hidden />
+              <MdArrowForward data-icon="inline-end" size={16} aria-hidden />
             </Button>
             <TrustNote firstName={r.firstName} />
           </>
@@ -115,7 +115,7 @@ export default function ProfessionalDetail({
             >
               Solicitar match
             </Button>
-            <p id={`full-${r.id}`} className="text-body-sm text-olive">
+            <p id={`full-${r.id}`} className="text-body-sm text-sage-600">
               {r.firstName} no tiene lugar para clientes nuevos por ahora. Probá con otro
               profesional de la lista.
             </p>

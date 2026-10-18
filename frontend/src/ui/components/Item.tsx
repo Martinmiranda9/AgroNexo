@@ -1,4 +1,5 @@
-// Código oficial: shadcn/ui `item` (base-nova). Solo cambian los imports de `cn` y `Separator`.
+// Cashmere Item (registro `cashmere/item`) sobre la API de subcomponentes que ya usaba la app. Suma
+// `interactive` y `selected` del registro.
 import * as React from 'react';
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
@@ -32,23 +33,34 @@ function ItemSeparator({ className, ...props }: React.ComponentProps<typeof Sepa
 }
 
 const itemVariants = cva(
-  'group/item flex w-full flex-wrap items-center rounded-lg border text-sm transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [a]:transition-colors [a]:hover:bg-muted',
+  'group/item text-card-foreground flex w-full flex-wrap items-center rounded-lg border text-sm transition-[background-color,box-shadow,border-color,transform] duration-150 outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
   {
     variants: {
       variant: {
-        default: 'border-transparent',
-        outline: 'border-border',
-        muted: 'border-transparent bg-muted/50',
+        default: 'bg-card border-border [box-shadow:var(--shadow-s)]',
+        outline: 'bg-card border-border [box-shadow:var(--shadow-s)]',
+        muted: 'bg-muted border-transparent',
       },
       size: {
-        default: 'gap-2.5 px-3 py-2.5',
-        sm: 'gap-2.5 px-3 py-2.5',
-        xs: 'gap-2 px-2.5 py-2 in-data-[slot=dropdown-menu-content]:p-0',
+        default: 'gap-3 px-3 py-2',
+        sm: 'gap-3 px-3 py-2',
+        xs: 'gap-2 px-2.5 py-1.5 in-data-[slot=dropdown-menu-content]:p-0',
+      },
+      interactive: {
+        true: 'cursor-pointer hover:bg-accent hover:[box-shadow:var(--shadow-button-hover)] active:translate-y-px active:[box-shadow:var(--shadow-inset)]',
+        false: '',
+      },
+      selected: {
+        // AgroNexo: lo seleccionado se marca en pine (regla de selección), no con el primario.
+        true: 'border-pine/40 bg-accent [box-shadow:var(--shadow-m)]',
+        false: '',
       },
     },
     defaultVariants: {
       variant: 'default',
       size: 'default',
+      interactive: false,
+      selected: false,
     },
   }
 );
@@ -57,6 +69,8 @@ function Item({
   className,
   variant = 'default',
   size = 'default',
+  interactive,
+  selected,
   render,
   ...props
 }: useRender.ComponentProps<'div'> & VariantProps<typeof itemVariants>) {
@@ -64,7 +78,7 @@ function Item({
     defaultTagName: 'div',
     props: mergeProps<'div'>(
       {
-        className: cn(itemVariants({ variant, size, className })),
+        className: cn(itemVariants({ variant, size, interactive, selected, className })),
       },
       props
     ),
@@ -83,9 +97,9 @@ const itemMediaVariants = cva(
     variants: {
       variant: {
         default: 'bg-transparent',
-        icon: "[&_svg:not([class*='size-'])]:size-4",
+        icon: "bg-muted text-muted-foreground size-8 rounded-lg [box-shadow:var(--shadow-s)] [&_svg:not([class*='size-'])]:size-4",
         image:
-          'size-10 overflow-hidden rounded-sm group-data-[size=sm]/item:size-8 group-data-[size=xs]/item:size-6 [&_img]:size-full [&_img]:object-cover',
+          'size-10 overflow-hidden rounded-lg group-data-[size=sm]/item:size-8 group-data-[size=xs]/item:size-6 [&_img]:size-full [&_img]:object-cover',
       },
     },
     defaultVariants: {
@@ -127,7 +141,7 @@ function ItemTitle({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="item-title"
       className={cn(
-        'line-clamp-1 flex w-fit items-center gap-2 text-sm leading-snug font-medium underline-offset-4',
+        'text-foreground line-clamp-1 flex w-fit items-center gap-2 text-sm leading-snug font-medium underline-offset-4',
         className
       )}
       {...props}
@@ -140,7 +154,7 @@ function ItemDescription({ className, ...props }: React.ComponentProps<'p'>) {
     <p
       data-slot="item-description"
       className={cn(
-        'text-muted-foreground [&>a:hover]:text-primary line-clamp-2 text-left text-sm leading-normal font-normal group-data-[size=xs]/item:text-xs [&>a]:underline [&>a]:underline-offset-4',
+        'text-muted-foreground [&>a:hover]:text-foreground line-clamp-2 text-left text-xs leading-normal font-normal [&>a]:underline [&>a]:underline-offset-4',
         className
       )}
       {...props}
