@@ -1,17 +1,16 @@
-# AgroNexo — Frontend: Plan de Implementación (v4)
+# AgroNexo — Frontend: Plan de Implementación
+
+> Cómo se trabaja hoy en `frontend/`. Si algo no coincide con el código, manda el código y se corrige este documento. Los valores exactos de color, sombras y radius viven en `src/app/globals.css`.
 
 ## Decisiones
 
-| # | Decisión |
-|:---|:---|
-| 1 | **Next.js 15 + React 19** (no Angular): es lo que usan las referencias (Clickie, Tegu), Tailwind es first-class y permite migrar a React Native compartiendo hooks y modelos. No se usa Express: el backend .NET ya cumple ese rol. |
-| 2 | **Auth0 + Social Login Google**: frontend y backend comparten identity provider; se pueden sumar email/Apple sin tocar el backend. |
-| 3 | **Landing pública: sí.** Flujo: landing → login/registro → onboarding de rol (Productor/Profesional) → dashboard autenticado. Rutas: `app/(public)/` y `app/(authenticated)/`. |
-| 4 | **BFF liviano (pendiente de cerrar antes de Fase 1):** Server Actions/Server Components para lecturas iniciales (SSR, token fuera del browser); `api.service.ts` solo para mutaciones en Client Components vía TanStack Query. |
+- **Next.js 15 + React 19.** El backend es la API .NET; no hay servidor Node propio.
+- **Firebase Authentication** (correo + contraseña y Google). El SDK autentica en el cliente; el ID token se verifica en el servidor (`jose` contra el JWKS de Google), se guarda en la cookie httpOnly `agronexo_session` y viaja como `Bearer` a la API, que lo vuelve a validar.
+- **Flujo:** `/` → `/login`. Login/registro → `/auth/continue` (decide destino) → onboarding de rol → app autenticada. Rutas en `app/(public)/` y `app/(authenticated)/`.
+- **Server Actions como capa de datos:** lecturas y mutaciones pasan por `core/actions/` (el token no sale del servidor).
+- **Cashmere** como sistema de diseño, con la paleta v4 "verde campo" e Inter.
 
----
-
-## Arquitectura de Capas
+## Arquitectura
 
 ```
 App ──→ Feature ──→ Core ──→ Shared
@@ -19,260 +18,141 @@ App ──→ Feature ──→ Core ──→ Shared
              └──→ UI ───────────┘
 ```
 
-- Feature importa Core, UI y Shared. UI y Core importan solo Shared. Shared no importa de nadie.
-- Core nunca importa Feature ni UI. Un Feature nunca importa otro Feature.
-
-| Capa | Contiene | NO contiene |
+| Capa | Contiene | Regla |
 |:---|:---|:---|
-| **App** | Rutas, layouts, `middleware.ts`, providers globales | Lógica de negocio, llamadas API |
-| **Feature** | Server Components (fetch inicial) + Client Components (interacción) | Componentes genéricos, HTTP directo |
-| **UI** | Dumb components: props + events | Llamadas API, estado de servidor |
-| **Core** | Models, services, Server Actions, config Auth0 | Componentes de UI, páginas |
-| **Shared** | Utils puros, constantes, tipos genéricos | Services con estado, lógica de negocio |
+| **App** | Rutas, layouts, route handlers (`app/api/`: sesión y proxy de registro) | Sin lógica de negocio ni llamadas directas al backend |
+| **Feature** | Pantallas, hooks, `lib/` de vista, `server/` con acciones propias | Nunca importa otro feature |
+| **UI** | Componentes tontos (props + eventos) | Solo importa Shared |
+| **Core** | `models/`, `actions/`, `services/`, `auth/` (Firebase), `config/` | Nunca importa Feature ni UI |
+| **Shared** | Utils puros (`cn`), constantes (`ROUTES`), hooks y tipos genéricos | No importa de nadie |
 
-### Patrón Server/Client
-
-Una page es Server Component por defecto (sin hooks). Se hace el fetch inicial vía Server Action y se pasan los datos como props. Solo se agrega `"use client"` (con TanStack Query usando `initialData`) cuando hace falta interactividad: filtros, aceptar/rechazar match, refetch. Empezar sin `"use client"` y sumarlo cuando el compilador lo exija.
-
----
-
-## Estructura de Archivos
+**Server/Client:** la page es Server Component, lee la sesión con `getSessionUser()` / `fetchCurrentUser()` (`core/auth/server.ts`), trae datos con una Server Action y los pasa a la pantalla del feature (`FarmsScreen`, `MatchDiscoveryScreen`…). `"use client"` solo cuando hay interactividad. La autorización es server-side: layout de `(authenticated)` (sin sesión → `/login`) y `/auth/continue` (rol y registro).
 
 ```
 frontend/src/
-├── middleware.ts            # Sesión Auth0 + redirects por rol
-├── app/
-│   ├── (public)/            # Landing, login, register
-│   ├── (authenticated)/     # dashboard, profile, match-discovery, matches
-│   └── layout.tsx, loading.tsx, error.tsx, not-found.tsx, globals.css
-├── features/                # auth, profile, match-discovery, matches ({components/, hooks/, index.ts})
-├── ui/                      # Design System / UI Kit
-│   ├── components/          # Button, Input, Card, Modal, Badge, Spinner, Toast…
-│   └── layouts/             # AppShell, Navbar, MobileNav, Sidebar, Footer
-├── core/                    # models/, services/, actions/, providers/, config/env.ts
-└── shared/                  # utils/, hooks/, constants/, types/
+├── app/          # (public): login, register, forgot-password, onboarding, welcome · (authenticated): dashboard,
+│                 # match-discovery, matches, farms · auth/continue · api/ · layout, error, not-found, globals.css
+├── features/     # app-shell, auth, onboarding, match-discovery, matches, farms
+├── ui/           # components/ (UI Kit) · layouts/ (AppShell)
+├── core/         # models, actions, services, auth, config/{env,api}.ts
+└── shared/       # utils, hooks, constants, types
 ```
 
-Auth se resuelve en `middleware.ts` + layouts, no con guards client-side.
-
----
-
-## Stack Técnico
+## Stack
 
 | Área | Tecnología |
 |:---|:---|
-| Framework | Next.js 15 (App Router) + React 19 + TypeScript 5 |
-| Estilos | Tailwind CSS 4 |
-| Auth | Auth0 (`@auth0/nextjs-auth0`) + Google, sesión en `middleware.ts` |
-| Estado | TanStack Query 5 (server/mutations), Zustand (filtros, selección), Context (solo theme/locale) |
-| Forms | React Hook Form + Zod |
-| Env vars | `@t3-oss/env-nextjs` + Zod |
-| Testing | Vitest + React Testing Library (unit), Playwright (E2E: buscar → ranking → aceptar match) |
-| Iconos / Motion | Phosphor Icons (`@phosphor-icons/react`) · `motion/react` |
-| Diseño | Taste Skill (`frontend/.agents/skills/`, principal: `design-taste-frontend/SKILL.md`; también `brandkit`, `minimalist-ui`, `high-end-visual-design`) |
+| Base | Next.js 15 (App Router, Turbopack) · React 19 · TypeScript 5 · Tailwind CSS 4 (tema en `globals.css`, sin modo oscuro) |
+| Componentes | Cashmere sobre `@base-ui/react` (Radix solo sin variante base: `react-slot`, `react-toast`) · `cva` + `clsx` + `tailwind-merge` |
+| Auth y datos | `firebase` + `jose` · Server Actions contra la API (`core/config/api.ts`) · estado local de React |
+| Forms | Controlados con validación propia y Zod; React Hook Form solo en `AgroNexoAuthModal` |
+| Otros | `country-state-city` · `react-phone-number-input` + `libphonenumber-js` · Gemini (`@google/genai`, en `features/match-discovery/server/`) · `recharts` 3 vía `ui/components/Chart` · `@t3-oss/env-nextjs` |
+| Íconos y motion | `react-icons/md` (`MdOutline*` por defecto, `Md*` relleno para activo/éxito/error) · `motion/react` |
+| Tests | Vitest + Testing Library (`tests/unit/`) · Playwright (`tests/e2e/`, un spec por feature) |
 
----
-
-## Diseño: Taste Skill + Sistema Visual
-
-Taste Skill es la guía anti-slop obligatoria. Antes de diseñar una pantalla se declaran los diales:
-
-| Pantalla | DESIGN_VARIANCE | MOTION_INTENSITY | VISUAL_DENSITY |
-|:---|:---|:---|:---|
-| Login / Auth | 7 | 6 | 3 |
-| Landing pública | 8 | 7 | 3 |
-| Dashboard | 6 | 4 | 6 |
-| Match Discovery | 7 | 5 | 5 |
-| Profile | 6 | 4 | 4 |
-
-### Reglas de diseño
-
-1. **Paleta v4 "verde campo"** (ver [Paleta](#paleta)): lienzo salvia, superficies blancas, pine para lo importante y verde campo para la acción. El crema queda solo en las superficies de marca.
-2. **Double-bezel** en cards, inputs y badges premium (shell externo + core interno con radios concéntricos).
-3. **Motion**: nunca `useState` para valores continuos; usar `useMotionValue` + `useTransform`. `AnimatePresence` en estados loading/empty/error.
-4. **Inputs con label flotante**, sin placeholder-as-label.
-5. **CTA button-in-button**: flecha dentro de círculo interno con hover independiente. Sheen sutil en hover.
-6. **Iconos Phosphor**, stroke 1.5–1.75.
-7. **`min-h-[100dvh]`**, nunca `h-screen` (iOS Safari).
-8. **Grain/noise** solo en elementos `fixed` con `pointer-events: none`.
-
-### Paleta
-
-Paleta v4 "verde campo" (2026-10-11), definida en `src/app/globals.css`. Muestras, contrastes y maqueta aplicada:
-https://claude.ai/artifact/73zC2CPYG6ZXhi7NTNSqHT
-
-**Proporción objetivo por pantalla:** ~60 % lienzo salvia · ~28 % superficies blancas · ~8 % pine y verde campo · ~4 % estados. Las zonas se separan por luminosidad y bordes, nunca por tono.
-
-#### Escala de marca: `field` (verde campo, tono 148°, armada en OKLCH desde `#3E7949`)
-
-| Paso | Hex | Uso |
-|:---|:---|:---|
-| `field-50` / `100` | `#f4fcf3` / `#e5f7e5` | Fondos de selección suaves |
-| `field-200` | `#cdeecf` | Texto e íconos del sidebar (11,5:1 sobre pine) |
-| `field-300` | `#ade1b2` | Acentos sobre pine (9,7:1), serie clara de gráficos |
-| `field-400` | `#88cc8f` | Rótulos del sidebar (7,6:1 sobre pine) |
-| `field-500` / `600` | `#63b070` / `#4d9259` | Series de gráficos, íconos |
-| **`field-700`** | **`#3e7949`** | **Acción principal** (`--primary`): botón, barra actual. Texto blanco 5,2:1 |
-| `field-800` | `#29603b` | Hover del botón, ítem activo del sidebar, superficie de invitación |
-| `field-900` | `#16482d` | Hover del sidebar |
-| **`field-950` = `pine`** | **`#00311e`** | **Lo importante**: sidebar, selección activa, títulos, dato clave |
-
-#### Neutros: `sage` (grises con un toque mínimo del verde de marca; sin crema)
-
-| Paso | Hex | Uso |
-|:---|:---|:---|
-| blanco | `#ffffff` | Cards, popovers, inputs, columna del formulario en login/onboarding |
-| `sage-50` | `#f4f6f4` | Lienzo (`--background`, `body`) |
-| `sage-100` | `#ecefec` | Hover, `muted`, contenedores de ícono |
-| `sage-200` | `#e0e4e1` | Borde de card y separadores (`--border`) |
-| `sage-400` | `#8a8f8b` | Borde de controles (`--input`, 3,3:1), íconos inactivos |
-| `sage-500` | `#707470` | Placeholders (4,7:1) |
-| `sage-600` | `#5a5f5b` | Texto secundario (`--muted-foreground`, 6,5:1) |
-| `sage-800` | `#2c302c` | Texto de apoyo |
-
-#### Estados (colores reales)
-
-| Estado | Tinte / punto | Texto del tag | Uso |
-|:---|:---|:---|:---|
-| Positivo | `status-green` `#16a34a` | `status-green-ink` `#166534` (6,4:1) | Aceptada, verificada, encaja |
-| Pendiente | `status-orange` `#f97316` | `status-orange-ink` `#9a3412` (6,6:1) | Pendiente, enviada, a revisar |
-| Negativo | `status-red` `#b91c1c` | el mismo (5,5:1 sobre su tinte) | Rechazada, errores, destructivo |
-
-**Tag vs. marca:** el verde de marca y el verde de estado son de la misma familia, así que se distinguen por forma. La marca va **siempre sólida** (botón, barra, sidebar); los estados van **siempre como pill clara** (tinte al 10 % + texto 800 + punto o ícono). Nunca un pill con tinte verde de marca, y lo activo en chips/toggles es pine, no verde campo.
-
-#### Superficies de marca (piezas puntuales)
-
-La combinación cálida del login original se conserva para piezas sueltas: avisos, estados vacíos, logros, invitaciones.
-
-| Superficie | Fondo | Título | Bajada (itálica 500) | Cuerpo | Botón | Para qué |
-|:---|:---|:---|:---|:---|:---|:---|
-| Crema | `cream` `#fef7e5` + borde `cream-border` | pine | `moss` `#4d694e` | `loam` `#24301e` | pine | Estados vacíos, bienvenida |
-| Cálida | `sand` `#fff3d5` + borde `sand-border` | pine | `moss` | `loam` | pine | Avisos y novedades |
-| Pine | `pine` | `beige` | `sprout` `#99a474` | `beige/75` | beige | Logros, dato clave |
-| Verde | `field-800` | `beige` | `cream-border` | `beige/85` | beige | Invitaciones, promociones |
-
-Reglas: son piezas dentro de la grilla, **nunca fondo de página ni franja a todo el ancho**; como máximo una clara y una oscura por vista (sin contar el sidebar); **nunca para estados del sistema** (errores y alertas usan los estados); título 600 con tracking −1px y bajada en itálica **solo dentro de estas piezas**; los avisos se pueden cerrar y no vuelven.
-
-#### Nombres heredados
-
-Los nombres de la v3 siguen existiendo como alias de la v4 para no tocar componentes: `beige` → `sage-50`, `beige-dark` → `sage-100`, `beige-deeper` → `sage-200`, `bg-card`/`surface` → blanco, `paper`/`bg-page` → `sage-50`, `bg-hero` → `field-50`, `olive` → `sage-600`, `olive-hover` → `sage-700`, `dark` → `sage-800`, `neutral-warm` → `sage-400`, `accent-mid` → `field-500`, `accent-light` → `field-300`, `danger` → `status-red`. **En código nuevo** usar la escala (`field-*`, `sage-*`) o los tokens semánticos (`primary`, `muted-foreground`, `border`, `input`…).
-
-### Combinaciones válidas
-
-| Contexto | Fondo | Texto | Borde |
-|:---|:---|:---|:---|
-| Botón primario / CTA | `primary` (`field-700`), hover `primary-hover` (`field-800`) | blanco | — |
-| Botón outline | transparent (hover: `muted`) | `pine` | `input` (`sage-400`) |
-| Botón ghost | transparent (hover: `muted`) | `pine` | — |
-| Input | blanco / transparent | `pine` | `input` (`sage-400`) |
-| Input focus | blanco | `pine` | `ring` (`pine`) + halo `ring/50` |
-| Selección activa (chip, toggle, radio, checkbox, paso) | `pine` | `beige` | `pine` |
-| Card / panel | blanco | `pine` | `border` (`sage-200`) |
-| Página de producto | `sage-50` | `pine` / `sage-600` | — |
-| Login / onboarding | columna blanca + panel `pine` | `pine` / `sage-600` | — |
-| Sidebar | `pine` (texto `field-200`) | hover `field-900`, activo `field-800` + blanco | `field-900` |
-
-### Tipografía y forma
-
-- **Geist** (UI, titulares) + **Geist Mono** (cifras: qq/ha, $/ha, fechas). Nunca serif.
-- Radius: 16px cards, 12px inputs/botones, pill (999px) en badges/chips/toggles; radius 0 solo en bloques hero/poster.
-- Sombra mínima (hairline 1px), nunca dura. Iconos en contenedor circular con tinte suave.
-
----
-
-## UI Kit — Consistencia Visual Obligatoria
+## Sistema de diseño Cashmere
 
 > [!IMPORTANT]
-> **Todo el desarrollo frontend debe respetar este UI Kit.** Mismos colores, combinaciones, botones y estilos de componentes en cada pantalla, actual o futura. El resultado final es un único UI Kit coherente, con identidad de marca y fiabilidad.
+> **Toda UI nueva se construye con componentes de Cashmere.** Prohibido crear componentes ad hoc o sumar utilidades Tailwind nuevas en páginas. Si Cashmere no cubre un caso, se consulta antes de crear algo.
 
-### Línea base visual
+- **Instalar ítem por ítem:** `npx shadcn@latest add https://better-design.com/registry/cashmere/<item>.json` (índice: `.../cashmere/index.json`). **Nunca** `all.json` ni `globals.json`: pisan `globals.css` y `ui/` (en Windows `button.tsx` reemplaza `Button.tsx`).
+- **Variante `<item>-base`** (Base UI) siempre que exista; Radix solo si no (ej. `sidebar`, `stat-card`, gráficos).
+- **Íconos:** cada `<Icon icon="ph:…">` de Cashmere se reemplaza por su equivalente de `react-icons/md`; `@iconify/react` no se instala.
+- **Tamaños de Cashmere**, responsivos: botón sm 32 · default 40 · lg 48 · icon 40 (pill); campos 40px. En celular el texto de los campos queda en 16px (iOS no hace zoom).
+- **Tailwind** solo dentro de `ui/`. En páginas y features, solo el layout imprescindible; al tocar una pantalla se borran las utilidades que repiten o pisan al componente.
+- **Reglas de Cashmere** (`rules.md`: componer con lo instalado, labels en sentence case, límites de copy) aplican salvo choque con la identidad.
+- **Ante conflictos:** 1) identidad de AgroNexo (paleta v4 e Inter) · 2) Cashmere (estructura, formas, espaciados, variantes) · 3) este plan, shadcn y Tailwind.
 
-Referencias: dashboards minimalistas tipo FixTrack / Haulsight (lienzo gris claro, cards blancas con borde fino, sidebar fuerte, verde solo donde importa) y la app móvil en verde bosque. Se adopta su lógica con la paleta v4:
+## Identidad visual
 
-- **Pine marca lo importante** (sidebar, selección, dato clave) y **verde campo marca la acción** (botón principal), sobre superficies neutras.
-- **Un único CTA primario por pantalla**, siempre en el mismo estilo y zona.
-- **Activo = relleno Pine + texto Beige**; inactivo = tinte `pine/8` u outline `input` (chips, tabs, toggles, filtros, fechas).
-- **Par de botones**: outline (secundario) + primario, mismo alto y radius.
-- **Cards**: imagen arriba, título, subtítulo corto, acciones abajo.
-- **Escritorio: `Sidebar` en pine** desde `lg` (`ui/layouts/Sidebar` + `AppShell`, conectado en `features/app-shell/AppLayout`); versión básica hasta tener la plantilla definitiva de sidebar y panel. **Celular: el encabezado** (`AppHeader`). `MobileNav` oscuro tipo pill en Pine, pendiente.
-- **Formularios compactos** con label arriba y `SegmentedControl` para opciones cortas.
-- **Espaciado en múltiplos de 4px** y misma jerarquía tipográfica en todas las pantallas.
+**Paleta v4 "verde campo"** (muestras y contrastes: https://claude.ai/artifact/73zC2CPYG6ZXhi7NTNSqHT). Proporción por pantalla: ~60 % lienzo salvia · ~28 % superficies blancas · ~8 % pine y verde campo · ~4 % estados. Las zonas se separan por luminosidad y bordes, nunca por tono. En código se usan la escala (`field-*`, `sage-*`) o los tokens semánticos, nunca hex.
 
-### Reglas obligatorias
-
-1. **Solo tokens**: prohibido `#hex`, `rgb()` o `bg-[#...]` en componentes/pantallas. Si falta un color, se agrega primero al sistema.
-2. **Solo componentes de `ui/`**: no re-estilizar ni crear "botones parecidos" en un feature. Si falta uno, se crea en `ui/` y se reutiliza.
-3. **Variantes cerradas**: nada de `className` one-off que cambie color, radius, alto o tipografía base.
-4. **Solo las combinaciones de la tabla** (nunca oliva como fondo de CTA ni texto arbitrario sobre Pine).
-5. **Todos los estados**: default, hover, focus-visible (`ring` pine + halo `ring/50`), active, disabled, loading y error.
-6. **Una pantalla nueva no introduce lenguaje visual nuevo**: se compone con el kit.
-7. **Todo cambio al kit es global**: se hace en `ui/` o en los tokens, nunca solo en una pantalla.
-
-### Catálogo base
-
-| Componente | Variantes |
-|:---|:---|
-| **Button** | `primary` · `outline` · `ghost` · `danger` (solo destructivo) · `sm`/`md`/`lg` · loading · disabled |
-| **Input / Select / Textarea** | default · focus · error · disabled · con icono (label flotante) |
-| **SegmentedControl / Chip / Toggle** | activo · inactivo · disabled (siempre pill) |
-| **Card** | estándar · seleccionable · con imagen |
-| **Badge / Tag** | neutro · positivo · alerta · error |
-| **Modal / Sheet** | estándar · confirmación (un CTA primario + una acción secundaria) |
-| **Toast** | éxito · info · error |
-| **Header / MobileNav / Sidebar** | por breakpoint |
-| **Avatar / Icon container** | tamaños fijos |
-
-### Checklist de cierre (obligatorio)
-
-- [ ] Cero colores hardcodeados; todo sale de tokens.
-- [ ] Todos los controles son de `ui/components/`.
-- [ ] Un solo CTA primario claro en la vista.
-- [ ] Activo/inactivo siguen la regla Pine + Beige; el botón principal es verde campo (`primary`).
-- [ ] Sin crema como fondo de página; estados con verde/naranja/rojo en pill clara; superficies de marca solo como piezas puntuales.
-- [ ] Radius, alturas, espaciado e iconos coinciden con el resto de la app.
-- [ ] Hover, focus, disabled, loading y error implementados.
-- [ ] Se ve como parte del mismo producto junto a Login, Onboarding y Dashboard.
-
-> Una pantalla que no pase el checklist **no se considera terminada**, aunque funcione.
-
----
-
-## Reglas Estrictas
-
-| # | Regla |
-|:---|:---|
-| 1 | Server Components por defecto; `"use client"` solo cuando sea necesario |
-| 2 | Un archivo = un componente = una responsabilidad |
-| 3 | Autorización server-side en `middleware.ts`; sin guards client-side |
-| 4 | Nunca llamar API desde UI: Server Components → `core/actions/`; Client Components → `core/services/` vía TanStack Query |
-| 5 | `next/dynamic` para componentes pesados (mapas, gráficos) |
-| 6 | Barrel exports nombrados, nunca `export * from` |
-| 7 | Env vars tipadas con `@t3-oss/env-nextjs`, nunca `process.env.X` suelto |
-| 8 | Rutas como constantes, nunca strings hardcodeados |
-| 9 | Mobile-first Tailwind (base = mobile, `md:` tablet, `lg:` desktop) |
-| 10 | Código en inglés, textos al usuario en español |
-| 11 | **UI Kit inviolable**: tokens, componentes de `ui/`, variantes cerradas y checklist en cada pantalla |
-
----
-
-## Features (Módulo Match — Fase 1)
-
-| Feature | Rutas | Pantallas clave |
+| Rol | Token | Uso |
 |:---|:---|:---|
-| Landing | `/` | Propuesta de valor, CTA a login/registro |
-| Auth | `/login`, `/register` | Google Sign-In, toggle Productor/Profesional |
-| Profile | `/profile` | Ver/editar perfil según rol |
-| Match Discovery | `/match-discovery`, `.../[id]/recommendations` | Búsqueda especialidad + ubicación, ranking |
-| Matches | `/matches`, `/matches/[id]` | Lista con estados, aceptar/rechazar |
+| **Lo importante** | `pine` (= `field-950`, `#00311e`) | Títulos, dato clave, selección activa, ítem activo del sidebar |
+| **Acción** | `primary` (= `field-700`, `#3e7949`), hover `field-800` | Botón principal, barra actual. Texto blanco |
+| Acentos | `field-50/100` fondos de selección · `field-300…600` series de gráficos e íconos | |
+| Lienzo / superficies | `background` = `sage-50` · `card`, `popover`, `input` = blanco · `canvas` = `sage-100` (marco autenticado) | |
+| Texto | `foreground` = `pine` · `muted-foreground` = `sage-600` · placeholder `sage-500` · apoyo `sage-800` | Sobre pine, el texto claro es `sage-50` |
+| Bordes | `border` = `sage-200` (cards, separadores) · `input-border` = `sage-400` (controles, 3,3:1) · `ring` = `pine` + halo `ring/50` | |
+| Estados | `success` (`status-green` / ink `#166534`) · `warning` (`status-orange` / ink `#9a3412`) · `destructive` (`status-red`) | Aceptada / pendiente / rechazada y errores |
+| Otros | `secondary` = pine 8 % · `muted`, `accent` = `sage-100` · `pop-*` (azul y violeta van a neutro) · `chart-1…5` · `sidebar-*` | |
 
----
+**Marca vs. estado:** la marca va **siempre sólida** (botón, barra); los estados van **siempre en pill clara** (tinte 10 % + texto ink + `BadgeDot` o ícono). Nunca un pill con verde de marca; lo activo en chips y toggles es pine, no verde campo.
 
-## Plan de Fases
+**Combinaciones válidas**
 
-| Fase | Subagente | Entregable |
-|:---|:---|:---|
-| 1 | Frontend Architect | Scaffold, Tailwind, `middleware.ts`, `core/models/`, decisión BFF, `core/actions/` + `core/services/` |
-| 2 | Auth Engineer | Auth0 + Google, sesión en middleware, feature `auth/` |
-| 3 | UI Engineer | **UI Kit** (`ui/`) con catálogo base y variantes cerradas, layouts responsive, escala tipográfica, Motion, tests |
-| 4 | Feature Engineer | `profile/`, `match-discovery/`, `matches/` con patrón Server/Client |
-| 5 | Test Engineer | Vitest, Playwright (flujo completo), responsive QA, accesibilidad básica |
+| Contexto | Resultado |
+|:---|:---|
+| Botón primario (`variant="default"`) | `primary`, hover `primary-hover`, texto blanco |
+| Botón outline / ghost / destructive | Transparente con borde `border` · transparente · `destructive/10` con texto `destructive`; texto `pine` en los dos primeros |
+| Input | Fondo blanco, texto `pine`, borde `input-border`; foco `ring` + halo |
+| Selección activa (chip, toggle, radio, checkbox, paso) | `pine` con texto `sage-50`; inactivo `secondary` u outline |
+| Card / página | Card blanca con `border` · página en `sage-50` con texto `pine` / `sage-600` |
+| Login / onboarding | Columna blanca + panel `pine` |
+| Sidebar | Blanco, texto `sage-600`; hover `field-100` + `field-800`; activo `pine` + blanco |
+
+**Tipografía y forma:** Inter (`next/font/google`, itálica real) para todo; `text-figure` (números tabulares) en cifras; Geist Mono solo en `font-mono` (IDs, teléfonos); nunca serif. Escala: `text-caption` 12 · `body-sm` 14 · `body` 16 · `body-lg` 18 · `heading-sm` 20 · `heading-md` 24 · `heading-lg` 30 · `heading-xl` 36. `--radius` 1rem, botones y badges pill, cards `rounded-2xl`, sombras suaves de Cashmere teñidas de pine; nunca sombras duras.
+
+## UI Kit
+
+**Línea base** (referencias tipo FixTrack / Haulsight): lienzo claro, cards blancas con borde fino, verde solo donde importa.
+
+- **Un único CTA primario por pantalla**, siempre en el mismo estilo y zona. Par de botones: outline + primario, mismo alto.
+- **Escritorio:** `Sidebar` blanco con activo en pine desde `lg` (`ui/components/Sidebar` + `ui/layouts/AppShell`, compuesto en `features/app-shell/AppSidebar`, ítems por rol en `navigation.ts`). **Celular:** `AppHeader`.
+- **Formularios:** label arriba (`Field` + `FieldLabel`, nunca placeholder como label) y `ToggleGroup` para opciones cortas. Altas y ediciones en `Drawer`; confirmaciones en `Dialog`.
+- **Cards:** imagen arriba, título, subtítulo corto, acciones abajo. Íconos en `IconContainer` circular con tinte.
+- **Motion:** `useMotionValue` + `useTransform` para valores continuos (nunca `useState`), `AnimatePresence` en loading/empty/error, respetar `prefers-reduced-motion`.
+- Espaciado en múltiplos de 4px · `min-h-[100dvh]`, nunca `h-screen` · grain/noise solo en elementos `fixed` con `pointer-events: none`.
+
+**Reglas obligatorias**
+
+1. **Solo tokens:** nada de `#hex`, `rgb()` ni `bg-[#…]`. Si falta un color, se agrega primero a `globals.css`.
+2. **Solo componentes de `ui/`:** no re-estilizar ni crear "botones parecidos". Si falta uno, se instala de Cashmere y se adapta solo a tokens e íconos Material.
+3. **Variantes cerradas:** nada de `className` one-off que cambie color, radius, alto o tipografía.
+4. **Todos los estados:** default, hover, focus-visible, active, disabled, loading y error.
+5. **Sin lenguaje visual nuevo:** una pantalla se compone con el kit; todo cambio al kit es global (en `ui/` o en `globals.css`).
+
+**Catálogo (`ui/components/`)**
+
+- **Cashmere:** `Button` (pill; `default`/`primary`, `secondary`, `outline`, `ghost`, `destructive`, `link`; tamaños `xs`–`lg` e `icon-*`; `asChild`/`render`; `loading`) · `IconButton` · `Badge` + `BadgeDot` (`success`, `warning`, `destructive`, `inverse`…) · `StatusIndicator` · `Input`, `Textarea`, `NativeSelect`, `InputGroup`, `PasswordInput`, `NumberInput`, `EmailField`, `InlineValidation`, `SearchInput`, `CommandSearch`, `AiAgentInput` · `Field` y familia · `Checkbox`/`CheckboxCard`, `RadioGroup`/`RadioCard` · `Toggle`, `ToggleGroup`, `SegmentedControl` · `Card` (+ `CardAction`), `StatCard` (`unit`, `action`, `change`) · `Alert` · `Dialog`, `Drawer`, `Popover`, `DropdownMenu`, `Collapsible`, `Tooltip` · `Toast` (`toast.success()`/`toast.error()`) · `Sidebar` y familia · `Avatar` (+ `InitialsAvatar`) · `Item`, `Empty`, `Table`, `Skeleton`, `Spinner`, `Separator`, `Kbd`, `Label` · `Progress` (`thin`/`default`/`thick`) · `Breadcrumb` · `Chart` (shadcn, para recharts 3). Recetas compartidas en `_shared.ts`.
+- **Propios de AgroNexo:** `AppLayoutSkeleton` (feature `app-shell`) · `ChoiceGroup` · `IconContainer` · `PhoneInput` · `VerificationBanner`, `NeedBriefCard`, `ContactCard` · `BrandLogo`, `BrandMark`, `BrandGlow`, `GoogleButton` · `ThoughtLine`, `hairline/HairlineFigure`.
+
+**Checklist de cierre** (una pantalla que no lo pasa no está terminada, aunque funcione):
+
+- [ ] Cero colores hardcodeados y todos los controles de `ui/components/`.
+- [ ] Un solo CTA primario (verde campo); activo en pine + `sage-50`; estados en pill clara.
+- [ ] Radius, alturas, espaciado e íconos iguales al resto de la app; hover, focus, disabled, loading y error.
+- [ ] Se ve como parte del mismo producto que Login, Onboarding, Búsqueda y Campos.
+- [ ] Spec E2E nuevo en `tests/e2e/` que cubre el cambio (ver `CLAUDE.md`).
+
+## Reglas de código
+
+1. Server Components por defecto; `"use client"` solo si hace falta. Un archivo = un componente = una responsabilidad.
+2. Nunca llamar a la API desde UI: datos vía Server Actions (`core/actions/` o `server/` del feature).
+3. `next/dynamic` para componentes pesados (mapas, gráficos).
+4. Barrels con exports nombrados, nunca `export * from`.
+5. Env vars tipadas con `@t3-oss/env-nextjs`, nunca `process.env.X` suelto.
+6. Rutas como constantes (`ROUTES`, `farmRoute()` en `shared/constants/routes.ts`).
+7. Mobile-first: base = celular, `md:` tablet, `lg:` escritorio.
+8. Código en inglés, textos al usuario en español.
+
+## Features y rutas
+
+| Feature | Rutas | Qué hace | Estado |
+|:---|:---|:---|:---|
+| `auth` | `/login`, `/register`, `/forgot-password`, `/auth/continue` | Correo + contraseña y Google, panel de marca | Hecho |
+| `onboarding` | `/onboarding`, `/welcome/[publicId]/[kind]` | Wizard de rol, ubicación, vista previa del perfil | Hecho |
+| `app-shell` | (layout autenticado) | Sidebar por rol + `AppHeader` en celular | Versión básica |
+| `match-discovery` | `/match-discovery` | Búsqueda asistida con Gemini, ficha de necesidad, ranking, enviar solicitud | Hecho |
+| `matches` | `/matches` | Solicitudes con estados, aceptar/rechazar | Hecho |
+| `farms` | `/farms`, `/farms/[id]` | Campos, equipo y tablero (lotes, campañas, actividades, resumen semanal) | En curso |
+| Dashboard | `/dashboard` | Panel del profesional | Versión básica |
+| Landing · `profile` | — | `/` redirige a `/login`; perfil sin ruta todavía | Pendiente |
+
+Navegación: Productor → Buscar · Mis solicitudes · Campos. Profesional → Panel · Solicitudes · Campos.
+
+## Deuda conocida
+
+- `core/config/env.ts` existe pero nadie lo importa; quedan `process.env.X` sueltos en `core/auth/`, `app/api/auth/session` y `search-professionals.action.ts` (regla 5).
+- Utilidades Tailwind de layout en pantallas existentes; se limpian al tocar cada una.

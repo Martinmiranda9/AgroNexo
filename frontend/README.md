@@ -1,90 +1,40 @@
 # AgroNexo — Frontend
 
-AgroNexo is a multi-tenant agricultural platform connecting producers and agronomic professionals/teams. This repository contains the frontend application built with **Next.js 15 (App Router)**, **React 19**, **TypeScript 5**, and **Tailwind CSS 4**.
+App Next.js de AgroNexo. La guía completa (arquitectura, stack, sistema de diseño Cashmere y reglas) está en [`ia/frontend_implementation_plan.md`](../ia/frontend_implementation_plan.md); las convenciones generales en [`ia/agent.md`](../ia/agent.md).
 
----
+## Stack
 
-## Tech Stack
+Next.js 15 (App Router) · React 19 · TypeScript 5 · Tailwind CSS 4 · Cashmere sobre Base UI · Google Material Icons (`react-icons/md`) · `motion/react` · Firebase Authentication · Server Actions contra la API .NET · Gemini para la búsqueda asistida · Vitest + Testing Library · Playwright.
 
-| Layer | Technology |
-|---|---|
-| **Framework** | Next.js 15 (App Router) + React 19 + TypeScript 5 (strict mode) |
-| **Styling** | Tailwind CSS 4 with custom AgroNexo design tokens |
-| **Authentication** | Auth0 (`@auth0/nextjs-auth0`) with edge session management |
-| **Server State** | TanStack Query v5 (mutations and client fetching) |
-| **Client State** | Zustand (filters, client selections) |
-| **Forms & Validation**| React Hook Form + Zod + `@hookform/resolvers` |
-| **Environment** | `@t3-oss/env-nextjs` + Zod (build-time validation) |
-| **Icons & Motion** | Lucide React, Motion (`motion/react`) |
-| **Unit Testing** | Vitest + React Testing Library + jsdom |
-| **E2E Testing** | Playwright (Chromium) |
-| **Code Quality** | ESLint (`next/core-web-vitals`) + Prettier (`prettier-plugin-tailwindcss`) |
+## Puesta en marcha
 
----
+Requisitos: Node.js 20+ y npm 10+, y la API corriendo en `http://localhost:5000` (ver el [README principal](../README.md)).
 
-## Getting Started
-
-### Prerequisites
-- **Node.js**: v20.x or higher
-- **npm**: v10.x or higher
-
-### 1. Install Dependencies
 ```bash
+cp .env.local.example .env.local   # Firebase, NEXT_PUBLIC_API_URL y, opcional, GEMINI_API_KEY
 npm install
-```
-
-### 2. Configure Environment Variables
-Copy the example environment file:
-```bash
-cp .env.local.example .env.local
-```
-Fill in the Auth0 credentials and the backend API endpoint (`NEXT_PUBLIC_API_URL`).
-
-### 3. Run Development Server
-```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) with your browser.
 
----
+App en [http://localhost:3000](http://localhost:3000).
 
-## Available Scripts
+## Scripts
 
-- `npm run dev`: Starts the Next.js development server on port 3000.
-- `npm run build`: Compiles the production build with type checking.
-- `npm run start`: Runs the built production application.
-- `npm run lint`: Runs ESLint across the codebase.
-- `npm run test`: Executes unit and component tests via Vitest.
-- `npm run test:e2e`: Runs end-to-end integration tests using Playwright.
+- `npm run dev`: servidor de desarrollo (Turbopack).
+- `npm run build` / `npm run start`: build de producción y su servidor.
+- `npm run lint`: ESLint.
+- `npm test`: tests unitarios (Vitest, `tests/unit/`).
+- `npm run test:e2e`: tests E2E (Playwright, `tests/e2e/`). Los flujos que pegan al backend necesitan la API en `:5000`.
 
----
-
-## Layered Architecture
-
-The project follows a strict unidirectional layered architecture:
+## Estructura
 
 ```
-App ──→ Features ──→ Core ──→ Shared
-             │                  ▲
-             └──→ UI ───────────┘
+src/
+├── app/        # Rutas: (public), (authenticated), auth/continue, api/
+├── features/   # Pantallas por feature: app-shell, auth, onboarding, match-discovery, matches, farms
+├── ui/         # UI Kit (Cashmere + piezas de marca) y layouts
+├── core/       # models, actions (Server Actions), services, auth (Firebase), config
+└── shared/     # utils, hooks, constants, types
 ```
 
-- `src/app/`: Next.js App Router route segments, public/authenticated route groups, root layouts, error/loading handlers, and middleware.
-- `src/features/`: Domain feature slices (`auth/`, `profile/`, `match-discovery/`, `matches/`) containing Server Components and interactive Client Components.
-- `src/ui/`: Reusable, domain-agnostic Design System components (`Button`, `Input`, `Card`, `Modal`, `Badge`, `Spinner`, `Toast`) and structural layouts (`AppShell`, `Navbar`, `MobileNav`, `Sidebar`, `Footer`).
-- `src/core/`: Models (TypeScript interfaces), client-side services, Server Actions, context providers, and environment configuration.
-- `src/shared/`: Utility functions, custom hooks, constants, and shared types.
-
----
-
-## Architectural Rules
-
-1. **Server Components by Default**: Pages and components are Server Components unless interactivity (`useState`, event listeners) is strictly needed.
-2. **Layer Import Boundaries**:
-   - Features may import Core, UI, and Shared.
-   - Features **never** import other Features.
-   - Core **never** imports Features or UI.
-   - UI imports only Shared.
-   - Shared never imports from outer layers.
-3. **No Direct API Calls from UI**: Server Components invoke `core/actions/`, while Client Components use `core/services/` via TanStack Query.
-4. **Localization & Language**: Code, types, and comments are written in **English**; all user-facing text and messages are in **Spanish**.
+Dependencias en una sola dirección: App → Feature → Core → Shared, y Feature → UI → Shared.
