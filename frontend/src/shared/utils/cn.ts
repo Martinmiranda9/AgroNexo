@@ -9,7 +9,7 @@ import { extendTailwindMerge } from 'tailwind-merge';
 const twMerge = extendTailwindMerge({
   extend: {
     theme: {
-      text: ['caption', 'body-sm', 'body', 'body-lg', 'heading-sm', 'heading-md', 'heading-lg', 'heading-xl', 'figure', 'overline'],
+      text: ['caption', 'body-sm', 'body', 'body-lg', 'heading-sm', 'heading-md', 'heading-lg', 'heading-xl', 'figure'],
     },
   },
 });
