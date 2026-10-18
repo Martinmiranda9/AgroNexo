@@ -7,5 +7,5 @@ namespace AgroNexo.Application.Identity.UseCases;
 /// </summary>
 public interface IRegisterUserUseCase
 {
-    Task<RegisterUserResponse> ExecuteAsync(RegisterUserRequest request, string auth0UserId, CancellationToken cancellationToken = default);
+    Task<RegisterUserResponse> ExecuteAsync(RegisterUserRequest request, string firebaseUid, CancellationToken cancellationToken = default);
 }

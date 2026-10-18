@@ -23,19 +23,19 @@ public class UpdateProfessionalProfileUseCase : IUpdateProfessionalProfileUseCas
     }
 
     public async Task<ProfessionalProfileResponse> ExecuteAsync(
-        string auth0UserId,
+        string firebaseUid,
         UpdateProfessionalProfileRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(auth0UserId))
-            throw new DomainValidationException(nameof(auth0UserId), "El identificador de usuario es obligatorio.");
+        if (string.IsNullOrWhiteSpace(firebaseUid))
+            throw new DomainValidationException(nameof(firebaseUid), "El identificador de usuario es obligatorio.");
 
         if (request == null)
             throw new ArgumentNullException(nameof(request));
 
-        var professional = await _professionalRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var professional = await _professionalRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (professional == null)
-            throw new EntityNotFoundException("Profesional", auth0UserId);
+            throw new EntityNotFoundException("Profesional", firebaseUid);
 
         RegisterUserUseCase.EnsurePhoneNumber(request.PhoneNumber);
         RegisterUserUseCase.EnsureLicenseNumber(request.Role, request.LicenseNumber);
@@ -63,7 +63,7 @@ public class UpdateProfessionalProfileUseCase : IUpdateProfessionalProfileUseCas
         {
             Id = professional.Id,
             TenantId = professional.TenantId,
-            Auth0UserId = professional.Auth0UserId,
+            FirebaseUid = professional.FirebaseUid,
             FirstName = professional.FirstName,
             LastName = professional.LastName,
             DocumentNumber = professional.DocumentNumber,

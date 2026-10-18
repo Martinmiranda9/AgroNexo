@@ -19,11 +19,11 @@ public class GetFarmsUseCase : IGetFarmsUseCase
     }
 
     public async Task<IReadOnlyList<FarmResponse>> ExecuteAsync(
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken)
-            ?? throw new EntityNotFoundException("Producer", auth0UserId);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken)
+            ?? throw new EntityNotFoundException("Producer", firebaseUid);
 
         var farms = await _farmRepository.GetByProducerIdAsync(producer.Id, cancellationToken);
 
@@ -32,11 +32,11 @@ public class GetFarmsUseCase : IGetFarmsUseCase
 
     public async Task<FarmResponse?> GetByIdAsync(
         Guid farmId,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken)
-            ?? throw new EntityNotFoundException("Producer", auth0UserId);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken)
+            ?? throw new EntityNotFoundException("Producer", firebaseUid);
 
         var farm = await _farmRepository.GetByIdAsync(farmId, cancellationToken);
         if (farm == null || farm.ProducerId != producer.Id) return null;

@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace AgroNexo.API.Controllers;
 
 /// <summary>
-/// Solo para desarrollo. Genera tokens JWT válidos para probar la API sin Auth0.
+/// Solo para desarrollo. Genera tokens JWT válidos para probar la API sin Firebase.
 /// </summary>
 [ApiController]
 [Route("api/v1/dev/token")]
@@ -24,12 +24,12 @@ public class DevAuthController : ControllerBase
     /// <summary>
     /// Genera un token JWT simulando a un usuario (Productor o Profesional).
     /// </summary>
-    /// <param name="userId">Un ID cualquiera (ej: auth0|123456)</param>
+    /// <param name="userId">Un ID cualquiera (ej: dev|123456)</param>
     /// <param name="role">Producer o Professional</param>
     /// <returns>El token listo para usar en Swagger</returns>
     [HttpGet]
     public IActionResult GenerateToken(
-        [FromQuery] string userId = "auth0|test_user_123", 
+        [FromQuery] string userId = "dev|test_user_123", 
         [FromQuery] string role = "Producer")
     {
         if (!_env.IsDevelopment())

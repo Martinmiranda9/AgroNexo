@@ -23,9 +23,9 @@ public class GetCurrentUserUseCaseTests
     [Fact]
     public async Task GetCurrentUser_WithoutProfile_ReturnsNotRegistered()
     {
-        _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync("google-oauth2|new", It.IsAny<CancellationToken>()))
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync("google-oauth2|new", It.IsAny<CancellationToken>()))
             .ReturnsAsync((Producer?)null);
-        _professionalRepoMock.Setup(r => r.GetByAuth0UserIdAsync("google-oauth2|new", It.IsAny<CancellationToken>()))
+        _professionalRepoMock.Setup(r => r.GetByFirebaseUidAsync("google-oauth2|new", It.IsAny<CancellationToken>()))
             .ReturnsAsync((Professional?)null);
 
         var response = await _useCase.ExecuteAsync("google-oauth2|new");
@@ -41,7 +41,7 @@ public class GetCurrentUserUseCaseTests
         var producer = new Producer(
             Guid.NewGuid(), "google-oauth2|producer", "Esteban", "Quito", "20-99887766-5",
             null, "Argentina", "Córdoba", "Río Cuarto", "+5493511234567", null, null);
-        _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync("google-oauth2|producer", It.IsAny<CancellationToken>()))
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync("google-oauth2|producer", It.IsAny<CancellationToken>()))
             .ReturnsAsync(producer);
 
         var response = await _useCase.ExecuteAsync("google-oauth2|producer");
@@ -50,7 +50,7 @@ public class GetCurrentUserUseCaseTests
         response.UserType.Should().Be(UserType.Producer);
         response.FirstName.Should().Be("Esteban");
         _professionalRepoMock.Verify(
-            r => r.GetByAuth0UserIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            r => r.GetByFirebaseUidAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]

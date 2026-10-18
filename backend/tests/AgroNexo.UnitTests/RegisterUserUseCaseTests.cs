@@ -42,10 +42,10 @@ public class RegisterUserUseCaseTests
             Email = "esteban@example.com"
         };
 
-        _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|producer1", It.IsAny<CancellationToken>()))
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|producer1", It.IsAny<CancellationToken>()))
             .ReturnsAsync((Producer?)null);
 
-        _professionalRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|producer1", It.IsAny<CancellationToken>()))
+        _professionalRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|producer1", It.IsAny<CancellationToken>()))
             .ReturnsAsync((Professional?)null);
 
         _tenantRepoMock.Setup(r => r.AddAsync(It.IsAny<Tenant>(), It.IsAny<CancellationToken>()))
@@ -66,12 +66,12 @@ public class RegisterUserUseCaseTests
         response.LastName.Should().Be("Quito");
         response.TenantName.Should().Be("Workspace de Esteban Quito");
         response.UserType.Should().Be(UserType.Producer);
-        response.Auth0UserId.Should().Be("auth0|producer1");
+        response.FirebaseUid.Should().Be("auth0|producer1");
         response.TenantId.Should().NotBeEmpty();
         response.UserId.Should().NotBeEmpty();
 
         _tenantRepoMock.Verify(r => r.AddAsync(It.Is<Tenant>(t => t.Name == "Workspace de Esteban Quito"), It.IsAny<CancellationToken>()), Times.Once);
-        _producerRepoMock.Verify(r => r.AddAsync(It.Is<Producer>(p => p.FirstName == "Esteban" && p.Auth0UserId == "auth0|producer1" && p.Email == "esteban@example.com"), It.IsAny<CancellationToken>()), Times.Once);
+        _producerRepoMock.Verify(r => r.AddAsync(It.Is<Producer>(p => p.FirstName == "Esteban" && p.FirebaseUid == "auth0|producer1" && p.Email == "esteban@example.com"), It.IsAny<CancellationToken>()), Times.Once);
         _professionalRepoMock.Verify(r => r.AddAsync(It.IsAny<Professional>(), It.IsAny<CancellationToken>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -95,10 +95,10 @@ public class RegisterUserUseCaseTests
             Email = "luciana@example.com"
         };
 
-        _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|pro1", It.IsAny<CancellationToken>()))
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|pro1", It.IsAny<CancellationToken>()))
             .ReturnsAsync((Producer?)null);
 
-        _professionalRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|pro1", It.IsAny<CancellationToken>()))
+        _professionalRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|pro1", It.IsAny<CancellationToken>()))
             .ReturnsAsync((Professional?)null);
 
         _tenantRepoMock.Setup(r => r.AddAsync(It.IsAny<Tenant>(), It.IsAny<CancellationToken>()))
@@ -143,7 +143,7 @@ public class RegisterUserUseCaseTests
         var tenantId = Guid.NewGuid();
         var existing = new Producer(tenantId, "auth0|existing", "Carlos", "Perez", "20-11111111-1");
 
-        _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|existing", It.IsAny<CancellationToken>()))
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|existing", It.IsAny<CancellationToken>()))
             .ReturnsAsync(existing);
 
         // Act
@@ -156,9 +156,9 @@ public class RegisterUserUseCaseTests
 
     private void SetupHappyRepos(string auth0UserId)
     {
-        _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync(auth0UserId, It.IsAny<CancellationToken>()))
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync(auth0UserId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Producer?)null);
-        _professionalRepoMock.Setup(r => r.GetByAuth0UserIdAsync(auth0UserId, It.IsAny<CancellationToken>()))
+        _professionalRepoMock.Setup(r => r.GetByFirebaseUidAsync(auth0UserId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Professional?)null);
         _tenantRepoMock.Setup(r => r.AddAsync(It.IsAny<Tenant>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Tenant t, CancellationToken ct) => t);

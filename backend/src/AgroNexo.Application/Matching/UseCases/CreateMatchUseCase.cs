@@ -34,25 +34,25 @@ public class CreateMatchUseCase : ICreateMatchUseCase
         _ownershipValidator = ownershipValidator;
     }
 
-    public async Task<MatchResponse> ExecuteByAuth0UserIdAsync(
+    public async Task<MatchResponse> ExecuteByFirebaseUidAsync(
         CreateMatchRequest request,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(auth0UserId))
-            throw new DomainValidationException(nameof(auth0UserId), "El identificador de usuario es obligatorio.");
+        if (string.IsNullOrWhiteSpace(firebaseUid))
+            throw new DomainValidationException(nameof(firebaseUid), "El identificador de usuario es obligatorio.");
 
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (producer == null)
-            throw new EntityNotFoundException("Productor", auth0UserId);
+            throw new EntityNotFoundException("Productor", firebaseUid);
 
-        return await ExecuteAsync(request, producer.Id, auth0UserId, cancellationToken);
+        return await ExecuteAsync(request, producer.Id, firebaseUid, cancellationToken);
     }
 
     public async Task<MatchResponse> ExecuteAsync(
         CreateMatchRequest request,
         Guid producerId,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
         if (request == null)
@@ -65,7 +65,7 @@ public class CreateMatchUseCase : ICreateMatchUseCase
             throw new DomainValidationException(nameof(request.ProfessionalId), "El ProfessionalId es obligatorio.");
 
         // 1. Verify Producer exists and belongs to the authenticated user
-        var producer = await _ownershipValidator.GetOwnedProducerOrThrowAsync(producerId, auth0UserId, cancellationToken);
+        var producer = await _ownershipValidator.GetOwnedProducerOrThrowAsync(producerId, firebaseUid, cancellationToken);
 
         // 2. Verify Professional exists
         var professional = await _professionalRepository.GetByIdAcrossTenantsAsync(request.ProfessionalId, cancellationToken);

@@ -6,7 +6,7 @@ using AgroNexo.Domain.Interfaces;
 namespace AgroNexo.Application.Professionals.UseCases;
 
 /// <summary>
-/// Retrieves professional profile and capacity metrics by Auth0 identifier or Professional ID.
+/// Retrieves professional profile and capacity metrics by Firebase identifier (`sub`) or Professional ID.
 /// </summary>
 public class GetProfessionalProfileUseCase : IGetProfessionalProfileUseCase
 {
@@ -17,12 +17,12 @@ public class GetProfessionalProfileUseCase : IGetProfessionalProfileUseCase
         _professionalRepository = professionalRepository;
     }
 
-    public async Task<ProfessionalProfileResponse?> GetByAuth0UserIdAsync(string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<ProfessionalProfileResponse?> GetByFirebaseUidAsync(string firebaseUid, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return null;
 
-        var professional = await _professionalRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var professional = await _professionalRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         return professional == null ? null : MapToResponse(professional);
     }
 
@@ -42,7 +42,7 @@ public class GetProfessionalProfileUseCase : IGetProfessionalProfileUseCase
             Id = professional.Id,
             PublicId = professional.PublicId,
             TenantId = professional.TenantId,
-            Auth0UserId = professional.Auth0UserId,
+            FirebaseUid = professional.FirebaseUid,
             FirstName = professional.FirstName,
             LastName = professional.LastName,
             DocumentNumber = professional.DocumentNumber,

@@ -4,5 +4,5 @@ namespace AgroNexo.Application.Farms.UseCases;
 
 public interface IArchiveFarmUseCase
 {
-    Task<FarmResponse> ExecuteAsync(Guid farmId, UpdateFarmStatusRequest request, string auth0UserId, CancellationToken cancellationToken = default);
+    Task<FarmResponse> ExecuteAsync(Guid farmId, UpdateFarmStatusRequest request, string firebaseUid, CancellationToken cancellationToken = default);
 }

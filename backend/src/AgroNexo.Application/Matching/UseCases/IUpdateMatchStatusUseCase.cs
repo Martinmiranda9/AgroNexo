@@ -7,5 +7,5 @@ namespace AgroNexo.Application.Matching.UseCases;
 /// </summary>
 public interface IUpdateMatchStatusUseCase
 {
-    Task<MatchResponse> ExecuteAsync(Guid matchId, UpdateMatchStatusRequest request, string? auth0UserId = null, CancellationToken cancellationToken = default);
+    Task<MatchResponse> ExecuteAsync(Guid matchId, UpdateMatchStatusRequest request, string? firebaseUid = null, CancellationToken cancellationToken = default);
 }

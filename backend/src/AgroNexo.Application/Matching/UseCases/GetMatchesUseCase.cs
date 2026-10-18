@@ -33,51 +33,51 @@ public class GetMatchesUseCase : IGetMatchesUseCase
     }
 
     public async Task<PagedResult<MatchResponse>> ExecuteForUserAsync(
-        string auth0UserId,
+        string firebaseUid,
         MatchFilterRequest filter,
         CancellationToken cancellationToken = default)
     {
         filter ??= new MatchFilterRequest();
 
         // Check if user is Producer or Professional to scope query automatically
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (producer != null)
         {
             filter.ProducerId = producer.Id;
         }
         else
         {
-            var professional = await _professionalRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+            var professional = await _professionalRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
             if (professional != null)
             {
                 filter.ProfessionalId = professional.Id;
             }
         }
 
-        return await ExecuteAsync(filter, auth0UserId, cancellationToken);
+        return await ExecuteAsync(filter, firebaseUid, cancellationToken);
     }
 
     public async Task<PagedResult<MatchResponse>> ExecuteAsync(
         MatchFilterRequest filter,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
         filter ??= new MatchFilterRequest();
 
         if (filter.ProducerId.HasValue)
         {
-            await _ownershipValidator.GetOwnedProducerOrThrowAsync(filter.ProducerId.Value, auth0UserId, cancellationToken);
+            await _ownershipValidator.GetOwnedProducerOrThrowAsync(filter.ProducerId.Value, firebaseUid, cancellationToken);
         }
         
         if (filter.ProfessionalId.HasValue)
         {
-            await _ownershipValidator.GetOwnedProfessionalOrThrowAsync(filter.ProfessionalId.Value, auth0UserId, _tenantContext.TenantId, cancellationToken);
+            await _ownershipValidator.GetOwnedProfessionalOrThrowAsync(filter.ProfessionalId.Value, firebaseUid, _tenantContext.TenantId, cancellationToken);
         }
 
         if (!filter.ProducerId.HasValue && !filter.ProfessionalId.HasValue)
         {
             // If neither is provided, force it to only get matches for the current user's entity
-            return await ExecuteForUserAsync(auth0UserId, filter, cancellationToken);
+            return await ExecuteForUserAsync(firebaseUid, filter, cancellationToken);
         }
 
         var matches = await _matchRepository.GetByFiltersAsync(

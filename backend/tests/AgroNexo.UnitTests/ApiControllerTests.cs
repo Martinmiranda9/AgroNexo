@@ -52,7 +52,7 @@ public class ApiControllerTests
             UserId = Guid.NewGuid(),
             TenantId = Guid.NewGuid(),
             TenantName = "Workspace de Juan Perez",
-            Auth0UserId = "auth0|user1",
+            FirebaseUid = "auth0|user1",
             FirstName = "Juan",
             LastName = "Perez"
         };
@@ -80,13 +80,13 @@ public class ApiControllerTests
         var expectedResponse = new ProducerProfileResponse
         {
             Id = Guid.NewGuid(),
-            Auth0UserId = "auth0|producer1",
+            FirebaseUid = "auth0|producer1",
             FirstName = "Carlos",
             LastName = "Gomez",
             IsActive = true
         };
 
-        mockUseCase.Setup(u => u.GetByAuth0UserIdAsync("auth0|producer1", It.IsAny<CancellationToken>()))
+        mockUseCase.Setup(u => u.GetByFirebaseUidAsync("auth0|producer1", It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResponse);
 
         var controller = new ProducersController(mockUseCase.Object);
@@ -110,7 +110,7 @@ public class ApiControllerTests
         var expectedResponse = new ProfessionalProfileResponse
         {
             Id = Guid.NewGuid(),
-            Auth0UserId = "auth0|prof1",
+            FirebaseUid = "auth0|prof1",
             FirstName = "Maria",
             LastName = "Lopez",
             Role = ProfessionalRole.Agronomist,
@@ -119,7 +119,7 @@ public class ApiControllerTests
             IsActive = true
         };
 
-        mockGetUseCase.Setup(u => u.GetByAuth0UserIdAsync("auth0|prof1", It.IsAny<CancellationToken>()))
+        mockGetUseCase.Setup(u => u.GetByFirebaseUidAsync("auth0|prof1", It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResponse);
 
         var controller = new ProfessionalsController(mockGetUseCase.Object, mockUpdateUseCase.Object);
@@ -159,7 +159,7 @@ public class ApiControllerTests
             Recommendations = new List<MatchRecommendationResponse>()
         };
 
-        mockGenerateUseCase.Setup(u => u.ExecuteByAuth0UserIdAsync(request, "auth0|producer1", It.IsAny<CancellationToken>()))
+        mockGenerateUseCase.Setup(u => u.ExecuteByFirebaseUidAsync(request, "auth0|producer1", It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResponse);
 
         var controller = new MatchDiscoveryController(mockGenerateUseCase.Object, mockGetUseCase.Object);
@@ -197,7 +197,7 @@ public class ApiControllerTests
             RequestedAt = DateTime.UtcNow
         };
 
-        mockCreateUseCase.Setup(u => u.ExecuteByAuth0UserIdAsync(request, "auth0|producer1", It.IsAny<CancellationToken>()))
+        mockCreateUseCase.Setup(u => u.ExecuteByFirebaseUidAsync(request, "auth0|producer1", It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResponse);
 
         var controller = new MatchesController(mockCreateUseCase.Object, mockGetUseCase.Object, mockUpdateUseCase.Object);

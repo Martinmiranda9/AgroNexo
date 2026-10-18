@@ -34,9 +34,9 @@ public class GetWorkspacesUseCase : IGetWorkspacesUseCase
         _professionalRepository = professionalRepository;
     }
 
-    public async Task<IReadOnlyList<WorkspaceResponse>> ListAsync(string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<WorkspaceResponse>> ListAsync(string firebaseUid, CancellationToken cancellationToken = default)
     {
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (producer != null)
         {
             var farms = await _farmRepository.GetByProducerIdAsync(producer.Id, cancellationToken);
@@ -49,7 +49,7 @@ public class GetWorkspacesUseCase : IGetWorkspacesUseCase
                 .ToList();
         }
 
-        var professional = await _professionalRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var professional = await _professionalRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (professional == null)
             return Array.Empty<WorkspaceResponse>();
 
@@ -67,9 +67,9 @@ public class GetWorkspacesUseCase : IGetWorkspacesUseCase
         return workspaces;
     }
 
-    public async Task<WorkspaceResponse> GetAsync(Guid farmId, string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<WorkspaceResponse> GetAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken = default)
     {
-        var access = await _farmAccessService.GetAccessAsync(farmId, auth0UserId, cancellationToken);
+        var access = await _farmAccessService.GetAccessAsync(farmId, firebaseUid, cancellationToken);
         var owner = access.Owner ?? await _producerRepository.GetByIdAsync(access.Farm.ProducerId, cancellationToken);
         var team = (await _farmMemberRepository.GetActiveByFarmAsync(farmId, cancellationToken)).ToList();
 

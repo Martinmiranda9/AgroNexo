@@ -14,7 +14,7 @@ public class RegisterUserResponse
 
     public Guid TenantId { get; set; }
     public string TenantName { get; set; } = string.Empty;
-    public string Auth0UserId { get; set; } = string.Empty;
+    public string FirebaseUid { get; set; } = string.Empty;
     public UserType UserType { get; set; }
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;

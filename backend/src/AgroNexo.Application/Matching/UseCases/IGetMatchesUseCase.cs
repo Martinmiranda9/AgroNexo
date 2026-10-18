@@ -8,6 +8,6 @@ namespace AgroNexo.Application.Matching.UseCases;
 /// </summary>
 public interface IGetMatchesUseCase
 {
-    Task<PagedResult<MatchResponse>> ExecuteAsync(MatchFilterRequest filter, string auth0UserId, CancellationToken cancellationToken = default);
-    Task<PagedResult<MatchResponse>> ExecuteForUserAsync(string auth0UserId, MatchFilterRequest filter, CancellationToken cancellationToken = default);
+    Task<PagedResult<MatchResponse>> ExecuteAsync(MatchFilterRequest filter, string firebaseUid, CancellationToken cancellationToken = default);
+    Task<PagedResult<MatchResponse>> ExecuteForUserAsync(string firebaseUid, MatchFilterRequest filter, CancellationToken cancellationToken = default);
 }

@@ -15,7 +15,7 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Producer>
         builder.Property(p => p.TenantId)
             .IsRequired();
 
-        builder.Property(p => p.Auth0UserId)
+        builder.Property(p => p.FirebaseUid)
             .IsRequired()
             .HasMaxLength(128);
 
@@ -59,7 +59,7 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Producer>
         builder.Property(p => p.UpdatedAt);
 
         // Indexes
-        builder.HasIndex(p => p.Auth0UserId)
+        builder.HasIndex(p => p.FirebaseUid)
             .IsUnique();
 
         builder.HasIndex(p => p.PublicId)

@@ -10,7 +10,7 @@ namespace AgroNexo.Domain.Entities;
 public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDeletable
 {
     public Guid TenantId { get; private set; }
-    public string Auth0UserId { get; private set; } = string.Empty;
+    public string FirebaseUid { get; private set; } = string.Empty;
     public string FirstName { get; private set; } = string.Empty;
     public string LastName { get; private set; } = string.Empty;
     public string DocumentNumber { get; private set; } = string.Empty;
@@ -60,7 +60,7 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
 
     public Producer(
         Guid tenantId,
-        string auth0UserId,
+        string firebaseUid,
         string firstName,
         string lastName,
         string documentNumber,
@@ -76,8 +76,8 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
         if (tenantId == Guid.Empty)
             throw new DomainValidationException(nameof(TenantId), "El TenantId es obligatorio.");
 
-        if (string.IsNullOrWhiteSpace(auth0UserId))
-            throw new DomainValidationException(nameof(Auth0UserId), "El identificador de Auth0 es obligatorio.");
+        if (string.IsNullOrWhiteSpace(firebaseUid))
+            throw new DomainValidationException(nameof(FirebaseUid), "El identificador de Firebase es obligatorio.");
 
         if (string.IsNullOrWhiteSpace(firstName))
             throw new DomainValidationException(nameof(FirstName), "El nombre del productor es obligatorio.");
@@ -87,7 +87,7 @@ public class Producer : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDe
 
         Id = Guid.NewGuid();
         TenantId = tenantId;
-        Auth0UserId = auth0UserId.Trim();
+        FirebaseUid = firebaseUid.Trim();
         FirstName = firstName.Trim();
         LastName = lastName.Trim();
         DocumentNumber = documentNumber?.Trim() ?? string.Empty;

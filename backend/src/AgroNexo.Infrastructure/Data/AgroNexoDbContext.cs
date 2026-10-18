@@ -34,6 +34,10 @@ public class AgroNexoDbContext : DbContext
     public DbSet<MatchRecommendation> MatchRecommendations => Set<MatchRecommendation>();
     public DbSet<Farm> Farms => Set<Farm>();
     public DbSet<FarmMember> FarmMembers => Set<FarmMember>();
+    public DbSet<Campaign> Campaigns => Set<Campaign>();
+    public DbSet<Lot> Lots => Set<Lot>();
+    public DbSet<LotCrop> LotCrops => Set<LotCrop>();
+    public DbSet<FarmActivity> FarmActivities => Set<FarmActivity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,6 +63,10 @@ public class AgroNexoDbContext : DbContext
         // 4. Farm entity filter (Tenant-scoped + Soft delete)
         modelBuilder.Entity<Farm>().HasQueryFilter(f =>
             f.IsActive && f.TenantId == CurrentTenantId);
+
+        // 5. Lotes: solo borrado lógico. Campañas, lotes y actividades no filtran por tenant porque también los leen los
+        // profesionales del equipo (otro tenant); el acceso al campo lo valida IFarmAccessService.
+        modelBuilder.Entity<Lot>().HasQueryFilter(l => l.IsActive);
 
         // FarmMember tampoco tiene filtro de tenant: une el campo (tenant del productor) con un profesional de otro.
 

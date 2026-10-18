@@ -37,11 +37,11 @@ public class FarmMembersController : ApiControllerBase
         [FromQuery] ProfessionalRole? role,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        var candidates = await _getFarmCandidatesUseCase.ExecuteAsync(farmId, role, auth0UserId, cancellationToken);
+        var candidates = await _getFarmCandidatesUseCase.ExecuteAsync(farmId, role, firebaseUid, cancellationToken);
         return Ok(candidates);
     }
 
@@ -61,11 +61,11 @@ public class FarmMembersController : ApiControllerBase
         [FromBody] AddFarmMemberRequest request,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        var member = await _manageFarmMembersUseCase.AddAsync(farmId, request, auth0UserId, cancellationToken);
+        var member = await _manageFarmMembersUseCase.AddAsync(farmId, request, firebaseUid, cancellationToken);
         return CreatedAtAction(
             nameof(WorkspacesController.GetWorkspace),
             "Workspaces",
@@ -86,11 +86,11 @@ public class FarmMembersController : ApiControllerBase
         [FromRoute] Guid memberId,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        await _manageFarmMembersUseCase.RemoveAsync(farmId, memberId, auth0UserId, cancellationToken);
+        await _manageFarmMembersUseCase.RemoveAsync(farmId, memberId, firebaseUid, cancellationToken);
         return NoContent();
     }
 
@@ -104,11 +104,11 @@ public class FarmMembersController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LeaveFarm([FromRoute] Guid farmId, CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        await _manageFarmMembersUseCase.LeaveAsync(farmId, auth0UserId, cancellationToken);
+        await _manageFarmMembersUseCase.LeaveAsync(farmId, firebaseUid, cancellationToken);
         return NoContent();
     }
 

@@ -27,11 +27,11 @@ public class UpdateFarmUseCase : IUpdateFarmUseCase
     public async Task<FarmResponse> ExecuteAsync(
         Guid farmId,
         UpdateFarmRequest request,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken)
-            ?? throw new EntityNotFoundException("Producer", auth0UserId);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken)
+            ?? throw new EntityNotFoundException("Producer", firebaseUid);
 
         var farm = await _farmRepository.GetByIdAsync(farmId, cancellationToken)
             ?? throw new EntityNotFoundException("Farm", farmId.ToString());

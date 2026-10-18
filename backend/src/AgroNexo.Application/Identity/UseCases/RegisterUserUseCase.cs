@@ -33,23 +33,23 @@ public class RegisterUserUseCase : IRegisterUserUseCase
 
     public async Task<RegisterUserResponse> ExecuteAsync(
         RegisterUserRequest request,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
         if (request == null)
             throw new ArgumentNullException(nameof(request));
 
-        if (string.IsNullOrWhiteSpace(auth0UserId))
-            throw new DomainValidationException(nameof(auth0UserId), "El identificador de autenticación Auth0 es obligatorio.");
+        if (string.IsNullOrWhiteSpace(firebaseUid))
+            throw new DomainValidationException(nameof(firebaseUid), "El identificador de Firebase es obligatorio.");
 
         EnsurePhoneNumber(request.PhoneNumber);
 
         // Check if user already exists
-        var existingProducer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var existingProducer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (existingProducer != null)
             throw new DomainException("El usuario ya se encuentra registrado como productor.");
 
-        var existingProfessional = await _professionalRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var existingProfessional = await _professionalRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (existingProfessional != null)
             throw new DomainException("El usuario ya se encuentra registrado como profesional.");
 
@@ -70,7 +70,7 @@ public class RegisterUserUseCase : IRegisterUserUseCase
         {
             var producer = new Producer(
                 tenant.Id,
-                auth0UserId,
+                firebaseUid,
                 request.FirstName,
                 request.LastName,
                 request.DocumentNumber ?? string.Empty,
@@ -96,7 +96,7 @@ public class RegisterUserUseCase : IRegisterUserUseCase
 
             var professional = new Professional(
                 tenant.Id,
-                auth0UserId,
+                firebaseUid,
                 request.FirstName,
                 request.LastName,
                 request.DocumentNumber ?? string.Empty,
@@ -133,7 +133,7 @@ public class RegisterUserUseCase : IRegisterUserUseCase
             PublicId = publicId,
             TenantId = tenant.Id,
             TenantName = tenant.Name,
-            Auth0UserId = auth0UserId,
+            FirebaseUid = firebaseUid,
             UserType = request.UserType,
             FirstName = request.FirstName.Trim(),
             LastName = request.LastName.Trim(),

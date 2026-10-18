@@ -7,5 +7,5 @@ namespace AgroNexo.Application.Matching.UseCases;
 /// </summary>
 public interface IGetMatchRecommendationsUseCase
 {
-    Task<MatchDiscoveryResponse?> ExecuteAsync(Guid discoveryRequestId, string auth0UserId, CancellationToken cancellationToken = default);
+    Task<MatchDiscoveryResponse?> ExecuteAsync(Guid discoveryRequestId, string firebaseUid, CancellationToken cancellationToken = default);
 }

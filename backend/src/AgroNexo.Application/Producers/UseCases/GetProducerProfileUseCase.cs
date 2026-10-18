@@ -5,7 +5,7 @@ using AgroNexo.Domain.Interfaces;
 namespace AgroNexo.Application.Producers.UseCases;
 
 /// <summary>
-/// Retrieves producer profile details by Auth0 identifier or Producer ID.
+/// Retrieves producer profile details by Firebase identifier (`sub`) or Producer ID.
 /// </summary>
 public class GetProducerProfileUseCase : IGetProducerProfileUseCase
 {
@@ -16,12 +16,12 @@ public class GetProducerProfileUseCase : IGetProducerProfileUseCase
         _producerRepository = producerRepository;
     }
 
-    public async Task<ProducerProfileResponse?> GetByAuth0UserIdAsync(string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<ProducerProfileResponse?> GetByFirebaseUidAsync(string firebaseUid, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return null;
 
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         return producer == null ? null : MapToResponse(producer);
     }
 
@@ -41,7 +41,7 @@ public class GetProducerProfileUseCase : IGetProducerProfileUseCase
             Id = producer.Id,
             PublicId = producer.PublicId,
             TenantId = producer.TenantId,
-            Auth0UserId = producer.Auth0UserId,
+            FirebaseUid = producer.FirebaseUid,
             FirstName = producer.FirstName,
             LastName = producer.LastName,
             DocumentNumber = producer.DocumentNumber,

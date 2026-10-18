@@ -30,7 +30,7 @@ public class TenantMiddleware
 
         if (user.Identity?.IsAuthenticated == true)
         {
-            var auth0UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            var firebaseUid = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
                 ?? user.FindFirst("sub")?.Value;
 
             var email = user.FindFirst(ClaimTypes.Email)?.Value
@@ -56,9 +56,9 @@ public class TenantMiddleware
             // Los tokens de Firebase no traen rol ni tenant: se resuelven desde la base según dónde esté registrado el usuario.
             string? registeredRole = null;
 
-            if (!hasTenant && !string.IsNullOrWhiteSpace(auth0UserId))
+            if (!hasTenant && !string.IsNullOrWhiteSpace(firebaseUid))
             {
-                var producer = await producerRepository.GetByAuth0UserIdAsync(auth0UserId);
+                var producer = await producerRepository.GetByFirebaseUidAsync(firebaseUid);
                 if (producer != null)
                 {
                     tenantId = producer.TenantId;
@@ -67,7 +67,7 @@ public class TenantMiddleware
                 }
                 else
                 {
-                    var professional = await professionalRepository.GetByAuth0UserIdAsync(auth0UserId);
+                    var professional = await professionalRepository.GetByFirebaseUidAsync(firebaseUid);
                     if (professional != null)
                     {
                         tenantId = professional.TenantId;
@@ -89,13 +89,13 @@ public class TenantMiddleware
 
             if (hasTenant)
             {
-                tenantContext.SetContext(tenantId, auth0UserId, role);
-                currentUserService.SetUser(auth0UserId, email, tenantId, role);
-                _logger.LogDebug("Resolved Tenant: {TenantId}, User: {Auth0UserId}, Role: {Role}", tenantId, auth0UserId, role);
+                tenantContext.SetContext(tenantId, firebaseUid, role);
+                currentUserService.SetUser(firebaseUid, email, tenantId, role);
+                _logger.LogDebug("Resolved Tenant: {TenantId}, User: {FirebaseUid}, Role: {Role}", tenantId, firebaseUid, role);
             }
             else
             {
-                currentUserService.SetUser(auth0UserId, email, null, role);
+                currentUserService.SetUser(firebaseUid, email, null, role);
             }
         }
 

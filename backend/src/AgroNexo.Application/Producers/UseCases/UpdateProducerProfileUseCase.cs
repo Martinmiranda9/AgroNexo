@@ -22,19 +22,19 @@ public class UpdateProducerProfileUseCase : IUpdateProducerProfileUseCase
     }
 
     public async Task<ProducerProfileResponse> ExecuteAsync(
-        string auth0UserId,
+        string firebaseUid,
         UpdateProducerProfileRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(auth0UserId))
-            throw new DomainValidationException(nameof(auth0UserId), "El identificador de usuario es obligatorio.");
+        if (string.IsNullOrWhiteSpace(firebaseUid))
+            throw new DomainValidationException(nameof(firebaseUid), "El identificador de usuario es obligatorio.");
 
         if (request == null)
             throw new ArgumentNullException(nameof(request));
 
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (producer == null)
-            throw new EntityNotFoundException("Productor", auth0UserId);
+            throw new EntityNotFoundException("Productor", firebaseUid);
 
         RegisterUserUseCase.EnsurePhoneNumber(request.PhoneNumber);
 
@@ -56,7 +56,7 @@ public class UpdateProducerProfileUseCase : IUpdateProducerProfileUseCase
         {
             Id = producer.Id,
             TenantId = producer.TenantId,
-            Auth0UserId = producer.Auth0UserId,
+            FirebaseUid = producer.FirebaseUid,
             FirstName = producer.FirstName,
             LastName = producer.LastName,
             DocumentNumber = producer.DocumentNumber,

@@ -14,9 +14,9 @@ public abstract class ApiControllerBase : ControllerBase
     /// <summary>
     /// Gets the external identity provider's user id ('sub' claim, now issued by Firebase) from the
     /// authenticated principal. Property name kept as-is: it's what every repository/use case matches
-    /// against the `Auth0UserId` column, and renaming it would be a mechanical, unrelated refactor.
+    /// against the `FirebaseUid` column, and renaming it would be a mechanical, unrelated refactor.
     /// </summary>
-    protected string? CurrentAuth0UserId =>
+    protected string? CurrentFirebaseUid =>
         User.FindFirst(ClaimTypes.NameIdentifier)?.Value
         ?? User.FindFirst("sub")?.Value;
 

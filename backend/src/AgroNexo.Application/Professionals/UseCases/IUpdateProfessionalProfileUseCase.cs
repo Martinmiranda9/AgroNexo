@@ -7,5 +7,5 @@ namespace AgroNexo.Application.Professionals.UseCases;
 /// </summary>
 public interface IUpdateProfessionalProfileUseCase
 {
-    Task<ProfessionalProfileResponse> ExecuteAsync(string auth0UserId, UpdateProfessionalProfileRequest request, CancellationToken cancellationToken = default);
+    Task<ProfessionalProfileResponse> ExecuteAsync(string firebaseUid, UpdateProfessionalProfileRequest request, CancellationToken cancellationToken = default);
 }

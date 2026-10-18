@@ -48,7 +48,7 @@ public class InfrastructureTests
 
         // Act
         var auth0Index = entity.GetIndexes()
-            .FirstOrDefault(i => i.Properties.Any(p => p.Name == nameof(Producer.Auth0UserId)));
+            .FirstOrDefault(i => i.Properties.Any(p => p.Name == nameof(Producer.FirebaseUid)));
 
         // Assert
         auth0Index.Should().NotBeNull();
@@ -64,7 +64,7 @@ public class InfrastructureTests
 
         // Act
         var auth0Index = entity.GetIndexes()
-            .FirstOrDefault(i => i.Properties.Any(p => p.Name == nameof(Professional.Auth0UserId)));
+            .FirstOrDefault(i => i.Properties.Any(p => p.Name == nameof(Professional.FirebaseUid)));
 
         var gistIndex = entity.GetIndexes()
             .FirstOrDefault(i => i.Properties.Any(p => p.Name == nameof(Professional.CoverageArea)));

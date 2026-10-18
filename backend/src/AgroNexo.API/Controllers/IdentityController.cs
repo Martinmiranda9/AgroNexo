@@ -32,8 +32,8 @@ public class IdentityController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Me(CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
         {
             return Unauthorized(new ProblemDetails
             {
@@ -44,7 +44,7 @@ public class IdentityController : ApiControllerBase
             });
         }
 
-        return Ok(await _getCurrentUserUseCase.ExecuteAsync(auth0UserId, cancellationToken));
+        return Ok(await _getCurrentUserUseCase.ExecuteAsync(firebaseUid, cancellationToken));
     }
 
     /// <summary>
@@ -62,8 +62,8 @@ public class IdentityController : ApiControllerBase
         [FromBody] RegisterUserRequest request,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
         {
             return Unauthorized(new ProblemDetails
             {
@@ -74,7 +74,7 @@ public class IdentityController : ApiControllerBase
             });
         }
 
-        var response = await _registerUserUseCase.ExecuteAsync(request, auth0UserId, cancellationToken);
+        var response = await _registerUserUseCase.ExecuteAsync(request, firebaseUid, cancellationToken);
         return StatusCode(StatusCodes.Status201Created, response);
     }
 }

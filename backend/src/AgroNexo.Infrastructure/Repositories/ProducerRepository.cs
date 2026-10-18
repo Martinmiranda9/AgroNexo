@@ -21,14 +21,14 @@ public class ProducerRepository : IProducerRepository
             .FirstOrDefaultAsync(p => p.Id == id && p.IsActive, cancellationToken);
     }
 
-    public async Task<Producer?> GetByAuth0UserIdAsync(string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<Producer?> GetByFirebaseUidAsync(string firebaseUid, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return null;
 
-        var normalizedAuth0Id = auth0UserId.Trim();
+        var normalizedFirebaseUid = firebaseUid.Trim();
         return await _context.Producers
-            .FirstOrDefaultAsync(p => p.Auth0UserId == normalizedAuth0Id && p.IsActive, cancellationToken);
+            .FirstOrDefaultAsync(p => p.FirebaseUid == normalizedFirebaseUid && p.IsActive, cancellationToken);
     }
 
     public async Task<Producer?> GetByTenantIdAsync(Guid tenantId, CancellationToken cancellationToken = default)

@@ -36,14 +36,14 @@ public class ManageFarmMembersUseCase : IManageFarmMembersUseCase
     public async Task<FarmMemberResponse> AddAsync(
         Guid farmId,
         AddFarmMemberRequest request,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         if (request.ProfessionalId == Guid.Empty)
             throw new DomainValidationException(nameof(request.ProfessionalId), "El profesional es obligatorio.");
 
-        var access = await _farmAccessService.GetOwnerAccessAsync(farmId, auth0UserId, cancellationToken);
+        var access = await _farmAccessService.GetOwnerAccessAsync(farmId, firebaseUid, cancellationToken);
         access.Farm.EnsureNotArchived();
 
         var professional = await _professionalRepository.GetByIdAcrossTenantsAsync(request.ProfessionalId, cancellationToken)
@@ -65,9 +65,9 @@ public class ManageFarmMembersUseCase : IManageFarmMembersUseCase
         return FarmMemberMapper.ToResponse(member, professional, includeContact: true);
     }
 
-    public async Task RemoveAsync(Guid farmId, Guid memberId, string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task RemoveAsync(Guid farmId, Guid memberId, string firebaseUid, CancellationToken cancellationToken = default)
     {
-        var access = await _farmAccessService.GetOwnerAccessAsync(farmId, auth0UserId, cancellationToken);
+        var access = await _farmAccessService.GetOwnerAccessAsync(farmId, firebaseUid, cancellationToken);
         access.Farm.EnsureNotArchived();
 
         var member = await _farmMemberRepository.GetByIdAsync(memberId, cancellationToken);
@@ -79,9 +79,9 @@ public class ManageFarmMembersUseCase : IManageFarmMembersUseCase
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task LeaveAsync(Guid farmId, string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task LeaveAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken = default)
     {
-        var access = await _farmAccessService.GetMemberAccessAsync(farmId, auth0UserId, cancellationToken);
+        var access = await _farmAccessService.GetMemberAccessAsync(farmId, firebaseUid, cancellationToken);
         var member = access.Membership!;
 
         member.Leave();

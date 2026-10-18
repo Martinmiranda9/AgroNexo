@@ -22,38 +22,38 @@ public class FarmAccessService : IFarmAccessService
         _professionalRepository = professionalRepository;
     }
 
-    public async Task<FarmAccess> GetAccessAsync(Guid farmId, string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<FarmAccess> GetAccessAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken = default)
     {
-        var access = await ResolveAsync(farmId, auth0UserId, cancellationToken);
+        var access = await ResolveAsync(farmId, firebaseUid, cancellationToken);
         return access ?? throw NotFound(farmId);
     }
 
-    public async Task<FarmAccess> GetOwnerAccessAsync(Guid farmId, string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<FarmAccess> GetOwnerAccessAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken = default)
     {
-        var access = await ResolveAsync(farmId, auth0UserId, cancellationToken);
+        var access = await ResolveAsync(farmId, firebaseUid, cancellationToken);
         return access is { IsOwner: true } ? access : throw NotFound(farmId);
     }
 
-    public async Task<FarmAccess> GetMemberAccessAsync(Guid farmId, string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<FarmAccess> GetMemberAccessAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken = default)
     {
-        var access = await ResolveAsync(farmId, auth0UserId, cancellationToken);
+        var access = await ResolveAsync(farmId, firebaseUid, cancellationToken);
         return access is { Membership: not null } ? access : throw NotFound(farmId);
     }
 
-    private async Task<FarmAccess?> ResolveAsync(Guid farmId, string auth0UserId, CancellationToken cancellationToken)
+    private async Task<FarmAccess?> ResolveAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken)
     {
-        if (farmId == Guid.Empty || string.IsNullOrWhiteSpace(auth0UserId))
+        if (farmId == Guid.Empty || string.IsNullOrWhiteSpace(firebaseUid))
             return null;
 
         var farm = await _farmRepository.GetByIdAcrossTenantsAsync(farmId, cancellationToken);
         if (farm == null)
             return null;
 
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (producer != null)
             return producer.Id == farm.ProducerId ? new FarmAccess(farm, producer, null, null) : null;
 
-        var professional = await _professionalRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var professional = await _professionalRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (professional == null)
             return null;
 

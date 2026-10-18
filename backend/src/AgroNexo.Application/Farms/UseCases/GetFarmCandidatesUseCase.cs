@@ -33,10 +33,10 @@ public class GetFarmCandidatesUseCase : IGetFarmCandidatesUseCase
     public async Task<IReadOnlyList<FarmCandidateResponse>> ExecuteAsync(
         Guid farmId,
         ProfessionalRole? role,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
-        var access = await _farmAccessService.GetOwnerAccessAsync(farmId, auth0UserId, cancellationToken);
+        var access = await _farmAccessService.GetOwnerAccessAsync(farmId, firebaseUid, cancellationToken);
         if (access.Farm.IsArchived)
             return Array.Empty<FarmCandidateResponse>();
 

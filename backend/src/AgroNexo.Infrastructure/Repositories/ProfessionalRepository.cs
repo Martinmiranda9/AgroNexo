@@ -30,19 +30,19 @@ public class ProfessionalRepository : IProfessionalRepository
             .FirstOrDefaultAsync(p => p.Id == id && p.IsActive, cancellationToken);
     }
 
-    public async Task<Professional?> GetByAuth0UserIdAsync(string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<Professional?> GetByFirebaseUidAsync(string firebaseUid, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return null;
 
         // IgnoreQueryFilters is required here: this lookup is what RESOLVES the tenant for a given
         // identity (TenantMiddleware, GetCurrentUserUseCase, duplicate-check on register), so it runs
         // before CurrentTenantId is known. With the tenant-scoped query filter applied, CurrentTenantId
         // defaults to Guid.Empty and this would never match any real row.
-        var normalizedAuth0Id = auth0UserId.Trim();
+        var normalizedFirebaseUid = firebaseUid.Trim();
         return await _context.Professionals
             .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(p => p.Auth0UserId == normalizedAuth0Id && p.IsActive, cancellationToken);
+            .FirstOrDefaultAsync(p => p.FirebaseUid == normalizedFirebaseUid && p.IsActive, cancellationToken);
     }
 
     public async Task<Professional?> GetByTenantIdAsync(Guid tenantId, CancellationToken cancellationToken = default)

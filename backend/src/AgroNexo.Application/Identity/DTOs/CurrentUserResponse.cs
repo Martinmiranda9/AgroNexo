@@ -4,11 +4,11 @@ namespace AgroNexo.Application.Identity.DTOs;
 
 /// <summary>
 /// Estado del usuario autenticado. Permite al frontend decidir si lo manda al registro
-/// (primer ingreso con Google/Auth0) o directo a la aplicación.
+/// (primer ingreso con Google o correo) o directo a la aplicación.
 /// </summary>
 public class CurrentUserResponse
 {
-    /// <summary>true cuando ya existe un Producer o Professional asociado a la identidad de Auth0.</summary>
+    /// <summary>true cuando ya existe un Producer o Professional asociado a la identidad de Firebase.</summary>
     public bool IsRegistered { get; set; }
 
     public UserType? UserType { get; set; }

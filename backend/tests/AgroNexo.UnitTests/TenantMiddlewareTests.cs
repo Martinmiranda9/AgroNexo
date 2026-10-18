@@ -51,7 +51,7 @@ public class TenantMiddlewareTests
 
         // Assert
         tenantContext.TenantId.Should().Be(expectedTenantId);
-        tenantContext.Auth0UserId.Should().Be(expectedUserId);
+        tenantContext.FirebaseUid.Should().Be(expectedUserId);
         tenantContext.UserRole.Should().Be("Producer");
         tenantContext.IsAuthenticated.Should().BeTrue();
 
@@ -69,7 +69,7 @@ public class TenantMiddlewareTests
         var expectedUserId = "auth0|dbproducer";
 
         var producer = new Producer(expectedTenantId, expectedUserId, "Carlos", "Gomez", "20123456");
-        _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync(expectedUserId, It.IsAny<CancellationToken>()))
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync(expectedUserId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(producer);
 
         var claims = new[]
@@ -96,7 +96,7 @@ public class TenantMiddlewareTests
 
         // Assert
         tenantContext.TenantId.Should().Be(expectedTenantId);
-        tenantContext.Auth0UserId.Should().Be(expectedUserId);
+        tenantContext.FirebaseUid.Should().Be(expectedUserId);
         tenantContext.UserRole.Should().Be("Producer");
 
         currentUserService.TenantId.Should().Be(expectedTenantId);
@@ -104,10 +104,10 @@ public class TenantMiddlewareTests
     }
 
     [Fact]
-    public async Task InvokeAsync_WhenUserHasHeaderTenantId_PopulatesTenantContextFromHeader()
+    public async Task InvokeAsync_WhenUnregisteredUserSendsTenantHeader_IgnoresHeaderAndReturnsUnauthorized()
     {
         // Arrange
-        var expectedTenantId = Guid.NewGuid();
+        var headerTenantId = Guid.NewGuid();
         var expectedUserId = "auth0|headeruser";
 
         var claims = new[]
@@ -118,7 +118,62 @@ public class TenantMiddlewareTests
         var principal = new ClaimsPrincipal(identity);
 
         var context = new DefaultHttpContext { User = principal };
-        context.Request.Headers["X-Tenant-ID"] = expectedTenantId.ToString();
+        context.Request.Path = "/api/v1/farms";
+        context.Request.Headers["X-Tenant-ID"] = headerTenantId.ToString();
+        context.Response.Body = new MemoryStream();
+
+        var tenantContext = new TenantContext();
+        var currentUserService = new CurrentUserService();
+
+        var nextCalled = false;
+        RequestDelegate next = _ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        };
+        var middleware = new TenantMiddleware(next, _loggerMock.Object);
+
+        // Act
+        await middleware.InvokeAsync(
+            context,
+            tenantContext,
+            currentUserService,
+            _producerRepoMock.Object,
+            _professionalRepoMock.Object);
+
+        // Assert
+        context.Response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+        context.Response.Body.Position = 0;
+        var body = await new StreamReader(context.Response.Body).ReadToEndAsync();
+        body.Should().Contain("tenant_claim_missing");
+
+        nextCalled.Should().BeFalse();
+        tenantContext.TenantId.Should().NotBe(headerTenantId);
+        tenantContext.IsAuthenticated.Should().BeFalse();
+        currentUserService.TenantId.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenRegisteredUserSendsDifferentTenantHeader_UsesTenantFromRepository()
+    {
+        // Arrange
+        var registeredTenantId = Guid.NewGuid();
+        var headerTenantId = Guid.NewGuid();
+        var expectedUserId = "auth0|headerproducer";
+
+        var producer = new Producer(registeredTenantId, expectedUserId, "Carlos", "Gomez", "20123456");
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync(expectedUserId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(producer);
+
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, expectedUserId)
+        };
+        var identity = new ClaimsIdentity(claims, "TestAuth");
+        var principal = new ClaimsPrincipal(identity);
+
+        var context = new DefaultHttpContext { User = principal };
+        context.Request.Headers["X-Tenant-ID"] = headerTenantId.ToString();
 
         var tenantContext = new TenantContext();
         var currentUserService = new CurrentUserService();
@@ -135,8 +190,8 @@ public class TenantMiddlewareTests
             _professionalRepoMock.Object);
 
         // Assert
-        tenantContext.TenantId.Should().Be(expectedTenantId);
-        tenantContext.Auth0UserId.Should().Be(expectedUserId);
-        currentUserService.TenantId.Should().Be(expectedTenantId);
+        tenantContext.TenantId.Should().Be(registeredTenantId);
+        tenantContext.FirebaseUid.Should().Be(expectedUserId);
+        currentUserService.TenantId.Should().Be(registeredTenantId);
     }
 }

@@ -14,7 +14,7 @@ public class ProfessionalProfileResponse
     public long PublicId { get; set; }
 
     public Guid TenantId { get; set; }
-    public string Auth0UserId { get; set; } = string.Empty;
+    public string FirebaseUid { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string DocumentNumber { get; set; } = string.Empty;

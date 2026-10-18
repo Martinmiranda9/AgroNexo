@@ -34,17 +34,17 @@ public class GenerateMatchRecommendationsUseCase : IGenerateMatchRecommendations
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<MatchDiscoveryResponse> ExecuteByAuth0UserIdAsync(
+    public async Task<MatchDiscoveryResponse> ExecuteByFirebaseUidAsync(
         CreateMatchDiscoveryRequest request,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(auth0UserId))
-            throw new DomainValidationException(nameof(auth0UserId), "El identificador de usuario es obligatorio.");
+        if (string.IsNullOrWhiteSpace(firebaseUid))
+            throw new DomainValidationException(nameof(firebaseUid), "El identificador de usuario es obligatorio.");
 
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (producer == null)
-            throw new EntityNotFoundException("Productor", auth0UserId);
+            throw new EntityNotFoundException("Productor", firebaseUid);
 
         return await ExecuteAsync(request, producer.Id, cancellationToken);
     }

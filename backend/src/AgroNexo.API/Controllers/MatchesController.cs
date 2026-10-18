@@ -44,8 +44,8 @@ public class MatchesController : ApiControllerBase
         [FromBody] CreateMatchRequest request,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
         {
             return Unauthorized(new ProblemDetails
             {
@@ -60,11 +60,11 @@ public class MatchesController : ApiControllerBase
 
         if (request.ProducerId.HasValue && request.ProducerId.Value != Guid.Empty)
         {
-            response = await _createMatchUseCase.ExecuteAsync(request, request.ProducerId.Value, auth0UserId, cancellationToken);
+            response = await _createMatchUseCase.ExecuteAsync(request, request.ProducerId.Value, firebaseUid, cancellationToken);
         }
         else
         {
-            response = await _createMatchUseCase.ExecuteByAuth0UserIdAsync(request, auth0UserId, cancellationToken);
+            response = await _createMatchUseCase.ExecuteByFirebaseUidAsync(request, firebaseUid, cancellationToken);
         }
 
         return CreatedAtAction(nameof(GetMatches), new { id = response.Id }, response);
@@ -84,18 +84,18 @@ public class MatchesController : ApiControllerBase
         [FromQuery] MatchFilterRequest filter,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
+        var firebaseUid = CurrentFirebaseUid;
         filter ??= new MatchFilterRequest();
 
         PagedResult<MatchResponse> result;
 
-        if (!string.IsNullOrWhiteSpace(auth0UserId) && !filter.ProducerId.HasValue && !filter.ProfessionalId.HasValue)
+        if (!string.IsNullOrWhiteSpace(firebaseUid) && !filter.ProducerId.HasValue && !filter.ProfessionalId.HasValue)
         {
-            result = await _getMatchesUseCase.ExecuteForUserAsync(auth0UserId, filter, cancellationToken);
+            result = await _getMatchesUseCase.ExecuteForUserAsync(firebaseUid, filter, cancellationToken);
         }
         else
         {
-            result = await _getMatchesUseCase.ExecuteAsync(filter, auth0UserId, cancellationToken);
+            result = await _getMatchesUseCase.ExecuteAsync(filter, firebaseUid, cancellationToken);
         }
 
         return Ok(result);
@@ -121,8 +121,8 @@ public class MatchesController : ApiControllerBase
         [FromBody] UpdateMatchStatusRequest request,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        var response = await _updateMatchStatusUseCase.ExecuteAsync(id, request, auth0UserId, cancellationToken);
+        var firebaseUid = CurrentFirebaseUid;
+        var response = await _updateMatchStatusUseCase.ExecuteAsync(id, request, firebaseUid, cancellationToken);
         return Ok(response);
     }
 }

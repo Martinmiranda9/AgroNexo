@@ -32,7 +32,7 @@ public class UpdateMatchStatusUseCase : IUpdateMatchStatusUseCase
     public async Task<MatchResponse> ExecuteAsync(
         Guid matchId,
         UpdateMatchStatusRequest request,
-        string? auth0UserId = null,
+        string? firebaseUid = null,
         CancellationToken cancellationToken = default)
     {
         if (matchId == Guid.Empty)
@@ -47,11 +47,11 @@ public class UpdateMatchStatusUseCase : IUpdateMatchStatusUseCase
 
         var professionalIsCaller = false;
 
-        // Cross-tenant authorization check if auth0UserId is supplied
-        if (!string.IsNullOrWhiteSpace(auth0UserId))
+        // Cross-tenant authorization check if firebaseUid is supplied
+        if (!string.IsNullOrWhiteSpace(firebaseUid))
         {
-            var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
-            var professional = await _professionalRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+            var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
+            var professional = await _professionalRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
 
             bool isProducerOwner = producer != null && producer.Id == match.ProducerId;
             bool isProfessionalOwner = professional != null && professional.Id == match.ProfessionalId;
@@ -59,7 +59,7 @@ public class UpdateMatchStatusUseCase : IUpdateMatchStatusUseCase
             if (!isProducerOwner && !isProfessionalOwner)
             {
                 throw new CrossTenantAccessException(
-                    $"El usuario '{auth0UserId}' no tiene permisos sobre este Match.");
+                    $"El usuario '{firebaseUid}' no tiene permisos sobre este Match.");
             }
 
             professionalIsCaller = isProfessionalOwner;
@@ -103,7 +103,7 @@ public class UpdateMatchStatusUseCase : IUpdateMatchStatusUseCase
         // Quien responde es el profesional invitado (el productor no puede aceptar): al aceptar recibe el contacto.
         var shareProducerContact = prod != null
             && match.Status == MatchStatus.Active
-            && !string.IsNullOrWhiteSpace(auth0UserId)
+            && !string.IsNullOrWhiteSpace(firebaseUid)
             && professionalIsCaller;
         var prof = await _professionalRepository.GetByIdAcrossTenantsAsync(match.ProfessionalId, cancellationToken);
 

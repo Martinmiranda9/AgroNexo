@@ -7,6 +7,6 @@ namespace AgroNexo.Application.Matching.UseCases;
 /// </summary>
 public interface ICreateMatchUseCase
 {
-    Task<MatchResponse> ExecuteAsync(CreateMatchRequest request, Guid producerId, string auth0UserId, CancellationToken cancellationToken = default);
-    Task<MatchResponse> ExecuteByAuth0UserIdAsync(CreateMatchRequest request, string auth0UserId, CancellationToken cancellationToken = default);
+    Task<MatchResponse> ExecuteAsync(CreateMatchRequest request, Guid producerId, string firebaseUid, CancellationToken cancellationToken = default);
+    Task<MatchResponse> ExecuteByFirebaseUidAsync(CreateMatchRequest request, string firebaseUid, CancellationToken cancellationToken = default);
 }

@@ -25,6 +25,40 @@ namespace AgroNexo.Infrastructure.Data.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("AgroNexo.Domain.Entities.Campaign", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("EndsOn")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("FarmId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("character varying(7)");
+
+                    b.Property<DateOnly>("StartsOn")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FarmId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("campaigns", (string)null);
+                });
+
             modelBuilder.Entity("AgroNexo.Domain.Entities.Farm", b =>
                 {
                     b.Property<Guid>("Id")
@@ -84,6 +118,68 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                     b.ToTable("farms", (string)null);
                 });
 
+            modelBuilder.Entity("AgroNexo.Domain.Entities.FarmActivity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("AuthorProfessionalId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CampaignId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("FarmId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("HectaresWorked")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)");
+
+                    b.Property<Guid?>("LotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorProfessionalId");
+
+                    b.HasIndex("CampaignId");
+
+                    b.HasIndex("LotId");
+
+                    b.HasIndex("FarmId", "Date");
+
+                    b.ToTable("farm_activities", (string)null);
+                });
+
             modelBuilder.Entity("AgroNexo.Domain.Entities.FarmMember", b =>
                 {
                     b.Property<Guid>("Id")
@@ -125,6 +221,76 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                         .HasFilter("\"Status\" = 0");
 
                     b.ToTable("farm_members", (string)null);
+                });
+
+            modelBuilder.Entity("AgroNexo.Domain.Entities.Lot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("FarmId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Hectares")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FarmId");
+
+                    b.ToTable("lots", (string)null);
+                });
+
+            modelBuilder.Entity("AgroNexo.Domain.Entities.LotCrop", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CampaignId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Crop")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly?>("ExpectedHarvestDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("LotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly?>("SowingDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignId");
+
+                    b.HasIndex("LotId", "CampaignId", "Crop")
+                        .IsUnique();
+
+                    b.ToTable("lot_crops", (string)null);
                 });
 
             modelBuilder.Entity("AgroNexo.Domain.Entities.Match", b =>
@@ -243,11 +409,6 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Auth0UserId")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
                     b.Property<string>("City")
                         .HasColumnType("text");
 
@@ -265,6 +426,11 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(254)
                         .HasColumnType("character varying(254)");
+
+                    b.Property<string>("FirebaseUid")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -314,7 +480,7 @@ namespace AgroNexo.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Auth0UserId")
+                    b.HasIndex("FirebaseUid")
                         .IsUnique();
 
                     b.HasIndex("PublicId")
@@ -331,11 +497,6 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Auth0UserId")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
                     b.Property<Geometry>("CoverageArea")
                         .HasColumnType("geometry");
 
@@ -350,6 +511,11 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(254)
                         .HasColumnType("character varying(254)");
+
+                    b.Property<string>("FirebaseUid")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -413,12 +579,12 @@ namespace AgroNexo.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Auth0UserId")
-                        .IsUnique();
-
                     b.HasIndex("CoverageArea");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("CoverageArea"), "GIST");
+
+                    b.HasIndex("FirebaseUid")
+                        .IsUnique();
 
                     b.HasIndex("PublicId")
                         .IsUnique();
@@ -455,6 +621,15 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                     b.ToTable("tenants", (string)null);
                 });
 
+            modelBuilder.Entity("AgroNexo.Domain.Entities.Campaign", b =>
+                {
+                    b.HasOne("AgroNexo.Domain.Entities.Farm", null)
+                        .WithMany()
+                        .HasForeignKey("FarmId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("AgroNexo.Domain.Entities.Farm", b =>
                 {
                     b.HasOne("AgroNexo.Domain.Entities.Producer", "Producer")
@@ -472,6 +647,30 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                     b.Navigation("Producer");
 
                     b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("AgroNexo.Domain.Entities.FarmActivity", b =>
+                {
+                    b.HasOne("AgroNexo.Domain.Entities.Professional", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorProfessionalId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AgroNexo.Domain.Entities.Campaign", null)
+                        .WithMany()
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AgroNexo.Domain.Entities.Farm", null)
+                        .WithMany()
+                        .HasForeignKey("FarmId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AgroNexo.Domain.Entities.Lot", null)
+                        .WithMany()
+                        .HasForeignKey("LotId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("AgroNexo.Domain.Entities.FarmMember", b =>
@@ -497,6 +696,30 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                     b.Navigation("Farm");
 
                     b.Navigation("Professional");
+                });
+
+            modelBuilder.Entity("AgroNexo.Domain.Entities.Lot", b =>
+                {
+                    b.HasOne("AgroNexo.Domain.Entities.Farm", null)
+                        .WithMany()
+                        .HasForeignKey("FarmId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AgroNexo.Domain.Entities.LotCrop", b =>
+                {
+                    b.HasOne("AgroNexo.Domain.Entities.Campaign", null)
+                        .WithMany()
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AgroNexo.Domain.Entities.Lot", null)
+                        .WithMany("Crops")
+                        .HasForeignKey("LotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AgroNexo.Domain.Entities.Match", b =>
@@ -612,6 +835,11 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("AgroNexo.Domain.Entities.Lot", b =>
+                {
+                    b.Navigation("Crops");
                 });
 
             modelBuilder.Entity("AgroNexo.Domain.Entities.MatchDiscoveryRequest", b =>

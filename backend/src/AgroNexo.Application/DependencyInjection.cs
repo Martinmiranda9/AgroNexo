@@ -8,6 +8,7 @@ using AgroNexo.Application.Matching.UseCases;
 using AgroNexo.Application.Producers.UseCases;
 using AgroNexo.Application.Professionals.UseCases;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AgroNexo.Application;
 
@@ -48,6 +49,14 @@ public static class DependencyInjection
         services.AddScoped<IGetFarmCandidatesUseCase, GetFarmCandidatesUseCase>();
         services.AddScoped<IManageFarmMembersUseCase, ManageFarmMembersUseCase>();
         services.AddScoped<IGetWorkspacesUseCase, GetWorkspacesUseCase>();
+
+        // Tablero del campo: campañas, lotes con cultivos y actividades
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddScoped<IFarmActivityResponseFactory, FarmActivityResponseFactory>();
+        services.AddScoped<IManageCampaignsUseCase, ManageCampaignsUseCase>();
+        services.AddScoped<IManageLotsUseCase, ManageLotsUseCase>();
+        services.AddScoped<IManageFarmActivitiesUseCase, ManageFarmActivitiesUseCase>();
+        services.AddScoped<IGetFarmDashboardUseCase, GetFarmDashboardUseCase>();
 
         // Matching Use Cases
         services.AddScoped<IGenerateMatchRecommendationsUseCase, GenerateMatchRecommendationsUseCase>();

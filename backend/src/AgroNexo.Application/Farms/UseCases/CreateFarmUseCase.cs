@@ -27,13 +27,13 @@ public class CreateFarmUseCase : ICreateFarmUseCase
 
     public async Task<FarmResponse> ExecuteAsync(
         CreateFarmRequest request,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken)
-            ?? throw new EntityNotFoundException("Producer", auth0UserId);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken)
+            ?? throw new EntityNotFoundException("Producer", firebaseUid);
 
         var location = request.LocationCoordinates != null && request.LocationCoordinates.Count > 0
             ? GeometryHelper.CreatePolygon(request.LocationCoordinates)

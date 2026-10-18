@@ -38,8 +38,8 @@ public class MatchDiscoveryController : ApiControllerBase
         [FromBody] CreateMatchDiscoveryRequest request,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
         {
             return Unauthorized(new ProblemDetails
             {
@@ -50,7 +50,7 @@ public class MatchDiscoveryController : ApiControllerBase
             });
         }
 
-        var response = await _generateRecommendationsUseCase.ExecuteByAuth0UserIdAsync(request, auth0UserId, cancellationToken);
+        var response = await _generateRecommendationsUseCase.ExecuteByFirebaseUidAsync(request, firebaseUid, cancellationToken);
         return CreatedAtAction(nameof(GetRecommendations), new { id = response.Id }, response);
     }
 
@@ -70,8 +70,8 @@ public class MatchDiscoveryController : ApiControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        var response = await _getRecommendationsUseCase.ExecuteAsync(id, auth0UserId, cancellationToken);
+        var firebaseUid = CurrentFirebaseUid;
+        var response = await _getRecommendationsUseCase.ExecuteAsync(id, firebaseUid, cancellationToken);
         if (response == null)
         {
             return NotFound(new ProblemDetails

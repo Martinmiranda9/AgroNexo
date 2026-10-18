@@ -27,11 +27,11 @@ public class WorkspacesController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetWorkspaces(CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        var workspaces = await _getWorkspacesUseCase.ListAsync(auth0UserId, cancellationToken);
+        var workspaces = await _getWorkspacesUseCase.ListAsync(firebaseUid, cancellationToken);
         return Ok(workspaces);
     }
 
@@ -45,11 +45,11 @@ public class WorkspacesController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetWorkspace([FromRoute] Guid farmId, CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        var workspace = await _getWorkspacesUseCase.GetAsync(farmId, auth0UserId, cancellationToken);
+        var workspace = await _getWorkspacesUseCase.GetAsync(farmId, firebaseUid, cancellationToken);
         return Ok(workspace);
     }
 

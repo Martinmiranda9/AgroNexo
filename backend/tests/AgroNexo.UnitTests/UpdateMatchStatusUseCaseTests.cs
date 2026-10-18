@@ -73,8 +73,8 @@ public class UpdateMatchStatusUseCaseTests
         var match = new Match(producer.Id, professional.Id);
 
         _matchRepoMock.Setup(r => r.GetByIdAsync(match.Id, It.IsAny<CancellationToken>())).ReturnsAsync(match);
-        _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|prof", It.IsAny<CancellationToken>())).ReturnsAsync((Producer?)null);
-        _professionalRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|prof", It.IsAny<CancellationToken>())).ReturnsAsync(professional);
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|prof", It.IsAny<CancellationToken>())).ReturnsAsync((Producer?)null);
+        _professionalRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|prof", It.IsAny<CancellationToken>())).ReturnsAsync(professional);
         _producerRepoMock.Setup(r => r.GetByIdAsync(producer.Id, It.IsAny<CancellationToken>())).ReturnsAsync(producer);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
@@ -99,8 +99,8 @@ public class UpdateMatchStatusUseCaseTests
         var match = new Match(producer.Id, professional.Id);
 
         _matchRepoMock.Setup(r => r.GetByIdAsync(match.Id, It.IsAny<CancellationToken>())).ReturnsAsync(match);
-        _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|prof", It.IsAny<CancellationToken>())).ReturnsAsync((Producer?)null);
-        _professionalRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|prof", It.IsAny<CancellationToken>())).ReturnsAsync(professional);
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|prof", It.IsAny<CancellationToken>())).ReturnsAsync((Producer?)null);
+        _professionalRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|prof", It.IsAny<CancellationToken>())).ReturnsAsync(professional);
         _producerRepoMock.Setup(r => r.GetByIdAsync(producer.Id, It.IsAny<CancellationToken>())).ReturnsAsync(producer);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
@@ -192,9 +192,9 @@ public class UpdateMatchStatusUseCaseTests
         var match = new Match(producer.Id, professional.Id, brief);
 
         _matchRepoMock.Setup(r => r.GetByIdAsync(match.Id, It.IsAny<CancellationToken>())).ReturnsAsync(match);
-        _producerRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|prod", It.IsAny<CancellationToken>())).ReturnsAsync(producer);
+        _producerRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|prod", It.IsAny<CancellationToken>())).ReturnsAsync(producer);
         _producerRepoMock.Setup(r => r.GetByIdAsync(producer.Id, It.IsAny<CancellationToken>())).ReturnsAsync(producer);
-        _professionalRepoMock.Setup(r => r.GetByAuth0UserIdAsync("auth0|prof", It.IsAny<CancellationToken>())).ReturnsAsync(professional);
+        _professionalRepoMock.Setup(r => r.GetByFirebaseUidAsync("auth0|prof", It.IsAny<CancellationToken>())).ReturnsAsync(professional);
         _professionalRepoMock.Setup(r => r.GetByIdAsync(professional.Id, It.IsAny<CancellationToken>())).ReturnsAsync(professional);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 

@@ -33,8 +33,8 @@ public class ProfessionalsController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetMyProfile(CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
         {
             return Unauthorized(new ProblemDetails
             {
@@ -45,7 +45,7 @@ public class ProfessionalsController : ApiControllerBase
             });
         }
 
-        var profile = await _getProfessionalProfileUseCase.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var profile = await _getProfessionalProfileUseCase.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (profile == null)
         {
             return NotFound(new ProblemDetails
@@ -74,8 +74,8 @@ public class ProfessionalsController : ApiControllerBase
         [FromBody] UpdateProfessionalProfileRequest request,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
         {
             return Unauthorized(new ProblemDetails
             {
@@ -86,7 +86,7 @@ public class ProfessionalsController : ApiControllerBase
             });
         }
 
-        var updatedProfile = await _updateProfessionalProfileUseCase.ExecuteAsync(auth0UserId, request, cancellationToken);
+        var updatedProfile = await _updateProfessionalProfileUseCase.ExecuteAsync(firebaseUid, request, cancellationToken);
         return Ok(updatedProfile);
     }
 }

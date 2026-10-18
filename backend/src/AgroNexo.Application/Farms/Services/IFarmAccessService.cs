@@ -7,11 +7,11 @@ namespace AgroNexo.Application.Farms.Services;
 public interface IFarmAccessService
 {
     /// <summary>Dueño o profesional activo del equipo.</summary>
-    Task<FarmAccess> GetAccessAsync(Guid farmId, string auth0UserId, CancellationToken cancellationToken = default);
+    Task<FarmAccess> GetAccessAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken = default);
 
     /// <summary>Solo el productor dueño.</summary>
-    Task<FarmAccess> GetOwnerAccessAsync(Guid farmId, string auth0UserId, CancellationToken cancellationToken = default);
+    Task<FarmAccess> GetOwnerAccessAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken = default);
 
     /// <summary>Solo un profesional activo del equipo.</summary>
-    Task<FarmAccess> GetMemberAccessAsync(Guid farmId, string auth0UserId, CancellationToken cancellationToken = default);
+    Task<FarmAccess> GetMemberAccessAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken = default);
 }

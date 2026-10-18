@@ -46,7 +46,7 @@ public class DomainTests
         // Assert
         producer.Id.Should().NotBeEmpty();
         producer.TenantId.Should().Be(tenantId);
-        producer.Auth0UserId.Should().Be("auth0|12345");
+        producer.FirebaseUid.Should().Be("auth0|12345");
         producer.FirstName.Should().Be("Carlos");
         producer.LastName.Should().Be("Perez");
         producer.DocumentNumber.Should().Be("20-12345678-9");

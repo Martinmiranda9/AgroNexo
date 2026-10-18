@@ -46,11 +46,11 @@ public class FarmsController : ApiControllerBase
         [FromBody] CreateFarmRequest request,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        var response = await _createFarmUseCase.ExecuteAsync(request, auth0UserId, cancellationToken);
+        var response = await _createFarmUseCase.ExecuteAsync(request, firebaseUid, cancellationToken);
         return CreatedAtAction(nameof(GetFarm), new { id = response.Id }, response);
     }
 
@@ -64,11 +64,11 @@ public class FarmsController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetMyFarms(CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        var farms = await _getFarmsUseCase.ExecuteAsync(auth0UserId, cancellationToken);
+        var farms = await _getFarmsUseCase.ExecuteAsync(firebaseUid, cancellationToken);
         return Ok(farms);
     }
 
@@ -84,11 +84,11 @@ public class FarmsController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetFarm([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        var farm = await _getFarmsUseCase.GetByIdAsync(id, auth0UserId, cancellationToken);
+        var farm = await _getFarmsUseCase.GetByIdAsync(id, firebaseUid, cancellationToken);
         if (farm == null)
             return NotFound(new ProblemDetails
             {
@@ -117,11 +117,11 @@ public class FarmsController : ApiControllerBase
         [FromBody] UpdateFarmRequest request,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        var updated = await _updateFarmUseCase.ExecuteAsync(id, request, auth0UserId, cancellationToken);
+        var updated = await _updateFarmUseCase.ExecuteAsync(id, request, firebaseUid, cancellationToken);
         return Ok(updated);
     }
 
@@ -137,11 +137,11 @@ public class FarmsController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteFarm([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        await _deleteFarmUseCase.ExecuteAsync(id, auth0UserId, cancellationToken);
+        await _deleteFarmUseCase.ExecuteAsync(id, firebaseUid, cancellationToken);
         return NoContent();
     }
 
@@ -160,11 +160,11 @@ public class FarmsController : ApiControllerBase
         [FromBody] UpdateFarmStatusRequest request,
         CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
             return Unauthorized(BuildUnauthorizedProblem());
 
-        var farm = await _archiveFarmUseCase.ExecuteAsync(id, request, auth0UserId, cancellationToken);
+        var farm = await _archiveFarmUseCase.ExecuteAsync(id, request, firebaseUid, cancellationToken);
         return Ok(farm);
     }
 

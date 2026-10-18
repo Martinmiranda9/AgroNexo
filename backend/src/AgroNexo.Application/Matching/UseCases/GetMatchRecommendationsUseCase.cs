@@ -24,12 +24,12 @@ public class GetMatchRecommendationsUseCase : IGetMatchRecommendationsUseCase
         _ownershipValidator = ownershipValidator;
     }
 
-    public async Task<MatchDiscoveryResponse?> ExecuteAsync(Guid discoveryRequestId, string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<MatchDiscoveryResponse?> ExecuteAsync(Guid discoveryRequestId, string firebaseUid, CancellationToken cancellationToken = default)
     {
         if (discoveryRequestId == Guid.Empty)
             return null;
 
-        var discoveryRequest = await _ownershipValidator.GetOwnedDiscoveryRequestOrThrowAsync(discoveryRequestId, auth0UserId, cancellationToken);
+        var discoveryRequest = await _ownershipValidator.GetOwnedDiscoveryRequestOrThrowAsync(discoveryRequestId, firebaseUid, cancellationToken);
         if (discoveryRequest == null)
             return null;
 

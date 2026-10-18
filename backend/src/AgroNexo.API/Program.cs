@@ -78,7 +78,7 @@ builder.Services.AddAuthentication(options =>
     }
     else
     {
-        // Firebase firma los ID token con RS256, pero a diferencia de Auth0 NO publica un documento de
+        // Firebase firma los ID token con RS256, pero NO publica un documento de
         // descubrimiento OIDC en su issuer (https://securetoken.google.com/{projectId}/.well-known/
         // openid-configuration no existe) — por eso NO se setea `options.Authority` (dispararía ese
         // descubrimiento y fallaría). Las claves se resuelven a mano contra el JWKS fijo de Google

@@ -29,8 +29,8 @@ public class ProducersController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetMyProfile(CancellationToken cancellationToken)
     {
-        var auth0UserId = CurrentAuth0UserId;
-        if (string.IsNullOrWhiteSpace(auth0UserId))
+        var firebaseUid = CurrentFirebaseUid;
+        if (string.IsNullOrWhiteSpace(firebaseUid))
         {
             return Unauthorized(new ProblemDetails
             {
@@ -41,7 +41,7 @@ public class ProducersController : ApiControllerBase
             });
         }
 
-        var profile = await _getProducerProfileUseCase.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var profile = await _getProducerProfileUseCase.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (profile == null)
         {
             return NotFound(new ProblemDetails

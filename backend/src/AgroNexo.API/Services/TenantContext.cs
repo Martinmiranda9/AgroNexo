@@ -8,14 +8,14 @@ namespace AgroNexo.API.Services;
 public class TenantContext : ITenantContext
 {
     public Guid TenantId { get; set; } = Guid.Empty;
-    public string? Auth0UserId { get; set; }
+    public string? FirebaseUid { get; set; }
     public string? UserRole { get; set; }
-    public bool IsAuthenticated => !string.IsNullOrWhiteSpace(Auth0UserId);
+    public bool IsAuthenticated => !string.IsNullOrWhiteSpace(FirebaseUid);
 
-    public void SetContext(Guid tenantId, string? auth0UserId, string? userRole)
+    public void SetContext(Guid tenantId, string? firebaseUid, string? userRole)
     {
         TenantId = tenantId;
-        Auth0UserId = auth0UserId;
+        FirebaseUid = firebaseUid;
         UserRole = userRole;
     }
 }

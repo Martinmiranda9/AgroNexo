@@ -6,7 +6,7 @@ using AgroNexo.Domain.Interfaces;
 namespace AgroNexo.Application.Identity.UseCases;
 
 /// <summary>
-/// Indica si la identidad de Auth0 ya completó el registro (Producer o Professional).
+/// Indica si la identidad de Firebase ya completó el registro (Producer o Professional).
 /// </summary>
 public class GetCurrentUserUseCase : IGetCurrentUserUseCase
 {
@@ -21,12 +21,12 @@ public class GetCurrentUserUseCase : IGetCurrentUserUseCase
         _professionalRepository = professionalRepository;
     }
 
-    public async Task<CurrentUserResponse> ExecuteAsync(string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task<CurrentUserResponse> ExecuteAsync(string firebaseUid, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(auth0UserId))
-            throw new DomainValidationException(nameof(auth0UserId), "El identificador de autenticación Auth0 es obligatorio.");
+        if (string.IsNullOrWhiteSpace(firebaseUid))
+            throw new DomainValidationException(nameof(firebaseUid), "El identificador de autenticación es obligatorio.");
 
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (producer != null)
         {
             return new CurrentUserResponse
@@ -38,7 +38,7 @@ public class GetCurrentUserUseCase : IGetCurrentUserUseCase
             };
         }
 
-        var professional = await _professionalRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken);
+        var professional = await _professionalRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken);
         if (professional != null)
         {
             return new CurrentUserResponse

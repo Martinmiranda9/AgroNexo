@@ -7,5 +7,5 @@ namespace AgroNexo.Application.Producers.UseCases;
 /// </summary>
 public interface IUpdateProducerProfileUseCase
 {
-    Task<ProducerProfileResponse> ExecuteAsync(string auth0UserId, UpdateProducerProfileRequest request, CancellationToken cancellationToken = default);
+    Task<ProducerProfileResponse> ExecuteAsync(string firebaseUid, UpdateProducerProfileRequest request, CancellationToken cancellationToken = default);
 }

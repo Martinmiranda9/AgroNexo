@@ -30,13 +30,13 @@ public class ArchiveFarmUseCase : IArchiveFarmUseCase
     public async Task<FarmResponse> ExecuteAsync(
         Guid farmId,
         UpdateFarmStatusRequest request,
-        string auth0UserId,
+        string firebaseUid,
         CancellationToken cancellationToken = default)
     {
         if (request?.Archived != true)
             throw new DomainValidationException(nameof(UpdateFarmStatusRequest.Archived), "Un campo archivado no se puede reabrir.");
 
-        var access = await _farmAccessService.GetOwnerAccessAsync(farmId, auth0UserId, cancellationToken);
+        var access = await _farmAccessService.GetOwnerAccessAsync(farmId, firebaseUid, cancellationToken);
         var farm = access.Farm;
 
         farm.Archive();

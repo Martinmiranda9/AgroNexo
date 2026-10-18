@@ -30,7 +30,8 @@ public class EndToEndMatchingFlowIntegrationTests : IntegrationTestBase
             UserType = UserType.Producer,
             FirstName = "Gustavo",
             LastName = "Grobo",
-            DocumentNumber = "20-11223344-5"
+            DocumentNumber = "20-11223344-5",
+            PhoneNumber = "+5493511234567"
         };
 
         var prodClient = CreateClientWithAuth(prodAuth0Id, "Producer");
@@ -55,7 +56,9 @@ public class EndToEndMatchingFlowIntegrationTests : IntegrationTestBase
             FirstName = "Florencia",
             LastName = "Rossi",
             DocumentNumber = "27-66778899-0",
+            PhoneNumber = "+5493517654321",
             Role = ProfessionalRole.Agronomist,
+            LicenseNumber = "MP-12345",
             Specialty = "Nutrición de Suelos",
             YearsExperience = 12,
             MaxCapacity = 25
@@ -81,7 +84,9 @@ public class EndToEndMatchingFlowIntegrationTests : IntegrationTestBase
             FirstName = "Florencia",
             LastName = "Rossi",
             DocumentNumber = "27-66778899-0",
+            PhoneNumber = "+5493517654321",
             Role = ProfessionalRole.Agronomist,
+            LicenseNumber = "MP-12345",
             Specialty = "Nutrición de Suelos",
             YearsExperience = 12,
             MaxCapacity = 25,

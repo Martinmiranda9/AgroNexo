@@ -22,10 +22,10 @@ public class DeleteFarmUseCase : IDeleteFarmUseCase
         _unitOfWork = unitOfWork;
     }
 
-    public async Task ExecuteAsync(Guid farmId, string auth0UserId, CancellationToken cancellationToken = default)
+    public async Task ExecuteAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken = default)
     {
-        var producer = await _producerRepository.GetByAuth0UserIdAsync(auth0UserId, cancellationToken)
-            ?? throw new EntityNotFoundException("Producer", auth0UserId);
+        var producer = await _producerRepository.GetByFirebaseUidAsync(firebaseUid, cancellationToken)
+            ?? throw new EntityNotFoundException("Producer", firebaseUid);
 
         var farm = await _farmRepository.GetByIdAsync(farmId, cancellationToken)
             ?? throw new EntityNotFoundException("Farm", farmId.ToString());
