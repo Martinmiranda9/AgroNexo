@@ -331,6 +331,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* En el marco autenticado el lienzo es `canvas`: el hueco estable de la barra de scroll toma el fondo del body, así que
+   el body lo acompaña para que no quede una franja más clara a la derecha. */
+body:has([data-slot="app-shell"]) {
+  background-color: var(--canvas);
+}
+
 /* Jerarquía semántica: H1–H6 según el Design System (las clases text-heading-* la pisan cuando hace falta) */
 @layer base {
   h1, h2, h3, h4, h5, h6 {

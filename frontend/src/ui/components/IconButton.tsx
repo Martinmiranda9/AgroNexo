@@ -29,6 +29,9 @@ const iconButtonVariants = cva(
           'bg-transparent text-muted-foreground hover:bg-field-100 hover:text-field-800 data-popup-open:bg-field-100 data-popup-open:text-field-800',
         outline:
           'bg-transparent text-foreground border border-border hover:bg-accent hover:border-ring/30',
+        // Blanco con borde fino sobre el lienzo: los íconos de la barra de arriba (avisos, ayuda, menú).
+        surface:
+          'bg-card text-foreground border border-border [box-shadow:var(--shadow-s)] hover:bg-field-100 hover:text-field-800 data-popup-open:bg-field-100 data-popup-open:text-field-800',
         destructive:
           'bg-destructive text-destructive-foreground [box-shadow:var(--shadow-button)] hover:brightness-105',
       },

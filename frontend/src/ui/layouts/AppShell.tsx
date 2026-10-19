@@ -1,27 +1,25 @@
 import type { ReactNode } from 'react';
 
 interface AppShellProps {
-  /** Encabezado fijo arriba, a todo el ancho. */
+  /** Barra de arriba del contenido (avisos, ayuda y perfil; en celular, además el menú y el logo). */
   header: ReactNode;
-  /** Barra lateral: se muestra desde `lg`, debajo del encabezado. En celular vive en el panel del menú. */
+  /** Sidebar de una columna, a toda la altura: se muestra desde `lg`. En celular vive en el panel del menú. */
   sidebar: ReactNode;
   children: ReactNode;
 }
 
 /**
- * Marco de las pantallas autenticadas (estructura de la referencia del tablero): lienzo gris, encabezado arriba y la
- * columna de pastillas del sidebar a la izquierda, fija mientras el contenido scrollea.
+ * Marco de las pantallas autenticadas: el sidebar blanco de una sola columna a la izquierda, fijo y a toda la altura,
+ * y a la derecha el lienzo con la barra de arriba y el contenido, que scrollea.
  */
 export default function AppShell({ header, sidebar, children }: AppShellProps) {
   return (
-    <div className="bg-canvas min-h-[100dvh]">
-      {header}
-      <div className="flex gap-6 px-4 pb-6 sm:px-6">
-        {/* z-20: por encima de los brillos `fixed` de algunas pantallas (BrandGlow en Buscar). */}
-        <div className="sticky top-19 z-20 hidden h-[calc(100dvh-6.25rem)] shrink-0 self-start lg:block">
-          {sidebar}
-        </div>
-        <div className="min-w-0 flex-1">{children}</div>
+    <div data-slot="app-shell" className="bg-canvas flex min-h-[100dvh]">
+      {/* z-20: por encima de los brillos `fixed` de algunas pantallas (BrandGlow en Buscar). */}
+      <div className="sticky top-0 z-20 hidden h-[100dvh] shrink-0 lg:block">{sidebar}</div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        {header}
+        <div className="min-w-0 flex-1 px-4 pb-6 sm:px-6">{children}</div>
       </div>
     </div>
   );

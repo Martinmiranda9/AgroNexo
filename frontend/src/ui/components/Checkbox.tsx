@@ -2,19 +2,20 @@
 
 import * as React from 'react';
 import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox';
-import { MdCheck } from 'react-icons/md';
+import { MdCheck, MdRemove } from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
 
 /*
  * Cashmere Checkbox (registro `cashmere/checkbox-base`): hueco suave cuando está vacío y relleno plano cuando
- * está marcado. AgroNexo: lo seleccionado es pine con el check en beige (no el color del botón).
+ * está marcado. AgroNexo: lo seleccionado es pine con el check en beige (no el color del botón). Con
+ * `indeterminate` ("seleccionar todo" a medias) muestra una raya en vez del check.
  */
 function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        'peer border-input-border relative size-4 shrink-0 rounded-sm border',
+        'peer border-input-border relative inline-flex size-4 shrink-0 items-center justify-center rounded-sm border align-middle',
         'bg-input [box-shadow:var(--shadow-inset)]',
         'transition-[background-color,box-shadow,border-color] duration-150',
         'hover:border-ring/60',
@@ -22,6 +23,7 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
         'disabled:cursor-not-allowed disabled:opacity-50 data-disabled:cursor-not-allowed data-disabled:opacity-50',
         'aria-invalid:border-destructive',
         'data-checked:bg-pine data-checked:border-pine data-checked:text-sage-50 data-checked:[box-shadow:var(--shadow-primary)]',
+        'data-indeterminate:bg-pine data-indeterminate:border-pine data-indeterminate:text-sage-50',
         // Área táctil más grande que el cuadro visible.
         'after:absolute after:-inset-x-3 after:-inset-y-2',
         className
@@ -30,9 +32,10 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
     >
       <CheckboxPrimitive.Indicator
         data-slot="checkbox-indicator"
-        className="flex size-full items-center justify-center text-current"
+        className="group/indicator flex size-full items-center justify-center text-current"
       >
-        <MdCheck className="size-3" />
+        <MdCheck className="size-3 group-data-indeterminate/indicator:hidden" />
+        <MdRemove className="hidden size-3 group-data-indeterminate/indicator:block" />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   );

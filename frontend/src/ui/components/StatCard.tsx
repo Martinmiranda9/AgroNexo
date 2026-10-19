@@ -10,7 +10,8 @@ import { cashmereGrainStyle } from './_shared';
  * - el rótulo va en sentence case, sin las mayúsculas espaciadas del registro (regla de Cashmere);
  * - la variación positiva usa el verde de estado (`success`) en vez de un oklch suelto;
  * - `tone`: `card` (la original), `tile` (casilla gris dentro de otra card, como las del tablero de referencia) y
- *   `brand` (la casilla destacada en verde campo, con texto blanco). En `tile` y `brand` el ícono va en un círculo.
+ *   `brand` (la casilla destacada: el dato clave, en pine sólido con texto sage-50; el verde campo queda solo para
+ *   el botón principal). En `tile` y `brand` el ícono va en un círculo.
  */
 type StatCardTone = 'card' | 'tile' | 'brand';
 
@@ -28,10 +29,10 @@ const TONES: Record<StatCardTone, { root: string; label: string; muted: string; 
     icon: 'bg-card text-foreground border-border rounded-full border',
   },
   brand: {
-    root: 'bg-linear-to-br from-field-600 to-field-800 text-white [box-shadow:var(--shadow-s)]',
-    label: 'text-white/85',
-    muted: 'text-white/80',
-    icon: 'bg-white/15 text-white border-white/25 rounded-full border',
+    root: 'bg-pine text-sage-50 [box-shadow:var(--shadow-s)]',
+    label: 'text-sage-50/85',
+    muted: 'text-sage-50/80',
+    icon: 'bg-sage-50/10 text-sage-50 border-sage-50/25 rounded-full border',
   },
 };
 
