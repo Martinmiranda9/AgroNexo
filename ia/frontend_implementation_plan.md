@@ -6,7 +6,7 @@
 
 - **Next.js 15 + React 19.** El backend es la API .NET; no hay servidor Node propio.
 - **Firebase Authentication** (correo + contraseña y Google). El SDK autentica en el cliente; el ID token se verifica en el servidor (`jose` contra el JWKS de Google), se guarda en la cookie httpOnly `agronexo_session` y viaja como `Bearer` a la API, que lo vuelve a validar.
-- **Flujo:** `/` → `/login`. Login/registro → `/auth/continue` (decide destino) → onboarding de rol → app autenticada. Rutas en `app/(public)/` y `app/(authenticated)/`.
+- **Flujo:** `/` → `/login`. Login/registro → `/auth/continue` (decide destino) → onboarding de rol → app autenticada. Ya registrado, entra al tablero de su campo en uso (con varios, el primero por nombre); sin campos, el productor va a Buscar y el profesional a su Panel (`homeRouteFor`, `core/services/home-route.service.ts`). El logo pasa por el mismo camino. Rutas en `app/(public)/` y `app/(authenticated)/`.
 - **Server Actions como capa de datos:** lecturas y mutaciones pasan por `core/actions/` (el token no sale del servidor).
 - **Cashmere** como sistema de diseño, con la paleta v4 "verde campo" e Inter.
 
@@ -99,7 +99,9 @@ frontend/src/
 **Línea base** (referencias tipo FixTrack / Haulsight): lienzo claro, cards blancas con borde fino, verde solo donde importa.
 
 - **Un único CTA primario por pantalla**, siempre en el mismo estilo y zona. Par de botones: outline + primario, mismo alto.
-- **Escritorio:** `Sidebar` blanco con activo en pine desde `lg` (`ui/components/Sidebar` + `ui/layouts/AppShell`, compuesto en `features/app-shell/AppSidebar`, ítems por rol en `navigation.ts`). **Celular:** `AppHeader`.
+- **Marco:** `Sidebar` blanco de **una sola columna** a toda la altura desde `lg` (`ui/components/Sidebar` + `ui/layouts/AppShell`, compuesto en `features/app-shell/AppSidebar`, ítems por rol en `navigation.ts`): arriba el logo sin contenedor ni borde con el espacio del usuario y el botón para colapsar a íconos, la búsqueda con forma de campo (Ctrl/⌘ + K) y "Menú principal"; en el medio "Mis campos"; abajo Ayuda y Cerrar sesión. Activo en pine. La barra de arriba (`AppHeader`) lleva la ruta (`Breadcrumb`) a la izquierda y avisos, ayuda y perfil a la derecha; en celular suma el menú (abre la misma columna en un `Drawer`) y el logo.
+- **Títulos de página:** `SectionHeader as="h1"` (título, bajada y acciones a la derecha); las secciones internas, `SectionHeader` (`h2`).
+- **Resúmenes y tablas:** cifras de una pantalla en `StatStrip` (una card con celdas, info en tooltip y variación en pill de estado); tablas con selección usan `Checkbox` (con `indeterminate`), `SelectionBar` para las acciones en lote, orden en el encabezado (`aria-sort`) y `Pagination` con filas por página.
 - **Formularios:** label arriba (`Field` + `FieldLabel`, nunca placeholder como label) y `ToggleGroup` para opciones cortas. Altas y ediciones en `Drawer`; confirmaciones en `Dialog`.
 - **Cards:** imagen arriba, título, subtítulo corto, acciones abajo. Íconos en `IconContainer` circular con tinte.
 - **Motion:** `useMotionValue` + `useTransform` para valores continuos (nunca `useState`), `AnimatePresence` en loading/empty/error, respetar `prefers-reduced-motion`.
@@ -115,8 +117,8 @@ frontend/src/
 
 **Catálogo (`ui/components/`)**
 
-- **Cashmere:** `Button` (pill; `default`/`primary`, `secondary`, `outline`, `ghost`, `destructive`, `link`; tamaños `xs`–`lg` e `icon-*`; `asChild`/`render`; `loading`) · `IconButton` · `Badge` + `BadgeDot` (`success`, `warning`, `destructive`, `inverse`…) · `StatusIndicator` · `Input`, `Textarea`, `NativeSelect`, `InputGroup`, `PasswordInput`, `NumberInput`, `EmailField`, `InlineValidation`, `SearchInput`, `CommandSearch`, `AiAgentInput` · `Field` y familia · `Checkbox`/`CheckboxCard`, `RadioGroup`/`RadioCard` · `Toggle`, `ToggleGroup`, `SegmentedControl` · `Card` (+ `CardAction`), `StatCard` (`unit`, `action`, `change`) · `Alert` · `Dialog`, `Drawer`, `Popover`, `DropdownMenu`, `Collapsible`, `Tooltip` · `Toast` (`toast.success()`/`toast.error()`) · `Sidebar` y familia · `Avatar` (+ `InitialsAvatar`) · `Item`, `Empty`, `Table`, `Skeleton`, `Spinner`, `Separator`, `Kbd`, `Label` · `Progress` (`thin`/`default`/`thick`) · `Breadcrumb` · `Chart` (shadcn, para recharts 3). Recetas compartidas en `_shared.ts`.
-- **Propios de AgroNexo:** `AppLayoutSkeleton` (feature `app-shell`) · `ChoiceGroup` · `IconContainer` · `PhoneInput` · `VerificationBanner`, `NeedBriefCard`, `ContactCard` · `BrandLogo`, `BrandMark`, `BrandGlow`, `GoogleButton` · `ThoughtLine`, `hairline/HairlineFigure`.
+- **Cashmere:** `Button` (pill; `default`/`primary`, `secondary`, `outline`, `ghost`, `destructive`, `link`; tamaños `xs`–`lg` e `icon-*`; `asChild`/`render`; `loading`) · `IconButton` (`surface`: blanco con borde, para la barra de arriba) · `Badge` + `BadgeDot` (`success`, `warning`, `destructive`, `inverse`…) · `StatusIndicator` · `Input`, `Textarea`, `NativeSelect`, `InputGroup`, `PasswordInput`, `NumberInput`, `EmailField`, `InlineValidation`, `SearchInput`, `CommandSearch`, `AiAgentInput` · `Field` y familia · `Checkbox` (con `indeterminate`)/`CheckboxCard`, `RadioGroup`/`RadioCard` · `Toggle`, `ToggleGroup`, `SegmentedControl` · `Card` (+ `CardAction`), `StatCard` (`unit`, `action`, `change`; tono `brand` = dato clave en pine) · `SectionHeader` (`as`) · `Alert` · `Dialog`, `Drawer`, `Popover`, `DropdownMenu`, `Collapsible`, `Tooltip` · `Toast` (`toast.success()`/`toast.error()`) · `Sidebar` y familia · `Avatar` (+ `InitialsAvatar`) · `Item`, `Empty`, `Table`, `Skeleton`, `Spinner`, `Separator`, `Kbd`, `Label` · `Progress` (`thin`/`default`/`thick`) · `Breadcrumb` · `Pagination` (+ `PaginationButton`, `pageWindow`) · `Chart` (shadcn, para recharts 3). Recetas compartidas en `_shared.ts`.
+- **Propios de AgroNexo:** `StatStrip` (tira de métricas) · `SelectionBar` (barra flotante de acciones sobre lo elegido) · `AppLayoutSkeleton` (feature `app-shell`) · `ChoiceGroup` · `IconContainer` · `PhoneInput` · `VerificationBanner`, `NeedBriefCard`, `ContactCard` · `BrandLogo`, `BrandMark`, `BrandGlow`, `GoogleButton` · `ThoughtLine`, `hairline/HairlineFigure`.
 
 **Checklist de cierre** (una pantalla que no lo pasa no está terminada, aunque funcione):
 
@@ -143,11 +145,11 @@ frontend/src/
 |:---|:---|:---|:---|
 | `auth` | `/login`, `/register`, `/forgot-password`, `/auth/continue` | Correo + contraseña y Google, panel de marca | Hecho |
 | `onboarding` | `/onboarding`, `/welcome/[publicId]/[kind]` | Wizard de rol, ubicación, vista previa del perfil | Hecho |
-| `app-shell` | (layout autenticado) | Sidebar por rol + `AppHeader` en celular | Versión básica |
+| `app-shell` | (layout autenticado) | Sidebar de una columna por rol (búsqueda, menú, Mis campos) + barra con ruta, avisos, ayuda y perfil | Hecho |
 | `match-discovery` | `/match-discovery` | Búsqueda asistida con Gemini, ficha de necesidad, ranking, enviar solicitud | Hecho |
 | `matches` | `/matches` | Solicitudes con estados, aceptar/rechazar | Hecho |
-| `farms` | `/farms`, `/farms/[id]` | Campos, equipo y tablero (lotes, campañas, actividades, resumen semanal) | En curso |
-| Dashboard | `/dashboard` | Panel del profesional | Versión básica |
+| `farms` | `/farms`, `/farms/[id]` | Campos con resumen, equipo y tablero (lotes, campañas, actividades con selección en lote y paginación) | En curso |
+| Dashboard | `/dashboard` | Panel del profesional: resumen de solicitudes y las que esperan respuesta | Hecho |
 | Landing · `profile` | — | `/` redirige a `/login`; perfil sin ruta todavía | Pendiente |
 
 Navegación: Productor → Buscar · Mis solicitudes · Campos. Profesional → Panel · Solicitudes · Campos.
