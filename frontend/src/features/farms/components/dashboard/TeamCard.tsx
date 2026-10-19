@@ -32,10 +32,10 @@ export default function TeamCard({ producerName, members, action }: TeamCardProp
       </div>
 
       <ul className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-1" style={{ scrollbarWidth: 'none' }}>
-        <li className="bg-pine flex min-h-32 w-44 shrink-0 flex-col justify-between rounded-xl p-4 text-white">
+        <li className="bg-pine text-sage-50 flex min-h-32 w-44 shrink-0 flex-col justify-between rounded-xl p-4">
           <Badge variant="inverse">Productor</Badge>
           <div>
-            <p className="text-caption text-white/70">Dueño del campo</p>
+            <p className="text-caption text-sage-50/70">Dueño del campo</p>
             <p className="text-body-sm truncate font-semibold">{producerName}</p>
           </div>
         </li>

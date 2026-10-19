@@ -9,15 +9,21 @@ import { BrandLogo, Button } from '@/ui/components';
  */
 export default function BackendUnavailable() {
   return (
-    <main className="bg-card text-pine flex min-h-[100dvh] w-full flex-col items-center justify-center px-6">
+    <main className="bg-card text-foreground flex min-h-[100dvh] w-full flex-col items-center justify-center px-6">
       <div role="alert" className="flex w-full max-w-[380px] flex-col items-center text-center">
         <BrandLogo />
-        <MdOutlineCloudOff size={40} className="text-sage-600 mt-10" aria-hidden />
+        <MdOutlineCloudOff size={40} className="text-muted-foreground mt-10" aria-hidden />
         <h1 className="text-heading-md tracking-heading mt-4">No pudimos conectarnos</h1>
-        <p className="text-body-sm text-sage-600 mt-2">
-          Tu sesión está bien, pero el servidor no responde en este momento. Probá de nuevo en unos segundos.
+        <p className="text-body-sm text-muted-foreground mt-2">
+          Tu sesión está bien, pero el servidor no responde en este momento. Probá de nuevo en unos
+          segundos.
         </p>
-        <Button type="button" size="lg" className="mt-8 w-full" onClick={() => window.location.reload()}>
+        <Button
+          type="button"
+          size="lg"
+          className="mt-8 w-full"
+          onClick={() => window.location.reload()}
+        >
           Reintentar
         </Button>
       </div>

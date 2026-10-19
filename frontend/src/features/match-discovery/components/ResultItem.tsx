@@ -42,15 +42,18 @@ export default function ResultItem({
       className="has-[button:focus-visible]:ring-ring/40 relative flex-nowrap items-start p-4 has-[button:focus-visible]:ring-2"
     >
       {/* El `<ol>` ya anuncia la posición: el número es solo visual. */}
-      <span aria-hidden className="text-body-sm text-sage-600 pt-0.5 font-mono font-medium">
+      <span aria-hidden className="text-body-sm text-muted-foreground pt-0.5 font-mono font-medium">
         {String(position).padStart(2, '0')}
       </span>
 
       <ItemContent className="min-w-0 gap-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-body-sm text-sage-600">{roleLabel(r.role)}</p>
-            <h3 id={titleId} className="text-body tracking-heading text-pine mt-0.5 font-semibold">
+            <p className="text-body-sm text-muted-foreground">{roleLabel(r.role)}</p>
+            <h3
+              id={titleId}
+              className="text-body tracking-heading text-foreground mt-0.5 font-semibold"
+            >
               <button
                 type="button"
                 onClick={onSelect}

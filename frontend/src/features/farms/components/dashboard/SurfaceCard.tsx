@@ -143,7 +143,7 @@ export default function SurfaceCard({
         <div className="min-w-0">
           <p className="text-body-sm text-muted-foreground">Superficie del campo</p>
           <p className="mt-1 flex items-baseline gap-1.5">
-            <span className="text-foreground text-[2rem] leading-10 font-semibold tracking-tight tabular-nums">
+            <span className="text-heading-lg text-foreground tracking-tight tabular-nums">
               {numberLabel(kpis.totalHectares)}
             </span>
             <span className="text-muted-foreground text-base font-medium">ha</span>
@@ -173,7 +173,7 @@ export default function SurfaceCard({
       </div>
 
       {!archived && (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid gap-2 min-[400px]:grid-cols-2">
           <Button type="button" size="lg" className="px-4" onClick={onNewActivity}>
             <MdAdd data-icon="inline-start" size={20} aria-hidden />
             Nueva actividad

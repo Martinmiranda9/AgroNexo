@@ -37,7 +37,10 @@ export default function SearchHero({ value, onChange, onSubmit }: SearchHeroProp
         Primero, profesionales con matrícula verificada
       </Badge>
 
-      <h1 id="search-hero-title" className="text-display text-pine mt-6 max-w-[14ch] text-balance">
+      <h1
+        id="search-hero-title"
+        className="text-display text-foreground mt-6 max-w-[14ch] text-balance"
+      >
         Encontremos al profesional que{' '}
         {/* Lo que importa resalta en un verde campo oscuro y con más peso, como un llamado a la acción. */}
         <span className="text-field-800 font-extrabold">tu campo necesita.</span>
@@ -51,7 +54,7 @@ export default function SearchHero({ value, onChange, onSubmit }: SearchHeroProp
       </div>
 
       <div className="mt-8 flex max-w-[660px] flex-col items-center gap-3">
-        <span id={examplesLabelId} className="text-body-sm text-sage-600">
+        <span id={examplesLabelId} className="text-body-sm text-muted-foreground">
           Por ejemplo:
         </span>
         <div

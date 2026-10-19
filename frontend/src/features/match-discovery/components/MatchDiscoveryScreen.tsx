@@ -104,7 +104,7 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
                     steps={SEARCH_STEPS}
                     glyph="sparkle"
                     fontSize={14}
-                    className="text-sage-600 mb-5"
+                    className="text-muted-foreground mb-5"
                   />
                   <NeedSummary
                     need={need}

@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${inter.variable} ${geistMono.variable}`}>
-      <body className="bg-sage-50 text-pine font-sans antialiased">{children}</body>
+      <body className="bg-sage-50 text-foreground font-sans antialiased">{children}</body>
     </html>
   );
 }

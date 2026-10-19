@@ -78,7 +78,7 @@ export default function ForgotPasswordForm() {
 
       <Link
         href="/login"
-        className="text-body-sm hover:text-sage-600 mt-8 font-semibold underline underline-offset-4"
+        className="text-body-sm hover:text-muted-foreground mt-8 font-semibold underline underline-offset-4"
       >
         Volver a iniciar sesión
       </Link>

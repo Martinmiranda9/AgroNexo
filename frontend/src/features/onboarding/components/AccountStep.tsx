@@ -115,14 +115,14 @@ export default function AccountStep() {
               Al continuar aceptás la{' '}
               <Link
                 href="/privacy"
-                className="hover:text-pine underline underline-offset-2 transition-colors"
+                className="hover:text-foreground underline underline-offset-2 transition-colors"
               >
                 Política de Privacidad
               </Link>{' '}
               y los{' '}
               <Link
                 href="/terms"
-                className="hover:text-pine underline underline-offset-2 transition-colors"
+                className="hover:text-foreground underline underline-offset-2 transition-colors"
               >
                 Términos de Servicio
               </Link>

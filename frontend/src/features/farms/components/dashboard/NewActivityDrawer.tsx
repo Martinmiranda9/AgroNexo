@@ -177,7 +177,7 @@ function ActivityForm({ farmId, lots, onClose, onCreated }: ActivityFormProps) {
             value={hectares}
             onValueChange={setHectares}
           />
-          <p className="text-caption text-sage-600">
+          <p className="text-caption text-muted-foreground">
             {hectaresError ??
               (status === 'Completed'
                 ? `Si lo dejás vacío, cuenta el lote entero (${lot?.hectares} ha).`

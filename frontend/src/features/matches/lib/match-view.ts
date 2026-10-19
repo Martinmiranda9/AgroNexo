@@ -34,3 +34,25 @@ export function sortRequests(matches: Match[]): Match[] {
     (a, b) => rank(a) - rank(b) || Date.parse(b.requestedAt) - Date.parse(a.requestedAt)
   );
 }
+
+const PERCENT = new Intl.NumberFormat('es-AR', { style: 'percent', maximumFractionDigits: 0 });
+
+/** Cuentas de la tira de métricas. La tasa de aceptación se calcula sobre las que ya tuvieron respuesta. */
+export function countRequests(matches: Match[]) {
+  const pending = matches.filter((match) => match.status === 'Pending').length;
+  const accepted = matches.filter(
+    (match) => match.status === 'Active' || match.status === 'Completed'
+  ).length;
+  const closed = matches.filter(
+    (match) => match.status === 'Rejected' || match.status === 'Cancelled'
+  ).length;
+  const answered = accepted + closed;
+  return {
+    total: matches.length,
+    pending,
+    accepted,
+    closed,
+    answered,
+    acceptanceRate: answered > 0 ? PERCENT.format(accepted / answered) : '—',
+  };
+}

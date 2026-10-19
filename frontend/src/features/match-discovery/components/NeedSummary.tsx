@@ -79,8 +79,8 @@ export default function NeedSummary({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="max-w-[72ch] min-w-0">
-          <p className="text-body-sm text-sage-600 font-semibold">Buscaste</p>
-          <p className="text-body-lg tracking-heading text-pine mt-1 line-clamp-2 font-medium">
+          <p className="text-body-sm text-muted-foreground font-semibold">Buscaste</p>
+          <p className="text-body-lg tracking-heading text-foreground mt-1 line-clamp-2 font-medium">
             “{need.text}”
           </p>
         </div>
@@ -114,7 +114,7 @@ export default function NeedSummary({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-body-sm text-sage-600 mr-1 font-semibold">Entendimos</span>
+        <span className="text-body-sm text-muted-foreground mr-1 font-semibold">Entendimos</span>
 
         <Badge variant="secondary" className={CHIP}>
           <MdOutlinePlace data-icon="inline-start" size={14} aria-hidden />
@@ -149,7 +149,7 @@ export default function NeedSummary({
       </div>
 
       {unresolvedPlace && (
-        <p className="text-body-sm text-sage-600" role="status">
+        <p className="text-body-sm text-muted-foreground" role="status">
           No encontramos “{unresolvedPlace}” en el mapa. Buscamos cerca de tu campo.
         </p>
       )}

@@ -76,6 +76,26 @@ export default function FarmDashboardScreen({
     }
   };
 
+  const changeStatusMany = async (activities: FarmActivity[], status: FarmActivityStatus) => {
+    if (activities.length === 0) return;
+    const outcomes = await Promise.all(
+      activities.map((activity) =>
+        updateFarmActivityStatusAction(workspace.farmId, activity.id, status)
+      )
+    );
+    const failed = outcomes.filter((outcome) => outcome.status !== 'ok');
+    const done = outcomes.length - failed.length;
+
+    if (done > 0) {
+      toast.success(
+        `${done === 1 ? '1 actividad pasó' : `${done} actividades pasaron`} a ${ACTIVITY_STATUS_LABEL[status].toLowerCase()}`
+      );
+      router.refresh();
+    }
+    const firstFailure = failed[0];
+    if (firstFailure) toast.error(failureCopy(firstFailure));
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <DashboardGreeting
@@ -83,6 +103,7 @@ export default function FarmDashboardScreen({
         firstName={viewerFirstName}
         workspace={workspace}
         archived={archived}
+        onInvite={canManage ? () => setPanel('invite') : undefined}
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -138,6 +159,7 @@ export default function FarmDashboardScreen({
             activities={dashboard.recentActivities}
             pendingId={pendingActivity}
             onChangeStatus={changeStatus}
+            onChangeStatusMany={changeStatusMany}
             emptyAction={
               !archived && (
                 <Button type="button" variant="outline" onClick={() => setPanel('activity')}>

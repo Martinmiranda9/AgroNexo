@@ -37,13 +37,13 @@ export default function ProfessionalMeta({
     {
       key: 'zone',
       label: 'Zona',
-      icon: <MdOutlinePlace size={iconSize} className="text-sage-600" aria-hidden />,
+      icon: <MdOutlinePlace size={iconSize} className="text-muted-foreground" aria-hidden />,
       value: compact ? result.proximityShort : result.proximity,
     },
     {
       key: 'experience',
       label: 'Experiencia',
-      icon: <MdOutlineWorkOutline size={iconSize} className="text-sage-600" aria-hidden />,
+      icon: <MdOutlineWorkOutline size={iconSize} className="text-muted-foreground" aria-hidden />,
       value: (
         <>
           <span className="font-mono">{r.yearsExperience}</span>
@@ -54,7 +54,7 @@ export default function ProfessionalMeta({
     {
       key: 'capacity',
       label: 'Cupo',
-      icon: <MdOutlineGroups size={iconSize} className="text-sage-600" aria-hidden />,
+      icon: <MdOutlineGroups size={iconSize} className="text-muted-foreground" aria-hidden />,
       value: hasCapacity(r) ? (
         compact ? (
           'Toma clientes'

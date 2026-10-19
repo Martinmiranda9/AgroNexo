@@ -11,14 +11,18 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   // Quien ya tiene sesión no necesita ver el login: se lo manda a donde corresponda.
   if (await getSessionUser()) redirect(AUTH_CONTINUE_PATH);
 
   const { error } = await searchParams;
 
   return (
-    <main className="min-h-[100dvh] w-full bg-sage-50 text-pine antialiased selection:bg-pine/10 selection:text-pine">
+    <main className="bg-sage-50 text-foreground selection:bg-pine/10 selection:text-foreground min-h-[100dvh] w-full antialiased">
       <AgroNexoAuthModal error={error} />
     </main>
   );
