@@ -3,26 +3,41 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MdOutlineSearch } from 'react-icons/md';
-import { getWorkspacesAction } from '@/core/actions/get-workspaces.action';
 import type { Workspace } from '@/core/models/farm.model';
 import { farmRoute } from '@/shared/constants/routes';
 import { CommandSearch } from '@/ui/components/CommandSearch';
-import { IconButton } from '@/ui/components/IconButton';
+import { Kbd, KbdGroup } from '@/ui/components/Kbd';
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/components/Popover';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/Tooltip';
+import { SidebarItem } from '@/ui/components/Sidebar';
 import { NAV } from '../navigation';
 import type { AppUser } from '../types';
+import WithLabel from './WithLabel';
+
+interface SearchCommandProps {
+  user: AppUser;
+  /** Campos del usuario (`null` mientras cargan): se suman a las secciones. */
+  farms: Workspace[] | null;
+  /** Columna colapsada: queda la lupa con su nombre en tooltip. */
+  collapsed?: boolean;
+  /** Atajo de teclado. Solo uno de los sidebars montados (el de escritorio) lo escucha. */
+  shortcut?: boolean;
+}
 
 /**
- * Lupa del encabezado: abre la búsqueda (también con Ctrl + K o ⌘ + K) sobre las secciones y los campos del usuario.
- * Los campos se piden la primera vez que se abre; si la API no responde, quedan solo las secciones.
+ * Búsqueda de arriba del sidebar, con forma de campo como en la referencia: abre la búsqueda (también con Ctrl + K o
+ * ⌘ + K) sobre las secciones y los campos del usuario, sin backend.
  */
-export default function SearchCommand({ user }: { user: AppUser }) {
+export default function SearchCommand({
+  user,
+  farms,
+  collapsed = false,
+  shortcut = false,
+}: SearchCommandProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [farms, setFarms] = useState<Workspace[] | null>(null);
 
   useEffect(() => {
+    if (!shortcut) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
@@ -31,14 +46,7 @@ export default function SearchCommand({ user }: { user: AppUser }) {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, []);
-
-  useEffect(() => {
-    if (!open || farms !== null) return;
-    getWorkspacesAction()
-      .then((result) => setFarms(result.status === 'ok' ? result.workspaces : []))
-      .catch(() => setFarms([]));
-  }, [open, farms]);
+  }, [shortcut]);
 
   // Texto que se ve → a dónde lleva. Una sección gana si un campo se llama igual.
   const targets = useMemo(() => {
@@ -52,20 +60,29 @@ export default function SearchCommand({ user }: { user: AppUser }) {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <Tooltip>
-        <TooltipTrigger
+      <WithLabel label="Buscar · Ctrl + K" show={collapsed}>
+        <PopoverTrigger
           render={
-            <PopoverTrigger
-              render={<IconButton variant="ghost" size="lg" shape="round" aria-label="Buscar" />}
+            <SidebarItem
+              variant="field"
+              aria-label="Buscar"
+              aria-keyshortcuts="Control+K Meta+K"
+              icon={<MdOutlineSearch size={20} aria-hidden />}
+              badge={
+                <KbdGroup aria-hidden className="group-data-[collapsed=true]/sidebar:hidden">
+                  <Kbd>Ctrl</Kbd>
+                  <Kbd>K</Kbd>
+                </KbdGroup>
+              }
             />
           }
         >
-          <MdOutlineSearch aria-hidden />
-        </TooltipTrigger>
-        <TooltipContent>Buscar · Ctrl + K</TooltipContent>
-      </Tooltip>
+          Buscar
+        </PopoverTrigger>
+      </WithLabel>
       <PopoverContent
-        align="end"
+        side={collapsed ? 'right' : 'bottom'}
+        align="start"
         sideOffset={10}
         className="w-80 gap-0 border-0 bg-transparent p-0 [box-shadow:none]"
       >

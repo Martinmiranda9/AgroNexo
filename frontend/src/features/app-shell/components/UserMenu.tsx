@@ -23,12 +23,12 @@ export default function UserMenu({ user }: { user: AppUser }) {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={`${name}, menú de la cuenta`}
-        className="border-border bg-card hover:bg-field-100 data-popup-open:bg-field-100 focus-visible:ring-ring/50 flex h-12 items-center gap-2.5 rounded-full border py-1 pr-3 pl-1 text-left [box-shadow:var(--shadow-s)] transition-colors outline-none focus-visible:ring-3"
+        className="border-border bg-card hover:bg-field-100 data-popup-open:bg-field-100 focus-visible:ring-ring/50 flex h-10 items-center gap-2 rounded-full border py-1 pr-3 pl-1 text-left [box-shadow:var(--shadow-s)] transition-colors outline-none focus-visible:ring-3"
       >
         {/* La foto es la de la cuenta (Google); sin foto o si no carga, quedan las iniciales. */}
-        <Avatar size="lg">
+        <Avatar size="sm">
           <AvatarImage src={user.avatarUrl} alt="" referrerPolicy="no-referrer" />
-          <AvatarFallback className="bg-pine font-semibold text-white">
+          <AvatarFallback className="bg-pine text-sage-50 font-semibold">
             {initialsOf(user)}
           </AvatarFallback>
         </Avatar>

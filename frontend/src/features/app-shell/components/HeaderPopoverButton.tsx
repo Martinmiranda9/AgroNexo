@@ -11,7 +11,7 @@ interface HeaderPopoverButtonProps {
   children: ReactNode;
 }
 
-/** Ícono redondo del encabezado (avisos, ayuda) que abre su contenido en un popover debajo. */
+/** Ícono redondo blanco de la barra de arriba (avisos, ayuda) que abre su contenido en un popover debajo. */
 export default function HeaderPopoverButton({ label, icon, children }: HeaderPopoverButtonProps) {
   return (
     <Popover>
@@ -19,7 +19,7 @@ export default function HeaderPopoverButton({ label, icon, children }: HeaderPop
         <TooltipTrigger
           render={
             <PopoverTrigger
-              render={<IconButton variant="ghost" size="lg" shape="round" aria-label={label} />}
+              render={<IconButton variant="surface" size="lg" shape="round" aria-label={label} />}
             />
           }
         >
