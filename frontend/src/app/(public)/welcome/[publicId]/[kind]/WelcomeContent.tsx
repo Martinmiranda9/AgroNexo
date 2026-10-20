@@ -45,14 +45,14 @@ export default function WelcomeContent({ firstName, publicId, roleLabel }: Welco
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
           >
-            <h1 className="text-heading-lg text-pine sm:text-heading-xl">
-              ¡Bienvenido a <span className="text-sage-600">Agro</span>
-              <span className="text-pine">Nexo</span>!
+            <h1 className="text-heading-lg text-foreground sm:text-heading-xl">
+              ¡Bienvenido a <span className="text-muted-foreground">Agro</span>
+              <span className="text-foreground">Nexo</span>!
             </h1>
-            <p className="text-body-lg text-sage-600 mt-3">
+            <p className="text-body-lg text-muted-foreground mt-3">
               {firstName && (
                 <>
-                  Hola, <strong className="text-pine font-semibold">{firstName}</strong>.{' '}
+                  Hola, <strong className="text-foreground font-semibold">{firstName}</strong>.{' '}
                 </>
               )}
             </p>
@@ -83,20 +83,21 @@ export default function WelcomeContent({ firstName, publicId, roleLabel }: Welco
             <Card className="flex flex-col gap-3 px-6 py-5">
               <div className="flex items-center gap-3">
                 <BrandMark variant="light" className="h-5 w-5 flex-shrink-0" />
-                <p className="text-body-sm text-pine">
+                <p className="text-body-sm text-foreground">
                   Tu perfil de <strong>{roleLabel}</strong> está listo
                 </p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="bg-pine/10 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full">
-                  <span className="text-caption text-pine font-bold">#</span>
+                  <span className="text-caption text-foreground font-bold">#</span>
                 </div>
-                <p className="text-body-sm text-sage-600">
-                  ID público: <span className="text-pine font-mono font-semibold">{publicId}</span>
+                <p className="text-body-sm text-muted-foreground">
+                  ID público:{' '}
+                  <span className="text-foreground font-mono font-semibold">{publicId}</span>
                 </p>
               </div>
               <Separator className="mt-1" />
-              <p className="text-body-sm text-sage-600">
+              <p className="text-body-sm text-muted-foreground">
                 Podés completar tu perfil, agregar tus campos y conectarte con profesionales desde
                 tu panel.
               </p>

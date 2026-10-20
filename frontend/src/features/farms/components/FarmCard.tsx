@@ -38,7 +38,7 @@ export default function FarmCard({ workspace: w, onInvite }: FarmCardProps) {
           <MdOutlineAgriculture size={18} aria-hidden />
         </IconContainer>
         <div className="min-w-0 flex-1">
-          <h2 className="text-body tracking-heading text-pine truncate font-semibold">
+          <h2 className="text-body tracking-heading text-foreground truncate font-semibold">
             {/* El link se estira sobre la card: toda la card abre el tablero, y el botón de invitar queda por encima. */}
             <Link
               href={farmRoute(w.farmId)}
@@ -47,7 +47,7 @@ export default function FarmCard({ workspace: w, onInvite }: FarmCardProps) {
               {w.name}
             </Link>
           </h2>
-          <p className="text-caption text-sage-600 font-medium">
+          <p className="text-caption text-muted-foreground font-medium">
             ID <span className="font-mono">{w.publicId}</span>
             {hectares && (
               <>
@@ -62,7 +62,9 @@ export default function FarmCard({ workspace: w, onInvite }: FarmCardProps) {
       </header>
 
       {w.description && (
-        <p className="text-body-sm text-sage-800 line-clamp-3 whitespace-pre-line">{w.description}</p>
+        <p className="text-body-sm text-sage-800 line-clamp-3 whitespace-pre-line">
+          {w.description}
+        </p>
       )}
 
       <footer className="border-border mt-auto flex flex-wrap items-center justify-between gap-3 border-t pt-4">

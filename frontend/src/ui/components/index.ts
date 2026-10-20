@@ -156,3 +156,17 @@ export {
   ProgressTrack,
   ProgressValue,
 } from './Progress';
+export {
+  Pagination,
+  PaginationButton,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  pageWindow,
+} from './Pagination';
+export { SelectionBar } from './SelectionBar';
+export { StatStrip, StatStripItem } from './StatStrip';
+export { SectionHeader } from './SectionHeader';

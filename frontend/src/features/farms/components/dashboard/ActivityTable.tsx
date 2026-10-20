@@ -1,8 +1,10 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { IconType } from 'react-icons';
 import {
+  MdArrowDownward,
+  MdArrowUpward,
   MdMoreHoriz,
   MdOutlineAgriculture,
   MdOutlineDirectionsCar,
@@ -22,6 +24,7 @@ import type {
 import { professionalRoleLabel } from '@/shared/constants/roles';
 import { Button } from '@/ui/components/Button';
 import { Card } from '@/ui/components/Card';
+import { Checkbox } from '@/ui/components/Checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +36,19 @@ import {
   DropdownMenuTrigger,
 } from '@/ui/components/DropdownMenu';
 import { IconButton } from '@/ui/components/IconButton';
+import { NativeSelect, NativeSelectOption } from '@/ui/components/NativeSelect';
+import {
+  Pagination,
+  PaginationButton,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+  pageWindow,
+} from '@/ui/components/Pagination';
 import { SearchInput } from '@/ui/components/SearchInput';
+import { SelectionBar } from '@/ui/components/SelectionBar';
 import { StatusIndicator, type StatusIndicatorProps } from '@/ui/components/StatusIndicator';
 import {
   Table,
@@ -52,6 +67,8 @@ import {
 } from '../../lib/dashboard-view';
 
 const ALL = 'all';
+
+const PAGE_SIZES = [5, 10, 20] as const;
 
 const TYPE_ICON: Record<FarmActivityType, IconType> = {
   Sowing: MdOutlineGrass,
@@ -76,26 +93,40 @@ interface ActivityTableProps {
   /** Actividad que se está guardando (deshabilita su cambio de estado). */
   pendingId: string | null;
   onChangeStatus: (activity: FarmActivity, status: FarmActivityStatus) => void;
+  /** Cambio de estado de varias actividades a la vez, desde la barra de la selección. */
+  onChangeStatusMany: (activities: FarmActivity[], status: FarmActivityStatus) => Promise<void>;
   emptyAction?: ReactNode;
 }
 
 /**
  * Actividad reciente del campo (el "Recent Activities" de la referencia): búsqueda y filtro por estado arriba, y la
- * tabla con fecha, labor, lote, responsable y estado. Quien puede editar una actividad cambia su estado desde "⋯".
+ * tabla con fecha, labor, lote, responsable y estado. Quien puede editar una actividad cambia su estado desde "⋯" o
+ * elige varias con las casillas y las pasa juntas desde la barra flotante (la de la referencia de tabla). Abajo, las
+ * filas por página y la paginación.
  */
 export default function ActivityTable({
   activities,
   pendingId,
   onChangeStatus,
+  onChangeStatusMany,
   emptyAction,
 }: ActivityTableProps) {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<string>(ALL);
+  const [newestFirst, setNewestFirst] = useState(true);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkPending, setBulkPending] = useState(false);
 
   const rows = useMemo(() => {
     const text = query.trim().toLowerCase();
+    const direction = newestFirst ? 1 : -1;
     return [...activities]
-      .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt))
+      .sort(
+        (a, b) =>
+          (b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)) * direction
+      )
       .filter((activity) => status === ALL || activity.status === status)
       .filter(
         (activity) =>
@@ -107,7 +138,61 @@ export default function ActivityTable({
             activity.author.name,
           ].some((value) => value.toLowerCase().includes(text))
       );
-  }, [activities, query, status]);
+  }, [activities, query, status, newestFirst]);
+
+  const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const pageRows = rows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const firstRow = rows.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const lastRow = Math.min(currentPage * pageSize, rows.length);
+
+  // Al buscar, filtrar o cambiar las filas por página se vuelve a la primera.
+  useEffect(() => setPage(1), [query, status, pageSize]);
+
+  // La selección vive sobre las actividades que existen: si una desaparece o deja de ser editable, sale.
+  useEffect(() => {
+    setSelected((current) => {
+      const editable = new Set(activities.filter((a) => a.canEdit).map((a) => a.id));
+      const next = new Set([...current].filter((id) => editable.has(id)));
+      return next.size === current.size ? current : next;
+    });
+  }, [activities]);
+
+  const selectableOnPage = pageRows.filter((activity) => activity.canEdit);
+  const pageSelectedCount = selectableOnPage.filter((a) => selected.has(a.id)).length;
+  const allOnPage = selectableOnPage.length > 0 && pageSelectedCount === selectableOnPage.length;
+  const someOnPage = pageSelectedCount > 0 && !allOnPage;
+  const selectedActivities = activities.filter((activity) => selected.has(activity.id));
+
+  const toggleRow = (id: string) =>
+    setSelected((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const togglePage = () =>
+    setSelected((current) => {
+      const next = new Set(current);
+      for (const activity of selectableOnPage) {
+        if (allOnPage) next.delete(activity.id);
+        else next.add(activity.id);
+      }
+      return next;
+    });
+
+  const clearSelection = () => setSelected(new Set());
+
+  const changeSelected = async (next: FarmActivityStatus) => {
+    setBulkPending(true);
+    await onChangeStatusMany(
+      selectedActivities.filter((activity) => activity.status !== next),
+      next
+    );
+    setBulkPending(false);
+    clearSelection();
+  };
 
   return (
     <Card className="flex h-full flex-col gap-4 p-5">
@@ -164,7 +249,36 @@ export default function ActivityTable({
           <Table>
             <TableHeader className="bg-surface-sunken">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="pl-4">Fecha</TableHead>
+                <TableHead className="w-10 pl-4">
+                  <Checkbox
+                    checked={allOnPage}
+                    indeterminate={someOnPage}
+                    disabled={selectableOnPage.length === 0}
+                    onCheckedChange={togglePage}
+                    aria-label="Elegir todas las actividades de esta página"
+                  />
+                </TableHead>
+                <TableHead aria-sort={newestFirst ? 'descending' : 'ascending'}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="xs"
+                    className="-ml-2"
+                    onClick={() => setNewestFirst((current) => !current)}
+                  >
+                    Fecha
+                    {newestFirst ? (
+                      <MdArrowDownward data-icon="inline-end" aria-hidden />
+                    ) : (
+                      <MdArrowUpward data-icon="inline-end" aria-hidden />
+                    )}
+                    <span className="sr-only">
+                      {newestFirst
+                        ? ', de la más nueva a la más vieja'
+                        : ', de la más vieja a la más nueva'}
+                    </span>
+                  </Button>
+                </TableHead>
                 <TableHead>Actividad</TableHead>
                 <TableHead>Lote</TableHead>
                 <TableHead>Responsable</TableHead>
@@ -175,12 +289,21 @@ export default function ActivityTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.length > 0 ? (
-                rows.map((activity) => {
+              {pageRows.length > 0 ? (
+                pageRows.map((activity) => {
                   const TypeIcon = TYPE_ICON[activity.type];
+                  const isSelected = selected.has(activity.id);
                   return (
-                    <TableRow key={activity.id}>
-                      <TableCell className="text-muted-foreground pl-4 tabular-nums">
+                    <TableRow key={activity.id} data-state={isSelected ? 'selected' : undefined}>
+                      <TableCell className="pl-4">
+                        <Checkbox
+                          checked={isSelected}
+                          disabled={!activity.canEdit}
+                          onCheckedChange={() => toggleRow(activity.id)}
+                          aria-label={`Elegir ${activity.title}`}
+                        />
+                      </TableCell>
+                      <TableCell className="text-muted-foreground tabular-nums">
                         {formatDay(activity.date)}
                       </TableCell>
                       <TableCell>
@@ -256,7 +379,7 @@ export default function ActivityTable({
                 })
               ) : (
                 <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={6} className="text-muted-foreground h-20 text-center">
+                  <TableCell colSpan={7} className="text-muted-foreground h-20 text-center">
                     No hay actividades con esa búsqueda o estado.
                   </TableCell>
                 </TableRow>
@@ -265,6 +388,81 @@ export default function ActivityTable({
           </Table>
         </div>
       )}
+
+      {activities.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <label htmlFor="activity-page-size">Filas por página</label>
+            <NativeSelect
+              id="activity-page-size"
+              size="sm"
+              value={pageSize}
+              onChange={(event) => setPageSize(Number(event.target.value))}
+            >
+              {PAGE_SIZES.map((size) => (
+                <NativeSelectOption key={size} value={size}>
+                  {size}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+            <span className="tabular-nums" aria-live="polite">
+              {firstRow}–{lastRow} de {rows.length}
+            </span>
+          </div>
+          {pageCount > 1 && (
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    disabled={currentPage === 1}
+                    onClick={() => setPage(currentPage - 1)}
+                  />
+                </PaginationItem>
+                {pageWindow(currentPage, pageCount).map((item, index) => (
+                  <PaginationItem key={item ?? `gap-${index}`}>
+                    {item === null ? (
+                      <PaginationEllipsis />
+                    ) : (
+                      <PaginationButton
+                        isActive={item === currentPage}
+                        aria-label={`Página ${item}`}
+                        onClick={() => setPage(item)}
+                      >
+                        {item}
+                      </PaginationButton>
+                    )}
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    disabled={currentPage === pageCount}
+                    onClick={() => setPage(currentPage + 1)}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
+        </div>
+      )}
+
+      <SelectionBar
+        count={selected.size}
+        noun={{ one: 'actividad elegida', other: 'actividades elegidas' }}
+        onClear={clearSelection}
+      >
+        {ACTIVITY_STATUS_OPTIONS.filter((option) => option !== 'Started').map((option) => (
+          <Button
+            key={option}
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={bulkPending || selectedActivities.every((a) => a.status === option)}
+            onClick={() => changeSelected(option)}
+          >
+            Pasar a {ACTIVITY_STATUS_LABEL[option].toLowerCase()}
+          </Button>
+        ))}
+      </SelectionBar>
     </Card>
   );
 }

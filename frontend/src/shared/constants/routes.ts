@@ -8,5 +8,8 @@ export const ROUTES = {
   farms: '/farms',
 } as const;
 
+/** Lista de campos con el panel de alta ya abierto (el "+" de "Mis campos" en el sidebar). */
+export const NEW_FARM_ROUTE = `${ROUTES.farms}?nuevo=1`;
+
 /** Tablero de un campo. */
 export const farmRoute = (farmId: string): string => `${ROUTES.farms}/${farmId}`;

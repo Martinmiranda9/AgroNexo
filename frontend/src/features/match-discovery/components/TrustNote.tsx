@@ -14,7 +14,7 @@ interface TrustNoteProps {
 export default function TrustNote({ firstName, className }: TrustNoteProps) {
   return (
     <Alert role="note" className={cn('bg-surface-sunken border-transparent px-4 py-3', className)}>
-      <MdOutlineLock className="text-sage-600" aria-hidden />
+      <MdOutlineLock className="text-muted-foreground" aria-hidden />
       <AlertDescription className="text-body-sm text-sage-800">
         Solicitar es gratis y no te compromete. {firstName} ve lo que necesitás y decide si acepta.
       </AlertDescription>

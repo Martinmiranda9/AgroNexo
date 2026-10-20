@@ -12,7 +12,12 @@ export const dynamic = 'force-dynamic';
  * Campos. El productor ve los suyos, los crea y suma a su equipo; el profesional ve los campos donde lo sumaron.
  * El backend acota la lista al usuario (`GET /api/v1/workspaces`).
  */
-export default async function FarmsPage() {
+export default async function FarmsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ nuevo?: string }>;
+}) {
+  const { nuevo } = await searchParams;
   const sessionUser = await getSessionUser();
   if (!sessionUser) redirect(ROUTES.login);
 
@@ -38,7 +43,7 @@ export default async function FarmsPage() {
       }}
     >
       <main className="mx-auto max-w-[1180px] pt-4 pb-10">
-        <FarmsScreen workspaces={result.workspaces} viewer={viewer} />
+        <FarmsScreen workspaces={result.workspaces} viewer={viewer} startCreating={nuevo === '1'} />
       </main>
     </AppLayout>
   );

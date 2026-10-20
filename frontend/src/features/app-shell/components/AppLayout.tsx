@@ -9,6 +9,8 @@ interface AppLayoutProps {
   user: AppUser;
   /** Solicitudes esperando respuesta: contador junto a "Solicitudes" en el sidebar. */
   pendingCount?: number;
+  /** Barra de arriba sin fondo propio (ver `AppHeader`). */
+  transparentHeader?: boolean;
   children: ReactNode;
 }
 
@@ -17,11 +19,18 @@ interface AppLayoutProps {
  * izquierda desde `lg`. Sirve en pantallas de servidor y de cliente; el estado del sidebar lo da
  * `SidebarStateProvider` (layout de las rutas autenticadas).
  */
-export default function AppLayout({ user, pendingCount, children }: AppLayoutProps) {
+export default function AppLayout({
+  user,
+  pendingCount,
+  transparentHeader,
+  children,
+}: AppLayoutProps) {
   return (
     <TooltipProvider delay={300}>
       <AppShell
-        header={<AppHeader user={user} pendingCount={pendingCount} />}
+        header={
+          <AppHeader user={user} pendingCount={pendingCount} transparent={transparentHeader} />
+        }
         sidebar={<DesktopSidebar user={user} pendingCount={pendingCount} />}
       >
         {children}

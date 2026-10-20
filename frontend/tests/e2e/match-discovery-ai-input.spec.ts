@@ -1,18 +1,15 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * Buscar profesionales con los componentes de Cashmere: el titular resalta "tu campo necesita." en verde campo oscuro y
- * negrita, y el campo para contar la necesidad es el AI Agent Input (Enter o la flecha buscan, Shift + Enter hace un salto
- * de línea; el dictado es solo el ícono del micrófono).
+ * Buscar profesionales con los componentes de Cashmere: el campo para contar la necesidad es el AI Agent Input (Enter o
+ * la flecha buscan, Shift + Enter hace un salto de línea; el dictado es solo el ícono del micrófono). El saludo y el
+ * resto de la entrada los cubre `match-discovery-hero.spec.ts`.
  *
  * Necesita una sesión real: `E2E_SESSION_TOKEN` con un ID token de Firebase de un productor ya registrado, y la API
  * levantada (NEXT_PUBLIC_API_URL). Sin el token, los tests se saltean.
  */
 
 const SESSION_TOKEN = process.env.E2E_SESSION_TOKEN;
-
-/** `--color-field-800` (#29603b). */
-const FIELD_800 = 'rgb(41, 96, 59)';
 
 async function signIn(page: Page) {
   await page.context().addCookies([
@@ -37,22 +34,6 @@ test.describe('Buscar profesionales con el AI Agent Input', () => {
     await signIn(page);
     await page.goto('/match-discovery');
     await expect(promptOf(page)).toBeVisible();
-  });
-
-  test('el titular resalta "tu campo necesita." en verde campo oscuro y negrita', async ({
-    page,
-  }) => {
-    const title = page.getByRole('heading', { level: 1 });
-    await expect(title).toHaveText('Encontremos al profesional que tu campo necesita.');
-
-    const highlight = title.getByText('tu campo necesita.');
-    expect(await highlight.evaluate((el) => getComputedStyle(el).color)).toBe(FIELD_800);
-    expect(await title.evaluate((el) => getComputedStyle(el).color)).not.toBe(FIELD_800);
-    expect(
-      Number(await highlight.evaluate((el) => getComputedStyle(el).fontWeight))
-    ).toBeGreaterThanOrEqual(800);
-    // Sin el trazo de resaltador debajo.
-    expect(await highlight.evaluate((el) => getComputedStyle(el).backgroundImage)).toBe('none');
   });
 
   test('la flecha se habilita recién con una necesidad de al menos 4 caracteres', async ({

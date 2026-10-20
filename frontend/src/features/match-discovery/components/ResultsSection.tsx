@@ -108,8 +108,8 @@ export default function ResultsSection({
       ) : (
         <>
           <div className="flex items-center gap-1.5">
-            <p aria-live="polite" className="text-body-sm text-sage-600">
-              <span className="text-pine font-mono font-semibold">{results.length}</span>{' '}
+            <p aria-live="polite" className="text-body-sm text-muted-foreground">
+              <span className="text-foreground font-mono font-semibold">{results.length}</span>{' '}
               {results.length === 1 ? 'profesional' : 'profesionales'} · primero los que mejor
               encajan
             </p>

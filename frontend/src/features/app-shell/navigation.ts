@@ -96,6 +96,12 @@ const DEFAULT_GUIDE: ScreenGuide = {
 export const guideFor = (pathname: string): ScreenGuide =>
   GUIDES.find(({ match }) => match(pathname))?.guide ?? DEFAULT_GUIDE;
 
+/** Bajada del logo en el sidebar: de quién es el espacio de trabajo. */
+export const SPACE_CAPTION: Record<AppUser['role'], string> = {
+  Producer: 'Espacio del productor',
+  Professional: 'Espacio del profesional',
+};
+
 export const ROLE_CAPTION: Record<AppUser['role'], string> = {
   Producer: 'Productor',
   Professional: 'Profesional',

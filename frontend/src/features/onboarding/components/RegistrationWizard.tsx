@@ -65,7 +65,7 @@ export default function RegistrationWizard({
   }, []);
 
   return (
-    <main className="bg-card text-pine flex min-h-[100dvh] w-full flex-col md:flex-row">
+    <main className="bg-card text-foreground flex min-h-[100dvh] w-full flex-col md:flex-row">
       <section className="flex min-h-[100dvh] w-full flex-col px-6 pt-8 pb-8 sm:px-12 md:w-[46%] md:px-12 lg:px-16">
         {/* Bloque centrado en vertical. La altura mínima es la del paso más alto (rol), así el header
             y los botones no se mueven al pasar entre pasos de distinto largo. */}
@@ -74,15 +74,15 @@ export default function RegistrationWizard({
             <OnboardingHeader current={displayStep} total={displayTotal} />
 
             {account?.email && (
-              <p className="border-pine/10 bg-sage-50 text-sage-600 text-body-sm mt-6 flex flex-wrap items-center gap-x-1.5 rounded-lg border px-3.5 py-2.5">
+              <p className="border-pine/10 bg-sage-50 text-muted-foreground text-body-sm mt-6 flex flex-wrap items-center gap-x-1.5 rounded-lg border px-3.5 py-2.5">
                 <MdCheckCircle size={16} className="text-success shrink-0" />
                 <span>
                   Cuenta {account.provider === 'google.com' ? 'de Google' : ''}{' '}
-                  <strong className="text-pine font-semibold">{account.email}</strong>
+                  <strong className="text-foreground font-semibold">{account.email}</strong>
                 </span>
                 <a
                   href={`/api/auth/logout?returnTo=${encodeURIComponent('/onboarding')}`}
-                  className="text-pine ml-auto py-1.5 font-semibold underline underline-offset-4"
+                  className="text-foreground ml-auto py-1.5 font-semibold underline underline-offset-4"
                 >
                   Cambiar
                 </a>
@@ -106,7 +106,7 @@ export default function RegistrationWizard({
                   >
                     {step.title}
                   </h1>
-                  <p className="text-sage-600 text-body-sm mt-2">{step.subtitle}</p>
+                  <p className="text-muted-foreground text-body-sm mt-2">{step.subtitle}</p>
                 </motion.div>
               </AnimatePresence>
 
@@ -182,11 +182,11 @@ export default function RegistrationWizard({
           </div>
         </div>
 
-        <footer className="text-sage-600 text-body-sm mt-auto pt-8 text-center">
+        <footer className="text-muted-foreground text-body-sm mt-auto pt-8 text-center">
           ¿Ya tenés una cuenta?{' '}
           <Link
             href="/login"
-            className="text-pine hover:text-sage-600 font-semibold underline underline-offset-4 transition-colors"
+            className="text-foreground hover:text-muted-foreground font-semibold underline underline-offset-4 transition-colors"
           >
             Iniciá sesión
           </Link>

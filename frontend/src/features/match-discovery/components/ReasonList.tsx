@@ -15,7 +15,7 @@ export default function ReasonList({ checks, missing }: ReasonListProps) {
     <div className="flex flex-col gap-4">
       <ul className="flex flex-col gap-2.5">
         {checks.map((check) => (
-          <li key={check} className="text-body-sm text-pine flex items-start gap-2.5">
+          <li key={check} className="text-body-sm text-foreground flex items-start gap-2.5">
             <span className="bg-fill-positive mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full">
               <MdCheck size={12} aria-hidden />
             </span>
@@ -26,13 +26,13 @@ export default function ReasonList({ checks, missing }: ReasonListProps) {
 
       {missing.length > 0 && (
         <div className="bg-fill-caution rounded-lg px-4 py-3">
-          <p className="text-body-sm text-pine font-semibold">Para consultarle</p>
+          <p className="text-body-sm text-foreground font-semibold">Para consultarle</p>
           <ul className="mt-2 flex flex-col gap-1.5">
             {missing.map((item) => (
               <li key={item} className="text-body-sm text-sage-800 flex items-start gap-2">
                 <MdOutlineHelpOutline
                   size={16}
-                  className="text-sage-600 mt-0.5 shrink-0"
+                  className="text-muted-foreground mt-0.5 shrink-0"
                   aria-hidden
                 />
                 {capitalize(item)}

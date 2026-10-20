@@ -41,8 +41,11 @@ export default function ProfessionalDetail({
         <header className="flex items-start gap-4">
           <InitialsAvatar initials={initialsOf(r)} size="lg" tone="solid" />
           <div className="min-w-0 flex-1">
-            <p className="text-body-sm text-sage-600 font-medium">{roleLabel(r.role)}</p>
-            <h2 id={detailTitleId(r.id)} className="text-heading-md tracking-heading text-pine">
+            <p className="text-body-sm text-muted-foreground font-medium">{roleLabel(r.role)}</p>
+            <h2
+              id={detailTitleId(r.id)}
+              className="text-heading-md tracking-heading text-foreground"
+            >
               {fullName(r)}
             </h2>
           </div>
@@ -72,7 +75,7 @@ export default function ProfessionalDetail({
         <ProfessionalMeta result={result} />
 
         <section aria-labelledby={`why-${r.id}`} className="flex flex-col gap-4">
-          <h3 id={`why-${r.id}`} className="text-body text-pine font-semibold">
+          <h3 id={`why-${r.id}`} className="text-body text-foreground font-semibold">
             Por qué aparece
           </h3>
           <p className="text-body-lg text-sage-800 max-w-[58ch]">{result.why}</p>
@@ -88,7 +91,7 @@ export default function ProfessionalDetail({
             className="border-border-strong border-dashed px-4 py-3"
           >
             <MdOutlineCheckCircle aria-hidden />
-            <AlertTitle className="text-body-sm text-pine font-semibold">
+            <AlertTitle className="text-body-sm text-foreground font-semibold">
               Solicitud enviada
             </AlertTitle>
             <AlertDescription className="text-body-sm text-sage-800">
@@ -115,7 +118,7 @@ export default function ProfessionalDetail({
             >
               Solicitar match
             </Button>
-            <p id={`full-${r.id}`} className="text-body-sm text-sage-600">
+            <p id={`full-${r.id}`} className="text-body-sm text-muted-foreground">
               {r.firstName} no tiene lugar para clientes nuevos por ahora. Probá con otro
               profesional de la lista.
             </p>

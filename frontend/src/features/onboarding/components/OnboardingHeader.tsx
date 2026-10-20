@@ -17,7 +17,7 @@ export default function OnboardingHeader({ current, total }: OnboardingHeaderPro
     <header>
       <div className="flex items-center justify-between">
         <BrandLogo />
-        <span aria-hidden className="text-body-sm text-sage-600 font-mono tabular-nums">
+        <span aria-hidden className="text-body-sm text-muted-foreground font-mono tabular-nums">
           Paso {step} de {total}
         </span>
       </div>

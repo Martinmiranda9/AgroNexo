@@ -76,6 +76,11 @@
   --text-heading-xl: 36px;
   --text-heading-xl--line-height: 40px;
   --text-heading-xl--font-weight: 700;
+  /* Saludo de una pantalla de entrada (Buscar): grande y liviano, un solo uso por pantalla. */
+  --text-display: 44px;
+  --text-display--line-height: 52px;
+  --text-display--font-weight: 500;
+  --text-display--letter-spacing: -0.03em;
 
   --tracking-heading: -0.01em;
 }
@@ -329,6 +334,12 @@ body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* En el marco autenticado el lienzo es `canvas`: el hueco estable de la barra de scroll toma el fondo del body, así que
+   el body lo acompaña para que no quede una franja más clara a la derecha. */
+body:has([data-slot="app-shell"]) {
+  background-color: var(--canvas);
 }
 
 /* Jerarquía semántica: H1–H6 según el Design System (las clases text-heading-* la pisan cuando hace falta) */

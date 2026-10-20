@@ -8,6 +8,7 @@ import {
   MdOutlineNotifications,
   MdOutlineNotificationsNone,
 } from 'react-icons/md';
+import { cn } from '@/shared/utils/cn';
 import BrandLogo from '@/ui/components/BrandLogo';
 import { Drawer, DrawerContent, DrawerTitle } from '@/ui/components/Drawer';
 import {
@@ -22,25 +23,23 @@ import { PopoverHeader, PopoverTitle } from '@/ui/components/Popover';
 import type { AppUser } from '../types';
 import AppSidebar from './AppSidebar';
 import HeaderPopoverButton from './HeaderPopoverButton';
+import PageBreadcrumb from './PageBreadcrumb';
 import ScreenGuideContent from './ScreenGuideContent';
-import SearchCommand from './SearchCommand';
 import UserMenu from './UserMenu';
 
 interface AppHeaderProps {
   user: AppUser;
   /** Solicitudes esperando respuesta: contador junto a "Solicitudes" en el menú del celular. */
   pendingCount?: number;
+  /** Sin fondo propio, para que se vea el brillo de una pantalla de entrada que no scrollea (Buscar). */
+  transparent?: boolean;
 }
 
-/** Pastilla blanca del encabezado, como las de la referencia. */
-const PILL =
-  'border-border bg-card flex h-12 items-center rounded-full border [box-shadow:var(--shadow-s)]';
-
 /**
- * Encabezado del marco: logo a la izquierda y, a la derecha, la pastilla de búsqueda, avisos y ayuda, y el perfil.
- * En celular y tablet suma el botón que abre el sidebar en un panel lateral.
+ * Barra de arriba del contenido: a la izquierda dónde está el usuario y a la derecha avisos, ayuda y el perfil. El logo y la búsqueda viven en el sidebar;
+ * en celular y tablet, donde el sidebar no se ve, la barra suma el botón de menú (abre el sidebar en un panel) y el logo.
  */
-export default function AppHeader({ user, pendingCount = 0 }: AppHeaderProps) {
+export default function AppHeader({ user, pendingCount = 0, transparent = false }: AppHeaderProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -48,11 +47,16 @@ export default function AppHeader({ user, pendingCount = 0 }: AppHeaderProps) {
   useEffect(() => setMenuOpen(false), [pathname]);
 
   return (
-    <header className="bg-canvas/85 sticky top-0 z-30 backdrop-blur-xl">
-      <div className="flex h-19 items-center gap-2 px-4 sm:gap-3 sm:px-6">
-        <div className={`${PILL} px-1 lg:hidden`}>
+    <header
+      className={cn(
+        'sticky top-0 z-30',
+        transparent ? 'bg-transparent' : 'bg-canvas/85 backdrop-blur-xl'
+      )}
+    >
+      <div className="flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6">
+        <div className="flex items-center gap-3 lg:hidden">
           <IconButton
-            variant="ghost"
+            variant="surface"
             size="lg"
             shape="round"
             aria-label="Abrir menú"
@@ -60,42 +64,38 @@ export default function AppHeader({ user, pendingCount = 0 }: AppHeaderProps) {
           >
             <MdOutlineMenu aria-hidden />
           </IconButton>
-        </div>
-
-        {/* BrandLogo ya es un link al inicio: no se envuelve en otro. */}
-        <div className={`${PILL} px-1.5 sm:pr-4`}>
           <BrandLogo compactOnMobile />
         </div>
+        <div className="hidden min-w-0 lg:block">
+          <PageBreadcrumb user={user} />
+        </div>
 
-        <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          <div className={`${PILL} gap-0.5 px-1`}>
-            <SearchCommand user={user} />
-            <HeaderPopoverButton label="Avisos" icon={<MdOutlineNotifications aria-hidden />}>
-              <PopoverHeader>
-                <PopoverTitle>Avisos</PopoverTitle>
-              </PopoverHeader>
-              <Empty className="p-4">
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <MdOutlineNotificationsNone aria-hidden />
-                  </EmptyMedia>
-                  <EmptyTitle>Sin novedades</EmptyTitle>
-                  <EmptyDescription>
-                    Acá vas a ver los avisos de tus campos y solicitudes.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
-            </HeaderPopoverButton>
-            <HeaderPopoverButton label="Ayuda" icon={<MdOutlineInfo aria-hidden />}>
-              <ScreenGuideContent pathname={pathname} />
-            </HeaderPopoverButton>
-          </div>
+        <div className="ml-auto flex items-center gap-2">
+          <HeaderPopoverButton label="Avisos" icon={<MdOutlineNotifications aria-hidden />}>
+            <PopoverHeader>
+              <PopoverTitle>Avisos</PopoverTitle>
+            </PopoverHeader>
+            <Empty className="p-4">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <MdOutlineNotificationsNone aria-hidden />
+                </EmptyMedia>
+                <EmptyTitle>Sin novedades</EmptyTitle>
+                <EmptyDescription>
+                  Acá vas a ver los avisos de tus campos y solicitudes.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          </HeaderPopoverButton>
+          <HeaderPopoverButton label="Ayuda" icon={<MdOutlineInfo aria-hidden />}>
+            <ScreenGuideContent pathname={pathname} />
+          </HeaderPopoverButton>
           <UserMenu user={user} />
         </div>
       </div>
 
       <Drawer open={menuOpen} onOpenChange={setMenuOpen} swipeDirection="left">
-        <DrawerContent className="bg-canvas p-4">
+        <DrawerContent className="p-0">
           <DrawerTitle className="sr-only">Menú</DrawerTitle>
           <AppSidebar user={user} pendingCount={pendingCount} />
         </DrawerContent>

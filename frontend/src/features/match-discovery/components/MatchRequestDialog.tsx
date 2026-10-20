@@ -255,7 +255,11 @@ function RequestForm({
               aria-busy={composing}
               disabled={pending}
             />
-            <p id="need-brief-summary-hint" className="text-caption text-sage-600" aria-live="polite">
+            <p
+              id="need-brief-summary-hint"
+              className="text-caption text-muted-foreground"
+              aria-live="polite"
+            >
               {hint}
             </p>
           </CollapsibleContent>

@@ -5,7 +5,8 @@ import { fetchCurrentUser, getSessionUser } from '@/core/auth/server';
 import { AppLayout } from '@/features/app-shell';
 import BackendUnavailable from '@/features/auth/components/BackendUnavailable';
 import { AddToFarmButton } from '@/features/farms';
-import { MatchRequestList, MatchRequestsEmpty } from '@/features/matches';
+import { MatchRequestList, MatchRequestsEmpty, MatchStats } from '@/features/matches';
+import { SectionHeader } from '@/ui/components/SectionHeader';
 import { ROUTES } from '@/shared/constants/routes';
 
 export const dynamic = 'force-dynamic';
@@ -58,12 +59,19 @@ export default async function MatchesPage() {
       pendingCount={waiting}
     >
       <main className="mx-auto max-w-[1180px] pt-4 pb-10">
-        <h1 className="text-heading-lg tracking-heading text-pine">
-          {viewer === 'Producer' ? 'Mis solicitudes' : 'Solicitudes de match'}
-        </h1>
-        <p className="text-body-sm text-sage-600 mt-1">{subtitle}</p>
+        <SectionHeader
+          as="h1"
+          title={viewer === 'Producer' ? 'Mis solicitudes' : 'Solicitudes de match'}
+          description={subtitle}
+        />
 
-        <div className="mt-8">
+        {matches.length > 0 && (
+          <div className="mt-6">
+            <MatchStats matches={matches} viewer={viewer} />
+          </div>
+        )}
+
+        <div className="mt-6">
           {matches.length > 0 ? (
             <MatchRequestList
               matches={matches}

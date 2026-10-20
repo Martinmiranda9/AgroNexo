@@ -47,10 +47,13 @@ function FarmRow({ farm, member, adding, disabled, onAdd }: FarmRowProps) {
         </IconContainer>
       </ItemMedia>
       <ItemContent className="min-w-0 gap-0">
-        <h3 id={titleId} className="text-body tracking-heading text-pine truncate font-semibold">
+        <h3
+          id={titleId}
+          className="text-body tracking-heading text-foreground truncate font-semibold"
+        >
           {farm.name}
         </h3>
-        <p className="text-caption text-sage-600 font-medium">
+        <p className="text-caption text-muted-foreground font-medium">
           ID <span className="font-mono">{farm.publicId}</span>
           {hectares && (
             <>

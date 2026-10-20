@@ -34,6 +34,9 @@ const buttonVariants = cva(
         outline:
           'bg-transparent text-foreground border border-border hover:bg-accent hover:border-foreground/20 hover:text-accent-foreground',
         ghost: 'bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+        // Blanco con borde fino y sombra suave sobre el lienzo (como el `surface` de IconButton): sugerencias y atajos.
+        surface:
+          'bg-card text-foreground border border-border [box-shadow:var(--shadow-s)] hover:bg-field-50 hover:border-field-200',
         destructive: 'bg-destructive/10 text-destructive hover:bg-destructive/20',
         link: 'text-foreground underline-offset-4 hover:underline hover:text-ring',
       },

@@ -49,8 +49,10 @@ export default function CandidateItem({
       </ItemMedia>
 
       <ItemContent className="min-w-0 gap-0">
-        <p className="text-caption text-sage-600 font-medium">{professionalRoleLabel(c.role)}</p>
-        <h3 id={titleId} className="text-body tracking-heading text-pine font-semibold">
+        <p className="text-caption text-muted-foreground font-medium">
+          {professionalRoleLabel(c.role)}
+        </p>
+        <h3 id={titleId} className="text-body tracking-heading text-foreground font-semibold">
           {fullName(c)}
         </h3>
         {c.specialty && <p className="text-body-sm text-sage-800 mt-0.5">{c.specialty}</p>}
@@ -59,13 +61,13 @@ export default function CandidateItem({
           {c.licenseNumber && (
             <div className="flex items-center gap-1.5">
               <dt className="sr-only">Matrícula</dt>
-              <MdOutlineBadge size={14} className="text-sage-600" aria-hidden />
+              <MdOutlineBadge size={14} className="text-muted-foreground" aria-hidden />
               <dd className="font-mono">{c.licenseNumber}</dd>
             </div>
           )}
           <div className="flex items-center gap-1.5">
             <dt className="sr-only">Experiencia</dt>
-            <MdOutlineWorkOutline size={14} className="text-sage-600" aria-hidden />
+            <MdOutlineWorkOutline size={14} className="text-muted-foreground" aria-hidden />
             <dd>
               <span className="font-mono">{c.yearsExperience}</span> años
             </dd>

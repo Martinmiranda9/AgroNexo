@@ -11,6 +11,7 @@ import { cn } from '@/shared/utils/cn';
  */
 
 const AVATAR_SIZES = {
+  xs: 'size-6 text-[0.6875rem]',
   sm: 'size-8 text-xs',
   default: 'size-10 text-sm',
   lg: 'size-12 text-base',
@@ -102,13 +103,15 @@ function AvatarGroup({ className, children, max, total, ...props }: AvatarGroupP
   );
 }
 
-const INITIALS_SIZES = { sm: 'sm', md: 'default', lg: 'lg' } as const;
+const INITIALS_SIZES = { xs: 'xs', sm: 'sm', md: 'default', lg: 'lg' } as const;
 
 const INITIALS_TONES = {
   /** Relleno pine + texto beige (lo activo / la persona protagonista). */
   solid: 'bg-pine text-sage-50',
   /** Tinte suave para listas y equipos. */
   tint: 'bg-muted text-muted-foreground',
+  /** Sobre pine (un ítem activo del sidebar): texto claro sobre un velo. */
+  inverse: 'bg-sage-50/15 text-sage-50',
 } as const;
 
 export interface InitialsAvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
