@@ -154,24 +154,30 @@ export const URGENCY_WORDS: Record<Urgency, string[]> = {
 export interface ExampleNeed {
   short: string;
   full: string;
+  /** Profesión a la que apunta el ejemplo: elige el ícono del tag. */
+  role: SearchableRole;
 }
 
 export const EXAMPLE_NEEDS: ExampleNeed[] = [
   {
     short: 'Contador para retenciones de granos',
     full: 'Necesito un contador que entienda de retenciones y liquidación de granos. Tengo 350 ha de soja.',
+    role: 'Accountant',
   },
   {
     short: 'Agrónomo para la fina, por ambientes',
     full: 'Busco agrónomo para planificar la fina y ajustar la fertilización por ambientes, este mes.',
+    role: 'Agronomist',
   },
   {
     short: 'Revisar un contrato de arrendamiento',
     full: 'Quiero revisar un contrato de arrendamiento antes de renovarlo.',
+    role: 'Lawyer',
   },
   {
     short: 'Financiar la campaña',
     full: 'Busco un inversionista que me ayude a financiar la campaña de trigo, 600 ha.',
+    role: 'Investor',
   },
 ];
 

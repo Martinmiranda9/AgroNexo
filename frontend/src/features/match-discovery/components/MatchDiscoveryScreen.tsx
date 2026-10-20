@@ -6,6 +6,7 @@ import { createMatchAction } from '@/core/actions/create-match.action';
 import type { CreateMatchResult, NeedBrief, SearchLocation } from '@/core/models/match.model';
 import { AppLayout } from '@/features/app-shell';
 import { useMediaQuery } from '@/shared/hooks/useMediaQuery';
+import { cn } from '@/shared/utils/cn';
 import BrandGlow from '@/ui/components/BrandGlow';
 import { Drawer, DrawerContent } from '@/ui/components/Drawer';
 import { useMatchDiscovery } from '../hooks/useMatchDiscovery';
@@ -70,16 +71,17 @@ export default function MatchDiscoveryScreen({ user, location }: MatchDiscoveryS
       };
 
   return (
-    <AppLayout user={user}>
+    <AppLayout user={user} transparentHeader={phase !== 'results'}>
       <div className="relative">
         <BrandGlow quiet={phase === 'results'} />
 
         <div className="relative z-10">
-          <main className="mx-auto max-w-[1180px] pb-16">
+          <main className={cn('mx-auto max-w-[1180px]', phase !== 'describe' && 'pb-16')}>
             <AnimatePresence mode="wait" initial={false}>
               {phase === 'describe' && (
                 <motion.div key="describe" {...fade}>
                   <SearchHero
+                    firstName={user.firstName}
                     value={discovery.draft}
                     onChange={discovery.setDraft}
                     onSubmit={discovery.submit}

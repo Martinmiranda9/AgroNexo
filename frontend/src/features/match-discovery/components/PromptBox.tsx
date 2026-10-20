@@ -6,9 +6,7 @@ import { cn } from '@/shared/utils/cn';
 import { AiAgentInput, AiAgentInputIconButton } from '@/ui/components/AiAgentInput';
 import { Alert, AlertDescription } from '@/ui/components/Alert';
 import { Badge, BadgeDot } from '@/ui/components/Badge';
-import { Kbd } from '@/ui/components/Kbd';
 import { Label } from '@/ui/components/Label';
-import { useMediaQuery } from '@/shared/hooks/useMediaQuery';
 import { useDictation, type DictationError } from '../hooks/useDictation';
 
 const MIN_LENGTH = 4;
@@ -32,8 +30,8 @@ interface PromptBoxProps {
 }
 
 /**
- * Campo único donde el productor cuenta lo que necesita (AI Agent Input de Cashmere), con dictado por voz en el
- * micrófono de la izquierda y envío con Enter o con la flecha.
+ * Campo único donde el productor cuenta lo que necesita (AI Agent Input de Cashmere): solo el micrófono para dictar a
+ * la izquierda y la flecha para enviar (también con Enter).
  */
 export default function PromptBox({ value, onChange, onSubmit, textareaRef }: PromptBoxProps) {
   const id = useId();
@@ -49,8 +47,6 @@ export default function PromptBox({ value, onChange, onSubmit, textareaRef }: Pr
     latest.current = next;
     onChange(next);
   });
-  // El atajo solo tiene sentido con teclado físico: en el celular no se muestra.
-  const finePointer = useMediaQuery('(pointer: fine)');
   const ready = value.trim().length >= MIN_LENGTH;
   const tooShort = value.trim().length > 0 && !ready;
 
@@ -108,26 +104,15 @@ export default function PromptBox({ value, onChange, onSubmit, textareaRef }: Pr
         }
       />
 
-      <div className="mt-3 flex min-h-5 flex-wrap items-center justify-center gap-x-3 gap-y-1 px-3 text-center">
-        <p
-          id={hintId}
-          className={cn(
-            'text-body-sm text-muted-foreground',
-            !dictation.listening && 'line-clamp-2'
-          )}
-        >
-          {hint}
-        </p>
-        {finePointer && !dictation.listening && (
-          <span
-            className="text-caption text-muted-foreground inline-flex items-center gap-1.5"
-            aria-hidden
-          >
-            <Kbd>Enter</Kbd>
-            para buscar
-          </span>
+      <p
+        id={hintId}
+        className={cn(
+          'text-body-sm text-muted-foreground mt-3 min-h-5 px-3 text-center',
+          !dictation.listening && 'line-clamp-2'
         )}
-      </div>
+      >
+        {hint}
+      </p>
 
       {dictation.error && (
         <Alert variant="destructive" className="mt-2">
