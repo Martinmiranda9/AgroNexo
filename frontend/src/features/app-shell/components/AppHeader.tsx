@@ -8,6 +8,7 @@ import {
   MdOutlineNotifications,
   MdOutlineNotificationsNone,
 } from 'react-icons/md';
+import { cn } from '@/shared/utils/cn';
 import BrandLogo from '@/ui/components/BrandLogo';
 import { Drawer, DrawerContent, DrawerTitle } from '@/ui/components/Drawer';
 import {
@@ -30,13 +31,15 @@ interface AppHeaderProps {
   user: AppUser;
   /** Solicitudes esperando respuesta: contador junto a "Solicitudes" en el menú del celular. */
   pendingCount?: number;
+  /** Sin fondo propio, para que se vea el brillo de una pantalla de entrada que no scrollea (Buscar). */
+  transparent?: boolean;
 }
 
 /**
  * Barra de arriba del contenido: a la izquierda dónde está el usuario y a la derecha avisos, ayuda y el perfil. El logo y la búsqueda viven en el sidebar;
  * en celular y tablet, donde el sidebar no se ve, la barra suma el botón de menú (abre el sidebar en un panel) y el logo.
  */
-export default function AppHeader({ user, pendingCount = 0 }: AppHeaderProps) {
+export default function AppHeader({ user, pendingCount = 0, transparent = false }: AppHeaderProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -44,7 +47,12 @@ export default function AppHeader({ user, pendingCount = 0 }: AppHeaderProps) {
   useEffect(() => setMenuOpen(false), [pathname]);
 
   return (
-    <header className="bg-canvas/85 sticky top-0 z-30 backdrop-blur-xl">
+    <header
+      className={cn(
+        'sticky top-0 z-30',
+        transparent ? 'bg-transparent' : 'bg-canvas/85 backdrop-blur-xl'
+      )}
+    >
       <div className="flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6">
         <div className="flex items-center gap-3 lg:hidden">
           <IconButton

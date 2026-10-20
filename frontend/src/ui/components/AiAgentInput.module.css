@@ -5,7 +5,7 @@
  * - colores de los tokens (card, foreground, primary) en vez de oklch sueltos; el aro animado de "pensando" en
  *   verdes de campo;
  * - tamaños más grandes para el campo principal de una pantalla (el registro está pensado para un chat chico) y un
- *   foco visible en el marco.
+ *   foco visible en el marco; placeholder en `sage-500` para el contraste.
  */
 .wrap {
   width: 100%;
@@ -100,8 +100,9 @@
   word-break: break-word;
 }
 .field::placeholder {
-  color: var(--foreground);
-  opacity: 0.5;
+  /* sage-500 sobre blanco: 4,8:1 (con pine al 50 % no llegaba a 4,5:1) */
+  color: var(--color-sage-500);
+  opacity: 1;
 }
 @media (max-width: 639px) {
   .field {
