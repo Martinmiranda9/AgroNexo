@@ -1,5 +1,7 @@
 using AgroNexo.Application.Common.Helpers;
+using AgroNexo.Application.Common.Interfaces;
 using AgroNexo.Application.Farms.DTOs;
+using AgroNexo.Application.Farms.Services;
 using AgroNexo.Domain.Exceptions;
 using AgroNexo.Domain.Interfaces;
 
@@ -12,15 +14,18 @@ public class UpdateFarmUseCase : IUpdateFarmUseCase
 {
     private readonly IProducerRepository _producerRepository;
     private readonly IFarmRepository _farmRepository;
+    private readonly IPlaceLookupService _placeLookup;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateFarmUseCase(
         IProducerRepository producerRepository,
         IFarmRepository farmRepository,
+        IPlaceLookupService placeLookup,
         IUnitOfWork unitOfWork)
     {
         _producerRepository = producerRepository;
         _farmRepository = farmRepository;
+        _placeLookup = placeLookup;
         _unitOfWork = unitOfWork;
     }
 
@@ -44,6 +49,11 @@ public class UpdateFarmUseCase : IUpdateFarmUseCase
             : null;
 
         farm.UpdateDetails(request.Name, request.TotalHectares, location, request.Description);
+
+        // Solo con perímetro nuevo: si no lo mandan, el campo conserva el que tenía y su ubicación.
+        if (location != null)
+            await FarmPlaceResolver.ApplyAsync(farm, _placeLookup, cancellationToken);
+
         await _farmRepository.UpdateAsync(farm, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

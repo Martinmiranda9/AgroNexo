@@ -1,6 +1,8 @@
+using AgroNexo.Application.Common.Interfaces;
 using AgroNexo.Domain.Interfaces;
 using AgroNexo.Infrastructure.Data;
 using AgroNexo.Infrastructure.Repositories;
+using AgroNexo.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +44,13 @@ public static class DependencyInjection
 
         // Register Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Ubicación de los campos (provincia, partido, localidad) con la API Georef
+        services.AddHttpClient<IPlaceLookupService, GeorefPlaceLookupService>(client =>
+        {
+            client.BaseAddress = new Uri(configuration["Georef:BaseUrl"] ?? GeorefPlaceLookupService.DefaultBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(3);
+        });
 
         return services;
     }

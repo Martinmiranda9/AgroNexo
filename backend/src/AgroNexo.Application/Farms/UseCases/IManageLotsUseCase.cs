@@ -7,10 +7,10 @@ public interface IManageLotsUseCase
     /// <summary>Lotes del campo con sus cultivos, para el dueño o un profesional del equipo.</summary>
     Task<IReadOnlyList<LotResponse>> ListAsync(Guid farmId, string firebaseUid, CancellationToken cancellationToken = default);
 
-    /// <summary>El productor dueño crea un lote.</summary>
+    /// <summary>El productor dueño o el agrónomo del equipo crean un lote, dibujado en el mapa o con sus hectáreas.</summary>
     Task<LotResponse> CreateAsync(Guid farmId, LotRequest request, string firebaseUid, CancellationToken cancellationToken = default);
 
-    /// <summary>El productor dueño corrige el nombre o las hectáreas de un lote.</summary>
+    /// <summary>El productor dueño o el agrónomo del equipo corrigen el nombre, las hectáreas o la forma de un lote.</summary>
     Task<LotResponse> UpdateAsync(Guid farmId, Guid lotId, LotRequest request, string firebaseUid, CancellationToken cancellationToken = default);
 
     /// <summary>El productor dueño da de baja un lote; sus actividades lo siguen nombrando.</summary>

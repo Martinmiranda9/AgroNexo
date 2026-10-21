@@ -24,6 +24,12 @@ public class FarmDashboardResponse
     public List<LotResponse> Lots { get; set; } = new();
 
     /// <summary>
+    /// Quien mira puede crear lotes y dibujar o corregir su forma: el productor dueño o el ingeniero agrónomo del equipo,
+    /// con el campo sin archivar.
+    /// </summary>
+    public bool CanEditLots { get; set; }
+
+    /// <summary>
     /// Avance de cada labor sobre la superficie a trabajar de la campaña (lotes con cultivo; si no hay, todos). Siembra y
     /// cosecha van siempre; el resto, si tiene actividades.
     /// </summary>

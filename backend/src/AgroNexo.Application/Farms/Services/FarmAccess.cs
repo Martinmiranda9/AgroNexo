@@ -1,4 +1,5 @@
 using AgroNexo.Domain.Entities;
+using AgroNexo.Domain.Enums;
 
 namespace AgroNexo.Application.Farms.Services;
 
@@ -26,4 +27,7 @@ public sealed class FarmAccess
     public FarmMember? Membership { get; }
 
     public bool IsOwner => Owner != null;
+
+    /// <summary>Crea lotes y dibuja o corrige su forma: el productor dueño o el ingeniero agrónomo del equipo.</summary>
+    public bool CanEditLots => IsOwner || Professional?.Role == ProfessionalRole.Agronomist;
 }

@@ -208,10 +208,10 @@ public class FarmDashboardIntegrationTests : IntegrationTestBase
             new CampaignRequest { Name = campaign.Name, StartsOn = Today, EndsOn = Today.AddDays(300) }, JsonOptions))
             .StatusCode.Should().Be(HttpStatusCode.Conflict);
 
-        // Los lotes no superan las hectáreas del campo (350) y no repiten nombre
+        // Las hectáreas de los lotes son las declaradas: pueden sumar más que el campo (350). Los nombres no se repiten.
         var lot = await CreateLotAsync(producer, farm.Id, "Lote Norte", 300);
-        (await producer.Client.PostAsJsonAsync($"/api/v1/farms/{farm.Id}/lots", new LotRequest { Name = "Lote Sur", Hectares = 60 }, JsonOptions))
-            .StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var overFarm = await CreateLotAsync(producer, farm.Id, "Lote Sur", 60);
+        (await producer.Client.DeleteAsync($"/api/v1/farms/{farm.Id}/lots/{overFarm.Id}")).StatusCode.Should().Be(HttpStatusCode.NoContent);
         (await producer.Client.PostAsJsonAsync($"/api/v1/farms/{farm.Id}/lots", new LotRequest { Name = "lote norte", Hectares = 10 }, JsonOptions))
             .StatusCode.Should().Be(HttpStatusCode.Conflict);
 
@@ -224,10 +224,13 @@ public class FarmDashboardIntegrationTests : IntegrationTestBase
         // Una campaña con cultivos no se borra
         (await producer.Client.DeleteAsync($"/api/v1/farms/{farm.Id}/campaigns/{campaign.Id}")).StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        // Un profesional del equipo ve los lotes pero no los administra
+        // El agrónomo del equipo ve los lotes, pero no los da de baja ni carga cultivos: eso es del productor
         var lots = await agronomist.Client.GetFromJsonAsync<List<LotResponse>>($"/api/v1/farms/{farm.Id}/lots", JsonOptions);
         lots.Should().ContainSingle().Which.Crops.Should().ContainSingle();
-        (await agronomist.Client.PostAsJsonAsync($"/api/v1/farms/{farm.Id}/lots", new LotRequest { Name = "Lote X", Hectares = 5 }, JsonOptions))
+        (await agronomist.Client.DeleteAsync($"/api/v1/farms/{farm.Id}/lots/{lot.Id}"))
+            .StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        (await agronomist.Client.PostAsJsonAsync($"/api/v1/farms/{farm.Id}/lots/{lot.Id}/crops",
+            new LotCropRequest { CampaignId = campaign.Id, Crop = CropType.Corn }, JsonOptions))
             .StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
         // Un lote dado de baja sale de la lista

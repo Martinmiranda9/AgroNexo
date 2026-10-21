@@ -39,6 +39,10 @@ public class FarmConfiguration : IEntityTypeConfiguration<Farm>
 
         builder.Property(f => f.ArchivedAt);
 
+        builder.Property(f => f.Province).HasMaxLength(Farm.PlaceNameMaxLength);
+        builder.Property(f => f.Department).HasMaxLength(Farm.PlaceNameMaxLength);
+        builder.Property(f => f.Locality).HasMaxLength(Farm.PlaceNameMaxLength);
+
         builder.Ignore(f => f.IsArchived);
 
         builder.Property(f => f.PublicId)

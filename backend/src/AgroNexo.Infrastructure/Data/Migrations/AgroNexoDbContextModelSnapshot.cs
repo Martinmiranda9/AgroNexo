@@ -71,6 +71,10 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Department")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -79,6 +83,10 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
+
+                    b.Property<string>("Locality")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<Geometry>("Location")
                         .HasColumnType("geometry");
@@ -90,6 +98,10 @@ namespace AgroNexo.Infrastructure.Data.Migrations
 
                     b.Property<Guid>("ProducerId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Province")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<long>("PublicId")
                         .ValueGeneratedOnAdd()
@@ -229,8 +241,20 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Polygon>("Boundary")
+                        .HasColumnType("geometry(Polygon,4326)");
+
+                    b.Property<DateTime?>("BoundaryEditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("BoundaryEditedByProfessionalId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedByProfessionalId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("FarmId")
                         .HasColumnType("uuid");
@@ -251,6 +275,10 @@ namespace AgroNexo.Infrastructure.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Boundary");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Boundary"), "gist");
 
                     b.HasIndex("FarmId");
 

@@ -1,5 +1,7 @@
 using AgroNexo.Application.Common.Helpers;
+using AgroNexo.Application.Common.Interfaces;
 using AgroNexo.Application.Farms.DTOs;
+using AgroNexo.Application.Farms.Services;
 using AgroNexo.Domain.Entities;
 using AgroNexo.Domain.Exceptions;
 using AgroNexo.Domain.Interfaces;
@@ -13,15 +15,18 @@ public class CreateFarmUseCase : ICreateFarmUseCase
 {
     private readonly IProducerRepository _producerRepository;
     private readonly IFarmRepository _farmRepository;
+    private readonly IPlaceLookupService _placeLookup;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateFarmUseCase(
         IProducerRepository producerRepository,
         IFarmRepository farmRepository,
+        IPlaceLookupService placeLookup,
         IUnitOfWork unitOfWork)
     {
         _producerRepository = producerRepository;
         _farmRepository = farmRepository;
+        _placeLookup = placeLookup;
         _unitOfWork = unitOfWork;
     }
 
@@ -47,6 +52,8 @@ public class CreateFarmUseCase : ICreateFarmUseCase
             location,
             request.Description);
 
+        await FarmPlaceResolver.ApplyAsync(farm, _placeLookup, cancellationToken);
+
         await _farmRepository.AddAsync(farm, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -67,6 +74,9 @@ public class CreateFarmUseCase : ICreateFarmUseCase
             Description = farm.Description,
             ArchivedAt = farm.ArchivedAt,
             LocationCoordinates = GeometryHelper.ToCoordinateDtos(farm.Location),
+            Province = farm.Province,
+            Department = farm.Department,
+            Locality = farm.Locality,
             CreatedAt = farm.CreatedAt,
             UpdatedAt = farm.UpdatedAt
         };
