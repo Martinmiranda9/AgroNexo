@@ -34,10 +34,9 @@ public class FarmActivityResponseFactory : IFarmActivityResponseFactory
         var owner = access.Owner ?? await _producerRepository.GetByIdAsync(access.Farm.ProducerId, cancellationToken);
         var ownerName = owner != null ? $"{owner.FirstName} {owner.LastName}".Trim() : "Productor";
 
-        // Los autores pueden haber dejado el equipo: se buscan por id, aunque sean de otro tenant.
-        var authors = new Dictionary<Guid, Professional?>();
-        foreach (var authorId in activities.Where(a => a.AuthorProfessionalId.HasValue).Select(a => a.AuthorProfessionalId!.Value).Distinct())
-            authors[authorId] = await _professionalRepository.GetByIdAcrossTenantsAsync(authorId, cancellationToken);
+        // Los autores pueden haber dejado el equipo: se buscan por id, aunque sean de otro tenant. Todos en una query.
+        var authorIds = activities.Where(a => a.AuthorProfessionalId.HasValue).Select(a => a.AuthorProfessionalId!.Value).Distinct().ToList();
+        var authors = await _professionalRepository.GetByIdsAcrossTenantsAsync(authorIds, cancellationToken);
 
         var viewerProfessionalId = access.Professional?.Id;
 

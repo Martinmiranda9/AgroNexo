@@ -30,6 +30,18 @@ public class ProfessionalRepository : IProfessionalRepository
             .FirstOrDefaultAsync(p => p.Id == id && p.IsActive, cancellationToken);
     }
 
+    public async Task<IReadOnlyDictionary<Guid, Professional>> GetByIdsAcrossTenantsAsync(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        if (ids.Count == 0)
+            return new Dictionary<Guid, Professional>();
+
+        return await _context.Professionals
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(p => ids.Contains(p.Id) && p.IsActive)
+            .ToDictionaryAsync(p => p.Id, cancellationToken);
+    }
+
     public async Task<Professional?> GetByFirebaseUidAsync(string firebaseUid, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(firebaseUid))
@@ -79,20 +91,32 @@ public class ProfessionalRepository : IProfessionalRepository
             query = query.Where(p => p.Specialty.ToLower() == normalizedSpecialty);
         }
 
-        var list = await query.ToListAsync(cancellationToken);
-
+        // La zona de cobertura se filtra en PostGIS (ST_Contains, con el índice GIST de CoverageArea) y no en memoria:
+        // así no se traen a la API todos los profesionales de la especialidad para descartar casi todos.
         if (requiresFieldPresence && location != null)
         {
-            list = list.Where(p => p.CoverageArea != null && p.CoverageArea.Contains(location)).ToList();
+            query = query.Where(p => p.CoverageArea != null && p.CoverageArea.Contains(location));
         }
 
-        return list;
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<int> GetActiveMatchCountAsync(Guid professionalId, CancellationToken cancellationToken = default)
     {
         return await _context.Matches
             .CountAsync(m => m.ProfessionalId == professionalId && m.Status == MatchStatus.Active, cancellationToken);
+    }
+
+    public async Task<IReadOnlyDictionary<Guid, int>> GetActiveMatchCountsAsync(IReadOnlyCollection<Guid> professionalIds, CancellationToken cancellationToken = default)
+    {
+        if (professionalIds.Count == 0)
+            return new Dictionary<Guid, int>();
+
+        return await _context.Matches
+            .Where(m => professionalIds.Contains(m.ProfessionalId) && m.Status == MatchStatus.Active)
+            .GroupBy(m => m.ProfessionalId)
+            .Select(g => new { ProfessionalId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.ProfessionalId, x => x.Count, cancellationToken);
     }
 
     public async Task<Professional> AddAsync(Professional professional, CancellationToken cancellationToken = default)
