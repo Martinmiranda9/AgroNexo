@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { MdLogout } from 'react-icons/md';
-import { Button, Spinner } from '@/ui/components';
-import { signOutSession } from '@/core/auth/firebase-actions';
+import { Button } from '@/ui/components/Button';
+import { Spinner } from '@/ui/components/Spinner';
 
 /** Cierra la sesión (Firebase + cookie) y vuelve al login. */
 export default function LogoutButton() {
@@ -12,6 +12,8 @@ export default function LogoutButton() {
   const handleLogout = async () => {
     setLoading(true);
     try {
+      // El SDK de Firebase se baja recién al cerrar sesión.
+      const { signOutSession } = await import('@/core/auth/firebase-actions');
       await signOutSession();
     } finally {
       window.location.assign('/login');

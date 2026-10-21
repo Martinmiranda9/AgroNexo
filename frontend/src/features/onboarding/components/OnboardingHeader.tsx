@@ -1,4 +1,5 @@
-import { BrandLogo, Progress } from '@/ui/components';
+import BrandLogo from '@/ui/components/BrandLogo';
+import { Progress } from '@/ui/components/Progress';
 
 interface OnboardingHeaderProps {
   /** Índice (base 0) del paso actual. */

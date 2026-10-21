@@ -1,7 +1,8 @@
 'use client';
 
-import { useId } from 'react';
-import { Field, FieldDescription, FieldError, FieldLabel, PasswordInput } from '@/ui/components';
+import { memo, useId } from 'react';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/ui/components/Field';
+import { PasswordInput } from '@/ui/components/PasswordInput';
 import type { PasswordField as PasswordFieldDef } from '../config/types';
 
 interface PasswordFieldProps {
@@ -11,8 +12,11 @@ interface PasswordFieldProps {
   onChange: (value: string) => void;
 }
 
-/** Campo de contraseña con mostrar/ocultar (PasswordInput de Cashmere). Cada instancia recuerda su visibilidad. */
-export default function PasswordField({ field, value, error, onChange }: PasswordFieldProps) {
+/**
+ * Campo de contraseña con mostrar/ocultar (PasswordInput de Cashmere). Cada instancia recuerda su visibilidad.
+ * Memorizado: en un formulario con varios campos, tipear en otro no lo vuelve a renderizar.
+ */
+function PasswordField({ field, value, error, onChange }: PasswordFieldProps) {
   const id = useId();
   const errorId = `${id}-error`;
   const hintId = `${id}-hint`;
@@ -35,3 +39,5 @@ export default function PasswordField({ field, value, error, onChange }: Passwor
     </Field>
   );
 }
+
+export default memo(PasswordField);

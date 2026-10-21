@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'motion/react';
-import { RadioCard, RadioGroup } from '@/ui/components';
+import { RadioCard, RadioGroup } from '@/ui/components/RadioGroup';
 import { ROLE_OPTIONS } from '../config/roles';
 import type { RegistrationKind } from '../config/types';
 

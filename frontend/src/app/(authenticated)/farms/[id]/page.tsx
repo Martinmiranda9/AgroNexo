@@ -3,7 +3,8 @@ import { getFarmDashboardAction } from '@/core/actions/get-farm-dashboard.action
 import { fetchCurrentUser, getSessionUser } from '@/core/auth/server';
 import { AppLayout } from '@/features/app-shell';
 import BackendUnavailable from '@/features/auth/components/BackendUnavailable';
-import { FarmDashboardScreen, greetingFor } from '@/features/farms';
+import FarmDashboardScreen from '@/features/farms/components/dashboard/FarmDashboardScreen';
+import { greetingFor } from '@/features/farms/lib/dashboard-view';
 import { ROUTES } from '@/shared/constants/routes';
 
 export const dynamic = 'force-dynamic';
@@ -23,14 +24,17 @@ export default async function FarmPage({ params, searchParams }: FarmPageProps) 
   const sessionUser = await getSessionUser();
   if (!sessionUser) redirect(ROUTES.login);
 
-  const current = await fetchCurrentUser();
+  // El estado del usuario y el tablero solo necesitan el token: van en paralelo.
+  const [current, result] = await Promise.all([
+    fetchCurrentUser(),
+    getFarmDashboardAction(id, campaign),
+  ]);
   if (current.status === 'unavailable') return <BackendUnavailable />;
   if (current.status === 'not-registered') redirect(ROUTES.onboarding);
 
   const viewer = current.user.userType;
   if (viewer !== 'Producer' && viewer !== 'Professional') redirect(ROUTES.dashboard);
 
-  const result = await getFarmDashboardAction(id, campaign);
   if (result.status === 'unauthorized') redirect(ROUTES.login);
   if (result.status === 'not-found') notFound();
   if (result.status !== 'ok') return <BackendUnavailable />;

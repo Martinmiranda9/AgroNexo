@@ -2,18 +2,12 @@
 
 import { useId } from 'react';
 import dynamic from 'next/dynamic';
-import {
-  ChoiceGroup,
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  Input,
-  NativeSelect,
-  NativeSelectOption,
-  NumberInput,
-  PhoneInput,
-} from '@/ui/components';
+import ChoiceGroup from '@/ui/components/ChoiceGroup';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/ui/components/Field';
+import { Input } from '@/ui/components/Input';
+import { NativeSelect, NativeSelectOption } from '@/ui/components/NativeSelect';
+import { NumberInput } from '@/ui/components/NumberInput';
+import { PhoneInput } from '@/ui/components/PhoneInput';
 import PasswordField from './PasswordField';
 import type { FieldDef, FormValues } from '../config/types';
 import { joinMulti, parseMulti } from '../lib/values';

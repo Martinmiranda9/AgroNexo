@@ -16,13 +16,13 @@ export default async function MatchDiscoveryPage() {
   const sessionUser = await getSessionUser();
   if (!sessionUser) redirect(ROUTES.login);
 
-  const current = await fetchCurrentUser();
+  // El perfil trae el apellido y la ubicación de registro; si falla, la pantalla igual funciona con lo que ya se sabe.
+  // Se pide junto con el estado del usuario: los dos solo necesitan el token.
+  const [current, profile] = await Promise.all([fetchCurrentUser(), getProducerProfileAction()]);
   if (current.status === 'unavailable') return <BackendUnavailable />;
   if (current.status === 'not-registered') redirect(ROUTES.onboarding);
   if (current.user.userType !== 'Producer') redirect(ROUTES.dashboard);
 
-  // El perfil trae el apellido y la ubicación de registro; si falla, la pantalla igual funciona con lo que ya se sabe.
-  const profile = await getProducerProfileAction();
   const location = await resolveSearchLocation({
     country: profile?.country,
     province: profile?.province,

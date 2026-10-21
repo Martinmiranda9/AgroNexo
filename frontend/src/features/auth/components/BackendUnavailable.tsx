@@ -1,7 +1,8 @@
 'use client';
 
 import { MdOutlineCloudOff } from 'react-icons/md';
-import { BrandLogo, Button } from '@/ui/components';
+import BrandLogo from '@/ui/components/BrandLogo';
+import { Button } from '@/ui/components/Button';
 
 /**
  * Pantalla para cuando la sesión es válida pero el servidor no responde. Es un estado distinto de

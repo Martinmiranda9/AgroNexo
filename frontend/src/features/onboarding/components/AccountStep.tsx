@@ -3,18 +3,12 @@
 import { useId, useState } from 'react';
 import Link from 'next/link';
 import { MdErrorOutline, MdOutlineMail } from 'react-icons/md';
-import {
-  Alert,
-  AlertDescription,
-  Button,
-  Checkbox,
-  Field,
-  FieldContent,
-  FieldError,
-  FieldLabel,
-  Separator,
-  Spinner,
-} from '@/ui/components';
+import { Alert, AlertDescription } from '@/ui/components/Alert';
+import { Button } from '@/ui/components/Button';
+import { Checkbox } from '@/ui/components/Checkbox';
+import { Field, FieldContent, FieldError, FieldLabel } from '@/ui/components/Field';
+import { Separator } from '@/ui/components/Separator';
+import { Spinner } from '@/ui/components/Spinner';
 import GoogleButton from '@/ui/components/GoogleButton';
 import PasswordField from './PasswordField';
 import {
@@ -25,6 +19,25 @@ import {
 } from '@/core/auth/firebase-actions';
 import { PASSWORD_REQUIREMENTS_HINT, passwordStrengthError } from '@/core/auth/password-rules';
 import EmailField, { validateEmail } from '@/ui/components/EmailField';
+import type { PasswordField as PasswordFieldDef } from '../config/types';
+
+// Fuera del componente: con la misma referencia en cada render, `PasswordField` (memo) no se re-renderiza al tipear
+// en el correo o en la otra contraseña.
+const PASSWORD_FIELD: PasswordFieldDef = {
+  kind: 'password',
+  name: 'password',
+  label: 'Contraseña',
+  autoComplete: 'new-password',
+  hint: PASSWORD_REQUIREMENTS_HINT,
+};
+
+const CONFIRM_PASSWORD_FIELD: PasswordFieldDef = {
+  kind: 'password',
+  name: 'confirmPassword',
+  label: 'Repetir contraseña',
+  confirms: 'password',
+  autoComplete: 'new-password',
+};
 
 /**
  * Paso "Tu cuenta": Google (popup nativo de Firebase) o correo + contraseña + repetir, creados
@@ -153,25 +166,13 @@ export default function AccountStep() {
       <div className="flex flex-col gap-4">
         <EmailField value={email} onChange={setEmail} error={fieldErrors.email} />
         <PasswordField
-          field={{
-            kind: 'password',
-            name: 'password',
-            label: 'Contraseña',
-            autoComplete: 'new-password',
-            hint: PASSWORD_REQUIREMENTS_HINT,
-          }}
+          field={PASSWORD_FIELD}
           value={password}
           error={fieldErrors.password}
           onChange={setPassword}
         />
         <PasswordField
-          field={{
-            kind: 'password',
-            name: 'confirmPassword',
-            label: 'Repetir contraseña',
-            confirms: 'password',
-            autoComplete: 'new-password',
-          }}
+          field={CONFIRM_PASSWORD_FIELD}
           value={confirmPassword}
           error={fieldErrors.confirmPassword}
           onChange={setConfirmPassword}
