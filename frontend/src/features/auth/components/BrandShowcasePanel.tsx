@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { Badge, BadgeDot } from '@/ui/components';
+import { Badge, BadgeDot } from '@/ui/components/Badge';
 import CampoFigure from './CampoFigure';
 
 // Paleta de líneas de Hairline sobre Pine. `--hairline-plate` tiene que ser el fondo exacto: las placas

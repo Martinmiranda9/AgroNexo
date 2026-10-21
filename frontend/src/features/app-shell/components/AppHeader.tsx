@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import {
   MdOutlineInfo,
@@ -39,7 +39,7 @@ interface AppHeaderProps {
  * Barra de arriba del contenido: a la izquierda dónde está el usuario y a la derecha avisos, ayuda y el perfil. El logo y la búsqueda viven en el sidebar;
  * en celular y tablet, donde el sidebar no se ve, la barra suma el botón de menú (abre el sidebar en un panel) y el logo.
  */
-export default function AppHeader({ user, pendingCount = 0, transparent = false }: AppHeaderProps) {
+function AppHeader({ user, pendingCount = 0, transparent = false }: AppHeaderProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -103,3 +103,7 @@ export default function AppHeader({ user, pendingCount = 0, transparent = false 
     </header>
   );
 }
+
+// Memorizado: en pantallas cliente con estado propio (Buscar re-renderiza con cada tecla) el marco no se vuelve a
+// renderizar si no cambian el usuario, el contador o el fondo.
+export default memo(AppHeader);

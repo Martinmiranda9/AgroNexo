@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace AgroNexo.API.Controllers;
 
 /// <summary>
-/// Lots of a farm and their crops per campaign. The whole team reads them; only the owner producer manages them. A farm
-/// the caller cannot access answers 404.
+/// Lots of a farm and their crops per campaign. The whole team reads them; the owner producer or the team's agronomist
+/// create them and correct them (name, hectares or the shape drawn on the map); only the owner removes lots and manages
+/// crops. A farm the caller cannot access answers 404; another team member trying to edit answers 403.
 /// </summary>
 [Route("api/v1/farms/{farmId:guid}/lots")]
 public class LotsController : ApiControllerBase
@@ -35,13 +36,15 @@ public class LotsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Creates a lot. Returns 400 if the lots would add up to more hectares than the farm, 409 if the name is taken.
+    /// Creates a lot with its declared hectares and, optionally, its location drawn on the map (visual reference only:
+    /// it does not change the hectares). Returns 400 if the drawn border crosses itself; 409 if the name is taken.
     /// </summary>
     [HttpPost]
-    [Authorize(Policy = "IsProducer")]
+    [Authorize(Policy = "Authenticated")]
     [ProducesResponseType(typeof(LotResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateLot(
@@ -57,12 +60,15 @@ public class LotsController : ApiControllerBase
         return CreatedAtAction(nameof(GetLots), new { farmId }, lot);
     }
 
-    /// <summary>Updates the name or hectares of a lot.</summary>
+    /// <summary>
+    /// Replaces a lot: name, declared hectares and location on the map (without a shape, the drawing is removed).
+    /// </summary>
     [HttpPut("{lotId:guid}")]
-    [Authorize(Policy = "IsProducer")]
+    [Authorize(Policy = "Authenticated")]
     [ProducesResponseType(typeof(LotResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateLot(

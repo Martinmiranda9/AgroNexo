@@ -30,6 +30,11 @@ public class FarmResponse
     /// </summary>
     public List<CoordinateDto> LocationCoordinates { get; set; } = new();
 
+    /// <summary>Provincia, partido y localidad, sacados del perímetro con Georef. <c>null</c> si no hay perímetro o no se encontró.</summary>
+    public string? Province { get; set; }
+    public string? Department { get; set; }
+    public string? Locality { get; set; }
+
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }

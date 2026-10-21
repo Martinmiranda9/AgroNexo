@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import type { AppUser } from '../types';
 import AppSidebar from './AppSidebar';
 import { useSidebarState } from './SidebarStateProvider';
@@ -10,7 +11,7 @@ interface DesktopSidebarProps {
 }
 
 /** Sidebar de escritorio: recuerda si el usuario lo dejó colapsado o expandido en este navegador. */
-export default function DesktopSidebar({ user, pendingCount }: DesktopSidebarProps) {
+function DesktopSidebar({ user, pendingCount }: DesktopSidebarProps) {
   const state = useSidebarState();
 
   return (
@@ -22,3 +23,6 @@ export default function DesktopSidebar({ user, pendingCount }: DesktopSidebarPro
     />
   );
 }
+
+// Memorizado por lo mismo que `AppHeader`: solo cambia con el usuario, el contador o el estado colapsado.
+export default memo(DesktopSidebar);

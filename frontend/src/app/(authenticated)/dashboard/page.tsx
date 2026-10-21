@@ -1,13 +1,16 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { MdArrowForward, MdOutlineCloudOff } from 'react-icons/md';
-import { Alert, AlertDescription, AlertTitle, Badge, BrandLogo, Button } from '@/ui/components';
+import { Alert, AlertDescription, AlertTitle } from '@/ui/components/Alert';
+import { Badge } from '@/ui/components/Badge';
+import BrandLogo from '@/ui/components/BrandLogo';
+import { Button } from '@/ui/components/Button';
 import { SectionHeader } from '@/ui/components/SectionHeader';
 import { AppLayout } from '@/features/app-shell';
 import LogoutButton from '@/features/auth/components/LogoutButton';
 import BackendUnavailable from '@/features/auth/components/BackendUnavailable';
 import { MatchRequestList, MatchRequestsEmpty, MatchStats } from '@/features/matches';
-import { greetingFor } from '@/features/farms';
+import { greetingFor } from '@/features/farms/lib/dashboard-view';
 import { getMatchesAction } from '@/core/actions/get-matches.action';
 import { fetchCurrentUser, getSessionUser } from '@/core/auth/server';
 import { ROUTES } from '@/shared/constants/routes';
@@ -25,7 +28,8 @@ export default async function DashboardPage() {
   const sessionUser = await getSessionUser();
   if (!sessionUser) redirect(ROUTES.login);
 
-  const current = await fetchCurrentUser();
+  // El estado del usuario y sus solicitudes solo necesitan el token: van en paralelo.
+  const [current, result] = await Promise.all([fetchCurrentUser(), getMatchesAction()]);
   if (current.status === 'unavailable') return <BackendUnavailable />;
   if (current.status === 'not-registered') redirect(ROUTES.onboarding);
 
@@ -53,7 +57,6 @@ export default async function DashboardPage() {
     );
   }
 
-  const result = await getMatchesAction();
   if (result.status === 'unauthorized') redirect(ROUTES.login);
   const matches = result.status === 'ok' ? result.matches : null;
   const pending = (matches ?? []).filter((match) => match.status === 'Pending');

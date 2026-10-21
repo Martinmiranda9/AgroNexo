@@ -1,3 +1,4 @@
+using AgroNexo.Application.Common.Helpers;
 using AgroNexo.Application.Farms.DTOs;
 using AgroNexo.Application.Farms.Services;
 using AgroNexo.Domain.Entities;
@@ -101,6 +102,10 @@ public class GetWorkspacesUseCase : IGetWorkspacesUseCase
             TotalHectares = farm.TotalHectares,
             CreatedAt = farm.CreatedAt,
             ArchivedAt = farm.ArchivedAt,
+            LocationCoordinates = GeometryHelper.ToCoordinateDtos(farm.Location),
+            Province = farm.Province,
+            Department = farm.Department,
+            Locality = farm.Locality,
             ProducerId = farm.ProducerId,
             ProducerName = owner != null ? $"{owner.FirstName} {owner.LastName}".Trim() : string.Empty,
             ViewerRole = viewerRole,

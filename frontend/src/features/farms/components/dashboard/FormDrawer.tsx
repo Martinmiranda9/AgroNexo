@@ -10,6 +10,9 @@ import FarmDrawer, {
   DRAWER_BODY,
   DRAWER_FOOTER,
   DRAWER_HEADER,
+  DRAWER_SPLIT_ASIDE,
+  DRAWER_SPLIT_BODY,
+  DRAWER_SPLIT_FIELDS,
   FarmDrawerCloseButton,
 } from '../FarmDrawer';
 
@@ -43,6 +46,8 @@ interface FormShellProps {
   onSubmit: () => Promise<string | null>;
   /** Valida antes de enviar; con errores, no envía. */
   validate?: () => boolean;
+  /** Lo que va al costado de los campos en pantalla completa (el mapa). */
+  aside?: ReactNode;
   children: ReactNode;
 }
 
@@ -55,6 +60,7 @@ export function FormShell({
   pendingLabel,
   onSubmit,
   validate,
+  aside,
   children,
 }: FormShellProps) {
   const [pending, setPending] = useState(false);
@@ -71,6 +77,13 @@ export function FormShell({
     if (error) setFailure(error);
   };
 
+  const failureAlert = failure && (
+    <Alert variant="destructive" role="alert">
+      <MdErrorOutline aria-hidden />
+      <AlertDescription>{failure}</AlertDescription>
+    </Alert>
+  );
+
   return (
     <form onSubmit={submit} noValidate className="flex min-h-0 flex-1 flex-col">
       <DrawerHeader className={DRAWER_HEADER}>
@@ -79,15 +92,20 @@ export function FormShell({
         <FarmDrawerCloseButton />
       </DrawerHeader>
 
-      <fieldset disabled={pending} className={DRAWER_BODY}>
-        {children}
-        {failure && (
-          <Alert variant="destructive" role="alert">
-            <MdErrorOutline aria-hidden />
-            <AlertDescription>{failure}</AlertDescription>
-          </Alert>
-        )}
-      </fieldset>
+      {aside ? (
+        <fieldset disabled={pending} className={DRAWER_SPLIT_BODY}>
+          <div className={DRAWER_SPLIT_FIELDS}>
+            {children}
+            {failureAlert}
+          </div>
+          <div className={DRAWER_SPLIT_ASIDE}>{aside}</div>
+        </fieldset>
+      ) : (
+        <fieldset disabled={pending} className={DRAWER_BODY}>
+          {children}
+          {failureAlert}
+        </fieldset>
+      )}
 
       <DrawerFooter className={DRAWER_FOOTER}>
         <Button type="button" variant="outline" size="lg" onClick={onClose} disabled={pending}>
@@ -105,6 +123,8 @@ export function FormShell({
 interface FormDrawerProps {
   open: boolean;
   onClose: () => void;
+  /** `full`: pantalla completa, para los formularios con mapa. */
+  size?: 'panel' | 'full';
   /** El formulario: se monta de cero en cada apertura para que arranque vacío. */
   children: ReactNode;
 }
@@ -113,7 +133,7 @@ interface FormDrawerProps {
  * Panel de alta del tablero (actividad, campaña, lote, cultivo). Al cerrar, el formulario sigue montado para que la
  * animación no quede vacía; al abrir de nuevo, se remonta.
  */
-export default function FormDrawer({ open, onClose, children }: FormDrawerProps) {
+export default function FormDrawer({ open, onClose, size, children }: FormDrawerProps) {
   const [formKey, setFormKey] = useState(0);
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
@@ -122,7 +142,7 @@ export default function FormDrawer({ open, onClose, children }: FormDrawerProps)
   }
 
   return (
-    <FarmDrawer open={open} onClose={onClose}>
+    <FarmDrawer open={open} onClose={onClose} size={size}>
       <Fragment key={formKey}>{children}</Fragment>
     </FarmDrawer>
   );

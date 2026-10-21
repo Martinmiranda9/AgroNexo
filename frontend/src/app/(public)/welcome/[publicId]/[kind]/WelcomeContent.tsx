@@ -3,7 +3,10 @@
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { MdArrowForward, MdOutlineCheckCircle } from 'react-icons/md';
-import { Alert, AlertDescription, AlertTitle, Button, Card, Separator } from '@/ui/components';
+import { Alert, AlertDescription, AlertTitle } from '@/ui/components/Alert';
+import { Button } from '@/ui/components/Button';
+import { Card } from '@/ui/components/Card';
+import { Separator } from '@/ui/components/Separator';
 import BrandMark from '@/ui/components/BrandMark';
 
 export interface WelcomeContentProps {

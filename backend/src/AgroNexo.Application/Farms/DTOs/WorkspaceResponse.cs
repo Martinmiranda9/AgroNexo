@@ -1,3 +1,5 @@
+using AgroNexo.Application.Common.DTOs;
+
 namespace AgroNexo.Application.Farms.DTOs;
 
 /// <summary>
@@ -12,6 +14,13 @@ public class WorkspaceResponse
     public decimal TotalHectares { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? ArchivedAt { get; set; }
+
+    /// <summary>Perímetro del campo dibujado en el mapa (anillo cerrado). Vacío si no tiene.</summary>
+    public List<CoordinateDto> LocationCoordinates { get; set; } = new();
+
+    public string? Province { get; set; }
+    public string? Department { get; set; }
+    public string? Locality { get; set; }
 
     public Guid ProducerId { get; set; }
     public string ProducerName { get; set; } = string.Empty;

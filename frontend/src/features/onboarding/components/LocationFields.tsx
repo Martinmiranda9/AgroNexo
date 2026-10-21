@@ -3,14 +3,9 @@
 import { useId, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { City, Country, State } from 'country-state-city';
-import {
-  Field,
-  FieldError,
-  FieldLabel,
-  Input,
-  NativeSelect,
-  NativeSelectOption,
-} from '@/ui/components';
+import { Field, FieldError, FieldLabel } from '@/ui/components/Field';
+import { Input } from '@/ui/components/Input';
+import { NativeSelect, NativeSelectOption } from '@/ui/components/NativeSelect';
 import type { FormValues, LocationField } from '../config/types';
 import type { FieldErrors } from '../lib/validation';
 

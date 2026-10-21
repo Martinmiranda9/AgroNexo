@@ -53,6 +53,7 @@ public static class DependencyInjection
         // Tablero del campo: campañas, lotes con cultivos y actividades
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IFarmActivityResponseFactory, FarmActivityResponseFactory>();
+        services.AddScoped<ILotAuthorDirectory, LotAuthorDirectory>();
         services.AddScoped<IManageCampaignsUseCase, ManageCampaignsUseCase>();
         services.AddScoped<IManageLotsUseCase, ManageLotsUseCase>();
         services.AddScoped<IManageFarmActivitiesUseCase, ManageFarmActivitiesUseCase>();

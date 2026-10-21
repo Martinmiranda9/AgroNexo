@@ -78,9 +78,12 @@ public class GenerateMatchRecommendationsUseCase : IGenerateMatchRecommendations
         var candidateDict = candidates.ToDictionary(c => c.Id);
         var scoringCandidates = new List<ScoringCandidate>();
 
+        // La carga de todos los candidatos en una sola query (antes era una por candidato).
+        var workloads = await _professionalRepository.GetActiveMatchCountsAsync(candidateDict.Keys.ToList(), cancellationToken);
+
         foreach (var candidate in candidates)
         {
-            int activeMatches = await _professionalRepository.GetActiveMatchCountAsync(candidate.Id, cancellationToken);
+            int activeMatches = workloads.GetValueOrDefault(candidate.Id);
             double distanceKm = GeoDistanceCalculator.CalculateDistanceKm(locationPoint, candidate.CoverageArea);
 
             scoringCandidates.Add(new ScoringCandidate

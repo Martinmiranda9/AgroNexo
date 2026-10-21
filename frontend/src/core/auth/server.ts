@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { API_ORIGIN } from '@/core/config/api';
 import { SESSION_COOKIE, isFirebaseConfigured } from './config';
@@ -30,8 +31,11 @@ function splitName(name?: string): { firstName?: string; lastName?: string } {
   return { firstName, lastName: rest.join(' ') || undefined };
 }
 
-/** Sesión actual o `null` (sin login, cookie vencida/inválida, o Firebase sin configurar). */
-export async function getSessionUser(): Promise<SessionUser | null> {
+/**
+ * Sesión actual o `null` (sin login, cookie vencida/inválida, o Firebase sin configurar). Memorizada por request: el
+ * layout y la página la piden los dos y el token se verifica una sola vez.
+ */
+export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   if (!isFirebaseConfigured()) return null;
 
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
@@ -48,7 +52,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     picture: payload.picture,
     provider: payload.firebase?.sign_in_provider ?? 'password',
   };
-}
+});
 
 /** ID token para el backend, o `undefined` si no hay sesión. Es el mismo valor que guarda la cookie. */
 export async function getBackendToken(): Promise<string | undefined> {
@@ -65,8 +69,11 @@ export type CurrentUserState =
   | { status: 'not-registered' }
   | { status: 'unavailable' };
 
-/** Consulta al backend si el usuario logueado ya completó el registro (`GET /identity/me`). */
-export async function fetchCurrentUser(): Promise<CurrentUserState> {
+/**
+ * Consulta al backend si el usuario logueado ya completó el registro (`GET /identity/me`). Memorizada por request, así
+ * un solo render no repite el pedido.
+ */
+export const fetchCurrentUser = cache(async (): Promise<CurrentUserState> => {
   const token = await getBackendToken();
   if (!token) return { status: 'unavailable' };
 
@@ -83,4 +90,4 @@ export async function fetchCurrentUser(): Promise<CurrentUserState> {
   } catch {
     return { status: 'unavailable' };
   }
-}
+});

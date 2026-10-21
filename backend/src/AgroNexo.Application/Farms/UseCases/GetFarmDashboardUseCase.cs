@@ -23,6 +23,7 @@ public class GetFarmDashboardUseCase : IGetFarmDashboardUseCase
     private readonly ILotRepository _lotRepository;
     private readonly IFarmActivityRepository _farmActivityRepository;
     private readonly IFarmActivityResponseFactory _activityResponseFactory;
+    private readonly ILotAuthorDirectory _lotAuthorDirectory;
     private readonly TimeProvider _clock;
 
     public GetFarmDashboardUseCase(
@@ -32,6 +33,7 @@ public class GetFarmDashboardUseCase : IGetFarmDashboardUseCase
         ILotRepository lotRepository,
         IFarmActivityRepository farmActivityRepository,
         IFarmActivityResponseFactory activityResponseFactory,
+        ILotAuthorDirectory lotAuthorDirectory,
         TimeProvider clock)
     {
         _farmAccessService = farmAccessService;
@@ -40,6 +42,7 @@ public class GetFarmDashboardUseCase : IGetFarmDashboardUseCase
         _lotRepository = lotRepository;
         _farmActivityRepository = farmActivityRepository;
         _activityResponseFactory = activityResponseFactory;
+        _lotAuthorDirectory = lotAuthorDirectory;
         _clock = clock;
     }
 
@@ -53,6 +56,7 @@ public class GetFarmDashboardUseCase : IGetFarmDashboardUseCase
         var selected = SelectCampaign(campaigns, campaignId, today);
 
         var lots = await _lotRepository.GetByFarmAsync(farmId, cancellationToken);
+        var lotAuthors = await _lotAuthorDirectory.LoadAsync(lots, access, cancellationToken);
         var plantings = selected == null
             ? new List<(Lot Lot, LotCrop Crop)>()
             : lots.SelectMany(l => l.CropsIn(selected.Id).Select(c => (Lot: l, Crop: c))).ToList();
@@ -89,7 +93,8 @@ public class GetFarmDashboardUseCase : IGetFarmDashboardUseCase
                 })
                 .OrderByDescending(s => s.Hectares)
                 .ToList(),
-            Lots = lots.Select(l => WithLastLabor(FarmPlanningMapper.ToResponse(l, today, selected?.Id ?? Guid.Empty), labors)).ToList(),
+            Lots = lots.Select(l => WithLastLabor(FarmPlanningMapper.ToResponse(l, today, lotAuthors, selected?.Id ?? Guid.Empty), labors)).ToList(),
+            CanEditLots = access.CanEditLots && !access.Farm.IsArchived,
             LaborProgress = selected == null ? new List<LaborProgressResponse>() : BuildLaborProgress(lots, plantings, labors),
             Timeline = selected == null ? null : BuildTimeline(selected, plantings, today),
             RecentActivities = await _activityResponseFactory.BuildAsync(recentItems, access, cancellationToken),

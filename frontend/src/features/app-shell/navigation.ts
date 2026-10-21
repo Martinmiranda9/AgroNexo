@@ -5,7 +5,6 @@ import {
   MdOutlineHandshake,
   MdOutlineSearch,
 } from 'react-icons/md';
-import { signOutSession } from '@/core/auth/firebase-actions';
 import { ROUTES } from '@/shared/constants/routes';
 import type { AppUser } from './types';
 
@@ -116,6 +115,8 @@ export const displayNameOf = (user: AppUser) =>
 /** Cierra la sesión de Firebase y vuelve al login aunque el cierre falle (la cookie ya no sirve). */
 export async function signOut() {
   try {
+    // El SDK de Firebase (~120 kB) se baja recién al cerrar sesión: el resto del marco no lo usa.
+    const { signOutSession } = await import('@/core/auth/firebase-actions');
     await signOutSession();
   } finally {
     window.location.assign(ROUTES.login);

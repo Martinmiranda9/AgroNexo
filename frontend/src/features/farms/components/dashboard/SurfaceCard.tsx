@@ -6,6 +6,7 @@ import {
   MdKeyboardArrowDown,
   MdMoreVert,
   MdOutlineCalendarToday,
+  MdOutlineMap,
   MdOutlinePersonAddAlt,
   MdWhatsapp,
 } from 'react-icons/md';
@@ -31,6 +32,8 @@ interface SurfaceCardProps {
   dashboard: FarmDashboard;
   /** El productor dueño y el campo sin archivar: arma lotes, campañas e invita. */
   canManage: boolean;
+  /** Crear lotes: el productor dueño o el agrónomo del equipo, con el campo sin archivar. */
+  canAddLots: boolean;
   archived: boolean;
   /** Contacto del productor: lo ve el profesional del equipo. */
   producerContact: FarmContact | null;
@@ -41,6 +44,8 @@ interface SurfaceCardProps {
   onNewLot: () => void;
   /** Cargar el cultivo de la campaña en un lote (solo con campaña elegida). */
   onAddCrop?: (lot: Lot) => void;
+  /** Abrir el lote con su dibujo en el mapa y sus datos. */
+  onViewLot: (lot: Lot) => void;
 }
 
 /** Chat de WhatsApp con el productor (wa.me pide el número solo con dígitos). */
@@ -125,6 +130,7 @@ function lotStatus(lot: Lot, campaignId: string | null) {
 export default function SurfaceCard({
   dashboard,
   canManage,
+  canAddLots,
   archived,
   producerContact,
   onSelectCampaign,
@@ -133,6 +139,7 @@ export default function SurfaceCard({
   onNewCampaign,
   onNewLot,
   onAddCrop,
+  onViewLot,
 }: SurfaceCardProps) {
   const { kpis, lots, campaigns, selectedCampaignId } = dashboard;
   const unassigned = Math.max(0, kpis.totalHectares - kpis.lotHectares);
@@ -217,7 +224,7 @@ export default function SurfaceCard({
             </span>
             Total {lotsLabel(lots.length)}
           </p>
-          {canManage && (
+          {canAddLots && (
             <Button type="button" variant="ghost" size="xs" onClick={onNewLot}>
               <MdAdd data-icon="inline-start" aria-hidden />
               Nuevo lote
@@ -227,8 +234,8 @@ export default function SurfaceCard({
 
         {lots.length === 0 ? (
           <p className="text-caption text-muted-foreground px-1.5 pb-1.5">
-            {canManage
-              ? 'Dividí el campo en lotes para cargar cultivos y labores.'
+            {canAddLots
+              ? 'Dividí el campo en lotes: dibujalos en el mapa para cargar cultivos y labores.'
               : 'El productor todavía no cargó lotes.'}
           </p>
         ) : (
@@ -274,6 +281,17 @@ export default function SurfaceCard({
                     {status.crop ? cropLabel(status.crop.crop) : '—'}
                   </p>
                   <p className={cn('text-caption mt-1 font-medium', status.tone)}>{status.text}</p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="xs"
+                    className="mt-1 -ml-3"
+                    onClick={() => onViewLot(lot)}
+                    aria-label={`Ver lote ${lot.name}`}
+                  >
+                    <MdOutlineMap data-icon="inline-start" aria-hidden />
+                    Ver lote
+                  </Button>
                 </li>
               );
             })}

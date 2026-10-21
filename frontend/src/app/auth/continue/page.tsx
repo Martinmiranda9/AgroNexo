@@ -18,13 +18,12 @@ export default async function AuthContinuePage() {
   const user = await getSessionUser();
   if (!user) redirect('/login');
 
-  const current = await fetchCurrentUser();
+  // El estado del usuario y sus campos van en paralelo; si los campos no llegan, entra igual a la pantalla de su rol.
+  const [current, workspaces] = await Promise.all([fetchCurrentUser(), getWorkspacesAction()]);
   if (current.status === 'unavailable') return <BackendUnavailable />;
 
   if (current.status !== 'registered') redirect(ROUTES.onboarding);
 
-  // Si los campos no llegan, entra igual a la pantalla de su rol.
-  const workspaces = await getWorkspacesAction();
   redirect(
     homeRouteFor(current.user.userType, workspaces.status === 'ok' ? workspaces.workspaces : null)
   );

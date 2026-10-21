@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import VerificationBanner from '@/ui/components/VerificationBanner';
-import { resolveRegistrationKind } from '@/features/onboarding';
-import { REGISTRATION_FLOWS } from '@/features/onboarding/config/flows';
+import { REGISTRATION_FLOWS, resolveRegistrationKind } from '@/features/onboarding/config/flows';
 import { fetchCurrentUser, getSessionUser } from '@/core/auth/server';
 import WelcomeContent from './WelcomeContent';
 

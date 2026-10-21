@@ -3,7 +3,7 @@ import { getWorkspacesAction } from '@/core/actions/get-workspaces.action';
 import { fetchCurrentUser, getSessionUser } from '@/core/auth/server';
 import { AppLayout } from '@/features/app-shell';
 import BackendUnavailable from '@/features/auth/components/BackendUnavailable';
-import { FarmsScreen } from '@/features/farms';
+import FarmsScreen from '@/features/farms/components/FarmsScreen';
 import { ROUTES } from '@/shared/constants/routes';
 
 export const dynamic = 'force-dynamic';
@@ -21,14 +21,14 @@ export default async function FarmsPage({
   const sessionUser = await getSessionUser();
   if (!sessionUser) redirect(ROUTES.login);
 
-  const current = await fetchCurrentUser();
+  // El estado del usuario y sus campos solo necesitan el token: van en paralelo.
+  const [current, result] = await Promise.all([fetchCurrentUser(), getWorkspacesAction()]);
   if (current.status === 'unavailable') return <BackendUnavailable />;
   if (current.status === 'not-registered') redirect(ROUTES.onboarding);
 
   const viewer = current.user.userType;
   if (viewer !== 'Producer' && viewer !== 'Professional') redirect(ROUTES.dashboard);
 
-  const result = await getWorkspacesAction();
   if (result.status === 'unauthorized') redirect(ROUTES.login);
   if (result.status !== 'ok') return <BackendUnavailable />;
 

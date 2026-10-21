@@ -1,5 +1,11 @@
 import type { ProfessionalRole } from './identity.model';
 
+/** Punto del mapa en WGS84 (`CoordinateDto`). */
+export interface GeoPoint {
+  latitude: number;
+  longitude: number;
+}
+
 /** Contacto de alguien del campo. Llega solo a quien ya tiene un match aceptado con esa persona. */
 export interface FarmContact {
   /** Formato internacional (E.164): `+5491155550000`. */
@@ -34,6 +40,12 @@ export interface Workspace {
   createdAt: string;
   /** Fecha en que se archivó; `null` mientras está en uso. */
   archivedAt: string | null;
+  /** Perímetro dibujado en el mapa (anillo cerrado: el último punto repite el primero). Vacío si no tiene. */
+  locationCoordinates?: GeoPoint[];
+  /** Provincia, partido y localidad sacados del perímetro; `null` si no hay perímetro. */
+  province?: string | null;
+  department?: string | null;
+  locality?: string | null;
   producerId: string;
   producerName: string;
   /** `Owner`: mira el productor dueño. `Member`: mira un profesional del equipo. */
@@ -70,8 +82,10 @@ export const FARM_HECTARES_MAX = 1_000_000;
 export interface CreateFarmInput {
   name: string;
   description?: string;
-  /** Opcional: 0 si no se sabe todavía. */
+  /** Opcional: 0 si no se sabe todavía. El perímetro dibujado no las cambia. */
   totalHectares?: number;
+  /** Perímetro dibujado en el mapa, solo para ubicar el campo (opcional, al menos 3 esquinas). */
+  locationCoordinates?: GeoPoint[];
 }
 
 /** Campo recién creado: lo justo para seguir con la invitación. */

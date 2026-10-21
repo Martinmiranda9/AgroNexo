@@ -19,7 +19,13 @@ public class LotConfiguration : IEntityTypeConfiguration<Lot>
         builder.Property(l => l.CreatedAt).IsRequired();
         builder.Property(l => l.UpdatedAt);
 
+        builder.Property(l => l.Boundary).HasColumnType($"geometry(Polygon,{Lot.BoundarySrid})");
+        builder.Property(l => l.CreatedByProfessionalId);
+        builder.Property(l => l.BoundaryEditedByProfessionalId);
+        builder.Property(l => l.BoundaryEditedAt);
+
         builder.HasIndex(l => l.FarmId);
+        builder.HasIndex(l => l.Boundary).HasMethod("gist");
 
         builder.HasOne<Farm>()
             .WithMany()

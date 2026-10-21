@@ -86,11 +86,8 @@ public class GenerateMatchRecommendationsUseCaseTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Professional> { prof1, prof2 });
 
-        _professionalRepoMock.Setup(r => r.GetActiveMatchCountAsync(prof1.Id, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(0);
-
-        _professionalRepoMock.Setup(r => r.GetActiveMatchCountAsync(prof2.Id, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(5);
+        _professionalRepoMock.Setup(r => r.GetActiveMatchCountsAsync(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Dictionary<Guid, int> { [prof1.Id] = 0, [prof2.Id] = 5 });
 
         _matchDiscoveryRepoMock.Setup(r => r.AddAsync(It.IsAny<MatchDiscoveryRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((MatchDiscoveryRequest req, CancellationToken ct) => req);

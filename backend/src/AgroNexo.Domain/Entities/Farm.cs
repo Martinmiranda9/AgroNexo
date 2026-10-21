@@ -24,7 +24,17 @@ public class Farm : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDeleta
 
     public bool IsArchived => ArchivedAt.HasValue;
 
+    /// <summary>Provincia donde está el campo, sacada del mapa (por ejemplo "Buenos Aires").</summary>
+    public string? Province { get; private set; }
+
+    /// <summary>Partido o departamento (por ejemplo "Pergamino").</summary>
+    public string? Department { get; private set; }
+
+    /// <summary>Localidad o gobierno local; si no hay, el partido.</summary>
+    public string? Locality { get; private set; }
+
     public const int DescriptionMaxLength = 500;
+    public const int PlaceNameMaxLength = 100;
 
     /// <summary>
     /// Human-readable numeric public identifier for the farm/lot (prefix 20, e.g. 200001).
@@ -65,8 +75,8 @@ public class Farm : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDeleta
         TenantId = tenantId;
         ProducerId = producerId;
         Name = name.Trim();
+        Location = ValidateLocation(location);
         TotalHectares = totalHectares;
-        Location = location;
         Description = NormalizeDescription(description);
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
@@ -83,14 +93,43 @@ public class Farm : BaseEntity, IAggregateRoot, ITenantScopedEntity, ISoftDeleta
             throw new DomainValidationException(nameof(TotalHectares), "La cantidad total de hectáreas no puede ser negativa.");
 
         Name = name.Trim();
-        TotalHectares = totalHectares;
         Description = NormalizeDescription(description);
         if (location != null)
         {
-            Location = location;
+            Location = ValidateLocation(location);
         }
 
+        TotalHectares = totalHectares;
         MarkUpdated();
+    }
+
+    /// <summary>Provincia, partido y localidad del campo. Vacíos o en blanco quedan en <c>null</c>.</summary>
+    public void SetPlace(string? province, string? department, string? locality)
+    {
+        Province = NormalizePlaceName(province, nameof(Province));
+        Department = NormalizePlaceName(department, nameof(Department));
+        Locality = NormalizePlaceName(locality, nameof(Locality));
+        MarkUpdated();
+    }
+
+    private static Geometry? ValidateLocation(Geometry? location)
+    {
+        if (location is Polygon && !location.IsValid)
+            throw new DomainValidationException(nameof(Location), "El perímetro del campo se cruza consigo mismo. Revisá el orden de las esquinas.");
+
+        return location;
+    }
+
+    private static string? NormalizePlaceName(string? value, string propertyName)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+
+        var trimmed = value.Trim();
+        if (trimmed.Length > PlaceNameMaxLength)
+            throw new DomainValidationException(propertyName, $"El nombre no puede superar los {PlaceNameMaxLength} caracteres.");
+
+        return trimmed;
     }
 
     /// <summary>Solo el productor archiva el campo; la baja del equipo la hace el caso de uso.</summary>

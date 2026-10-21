@@ -4,7 +4,7 @@ import { getWorkspacesAction } from '@/core/actions/get-workspaces.action';
 import { fetchCurrentUser, getSessionUser } from '@/core/auth/server';
 import { AppLayout } from '@/features/app-shell';
 import BackendUnavailable from '@/features/auth/components/BackendUnavailable';
-import { AddToFarmButton } from '@/features/farms';
+import AddToFarmButton from '@/features/farms/components/AddToFarmButton';
 import { MatchRequestList, MatchRequestsEmpty, MatchStats } from '@/features/matches';
 import { SectionHeader } from '@/ui/components/SectionHeader';
 import { ROUTES } from '@/shared/constants/routes';
@@ -19,14 +19,14 @@ export default async function MatchesPage() {
   const sessionUser = await getSessionUser();
   if (!sessionUser) redirect(ROUTES.login);
 
-  const current = await fetchCurrentUser();
+  // El estado del usuario y las solicitudes solo necesitan el token: van en paralelo.
+  const [current, result] = await Promise.all([fetchCurrentUser(), getMatchesAction()]);
   if (current.status === 'unavailable') return <BackendUnavailable />;
   if (current.status === 'not-registered') redirect(ROUTES.onboarding);
 
   const viewer = current.user.userType;
   if (viewer !== 'Producer' && viewer !== 'Professional') redirect(ROUTES.dashboard);
 
-  const result = await getMatchesAction();
   if (result.status === 'unauthorized') redirect(ROUTES.login);
   if (result.status !== 'ok') return <BackendUnavailable />;
 

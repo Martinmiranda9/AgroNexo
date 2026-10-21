@@ -1,17 +1,21 @@
 using AgroNexo.Domain.Common;
 using AgroNexo.Domain.Enums;
 using AgroNexo.Domain.Exceptions;
+using NetTopologySuite.Geometries;
 
 namespace AgroNexo.Domain.Entities;
 
 /// <summary>
 /// Parte de un campo que se trabaja por separado (por ejemplo "Lote 3 · 20 ha"). En cada campaña tiene sus cultivos.
-/// Lo administra el productor dueño del campo.
+/// Las hectáreas son siempre las que declara quien lo carga; la forma dibujada en el mapa es opcional y solo lo ubica.
+/// Lo crean y corrigen el productor dueño o el ingeniero agrónomo del equipo; los cultivos y la baja son solo del
+/// productor.
 /// </summary>
 public class Lot : BaseEntity, IAggregateRoot, ISoftDeletable
 {
     public const int NameMaxLength = 100;
     public const decimal HectaresMax = 1_000_000m;
+    public const int BoundarySrid = 4326;
 
     private readonly List<LotCrop> _crops = new();
 
@@ -20,6 +24,18 @@ public class Lot : BaseEntity, IAggregateRoot, ISoftDeletable
     public decimal Hectares { get; private set; }
     public bool IsActive { get; private set; } = true;
 
+    /// <summary>Forma del lote dibujada en el mapa (SRID 4326), solo para ubicarlo; <c>null</c> si no se dibujó.</summary>
+    public Polygon? Boundary { get; private set; }
+
+    /// <summary>Profesional que creó el lote; <c>null</c> si lo creó el productor.</summary>
+    public Guid? CreatedByProfessionalId { get; private set; }
+
+    /// <summary>Profesional que dibujó o corrigió la forma por última vez; <c>null</c> si fue el productor.</summary>
+    public Guid? BoundaryEditedByProfessionalId { get; private set; }
+
+    /// <summary>Cuándo se dibujó o corrigió la forma por última vez; <c>null</c> si el lote no tiene forma.</summary>
+    public DateTime? BoundaryEditedAt { get; private set; }
+
     public IReadOnlyCollection<LotCrop> Crops => _crops.AsReadOnly();
 
     // Parameterless constructor for EF Core
@@ -27,21 +43,44 @@ public class Lot : BaseEntity, IAggregateRoot, ISoftDeletable
     {
     }
 
-    public Lot(Guid farmId, string name, decimal hectares)
+    /// <summary>Lote con sus hectáreas declaradas y, si se dibujó, su ubicación en el mapa.</summary>
+    public Lot(Guid farmId, string name, decimal hectares, Polygon? boundary = null, Guid? createdByProfessionalId = null)
     {
         if (farmId == Guid.Empty)
             throw new DomainValidationException(nameof(FarmId), "El FarmId es obligatorio.");
 
         Id = Guid.NewGuid();
         FarmId = farmId;
-        Apply(name, hectares);
+        ApplyName(name);
+        ApplyHectares(hectares);
+        CreatedByProfessionalId = createdByProfessionalId;
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
+
+        if (boundary != null)
+            ApplyBoundary(boundary, createdByProfessionalId);
     }
 
-    public void Update(string name, decimal hectares)
+    /// <summary>
+    /// Corrige nombre, hectáreas y ubicación. Sin forma, el lote queda sin dibujo; si la forma cambió, se registra quién
+    /// la corrigió.
+    /// </summary>
+    public void Update(string name, decimal hectares, Polygon? boundary = null, Guid? editedByProfessionalId = null)
     {
-        Apply(name, hectares);
+        ApplyName(name);
+        ApplyHectares(hectares);
+
+        if (boundary == null)
+        {
+            Boundary = null;
+            BoundaryEditedByProfessionalId = null;
+            BoundaryEditedAt = null;
+        }
+        else if (Boundary == null || !Boundary.EqualsExact(boundary))
+        {
+            ApplyBoundary(boundary, editedByProfessionalId);
+        }
+
         MarkUpdated();
     }
 
@@ -82,7 +121,7 @@ public class Lot : BaseEntity, IAggregateRoot, ISoftDeletable
         MarkUpdated();
     }
 
-    private void Apply(string name, decimal hectares)
+    private void ApplyName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainValidationException(nameof(Name), "El nombre del lote es obligatorio.");
@@ -91,10 +130,29 @@ public class Lot : BaseEntity, IAggregateRoot, ISoftDeletable
         if (trimmed.Length > NameMaxLength)
             throw new DomainValidationException(nameof(Name), $"El nombre del lote no puede superar los {NameMaxLength} caracteres.");
 
+        Name = trimmed;
+    }
+
+    private void ApplyHectares(decimal hectares)
+    {
         if (hectares <= 0 || hectares > HectaresMax)
             throw new DomainValidationException(nameof(Hectares), "Las hectáreas del lote tienen que ser mayores a cero.");
 
-        Name = trimmed;
         Hectares = hectares;
+    }
+
+    private void ApplyBoundary(Polygon boundary, Guid? editedByProfessionalId)
+    {
+        ArgumentNullException.ThrowIfNull(boundary);
+
+        if (boundary.SRID != BoundarySrid)
+            throw new DomainValidationException(nameof(Boundary), $"La forma del lote tiene que estar en coordenadas geográficas (SRID {BoundarySrid}).");
+
+        if (!boundary.IsValid)
+            throw new DomainValidationException(nameof(Boundary), "El borde del lote se cruza consigo mismo. Revisá el orden de las esquinas.");
+
+        Boundary = boundary;
+        BoundaryEditedByProfessionalId = editedByProfessionalId;
+        BoundaryEditedAt = DateTime.UtcNow;
     }
 }

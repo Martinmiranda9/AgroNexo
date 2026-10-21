@@ -1,22 +1,17 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { useController, useForm } from 'react-hook-form';
+import { useController, useForm, type Control } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
 import { MdErrorOutline } from 'react-icons/md';
-import {
-  Alert,
-  AlertDescription,
-  Button,
-  Field,
-  FieldError,
-  FieldLabel,
-  PasswordInput,
-  Separator,
-  Spinner,
-} from '@/ui/components';
+import { Alert, AlertDescription } from '@/ui/components/Alert';
+import { Button } from '@/ui/components/Button';
+import { Field, FieldError, FieldLabel } from '@/ui/components/Field';
+import { PasswordInput } from '@/ui/components/PasswordInput';
+import { Separator } from '@/ui/components/Separator';
+import { Spinner } from '@/ui/components/Spinner';
 import BrandMark from '@/ui/components/BrandMark';
 import EmailField from '@/ui/components/EmailField';
 import GoogleButton from '@/ui/components/GoogleButton';
@@ -51,6 +46,17 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 /**
+ * El correo controlado vive en su propio componente: cada tecla re-renderiza solo este campo y no toda la pantalla
+ * (con el panel de marca incluido), que es lo que pasaba con `useController` en la raíz del formulario.
+ */
+function LoginEmailField({ control, error }: { control: Control<LoginValues>; error?: string }) {
+  const { field } = useController({ name: 'email', control });
+  return (
+    <EmailField name={field.name} value={field.value} onChange={field.onChange} error={error} />
+  );
+}
+
+/**
  * Inicio de sesión (el registro vive en /onboarding). Google y correo+contraseña van directo contra
  * Firebase con el SDK de cliente: sin redirección a una pantalla ajena, el formulario es el nuestro.
  */
@@ -62,7 +68,6 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginValues>({ resolver: zodResolver(loginSchema), defaultValues: { email: '' } });
-  const { field: emailField } = useController({ name: 'email', control });
   const [formError, setFormError] = useState<string>();
   const [googleLoading, setGoogleLoading] = useState(false);
   const copy = COPY;
@@ -122,12 +127,7 @@ export default function AgroNexoAuthModal({ error }: { error?: string }) {
             noValidate
             className="flex flex-col gap-4 text-left"
           >
-            <EmailField
-              name={emailField.name}
-              value={emailField.value}
-              onChange={emailField.onChange}
-              error={errors.email?.message}
-            />
+            <LoginEmailField control={control} error={errors.email?.message} />
 
             <Field data-invalid={errors.password ? true : undefined}>
               <FieldLabel htmlFor={passwordId}>Contraseña</FieldLabel>

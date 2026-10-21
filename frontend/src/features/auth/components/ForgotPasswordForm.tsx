@@ -3,15 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { MdCheckCircle, MdErrorOutline } from 'react-icons/md';
-import {
-  Alert,
-  AlertDescription,
-  Button,
-  Field,
-  FieldLabel,
-  Input,
-  Spinner,
-} from '@/ui/components';
+import { Alert, AlertDescription } from '@/ui/components/Alert';
+import { Button } from '@/ui/components/Button';
+import { Field, FieldLabel } from '@/ui/components/Field';
+import { Input } from '@/ui/components/Input';
+import { Spinner } from '@/ui/components/Spinner';
 import BrandMark from '@/ui/components/BrandMark';
 import EmailField, { validateEmail } from '@/ui/components/EmailField';
 import { sendPasswordReset } from '@/core/auth/firebase-actions';
