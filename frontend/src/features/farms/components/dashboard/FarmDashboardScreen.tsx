@@ -8,7 +8,9 @@ import type {
   FarmActivity,
   FarmActivityStatus,
   FarmDashboard,
+  Lot,
 } from '@/core/models/farm-dashboard.model';
+import type { GeoPoint } from '@/core/models/farm.model';
 import { Button } from '@/ui/components/Button';
 import { toast } from '@/ui/components/Toaster';
 import { ACTIVITY_STATUS_LABEL } from '../../lib/dashboard-view';
@@ -19,6 +21,7 @@ import DashboardGreeting from './DashboardGreeting';
 import { failureCopy } from './FormDrawer';
 import KpiTilesCard from './KpiTilesCard';
 import LaborChartCard from './LaborChartCard';
+import LotDetailsDialog from './LotDetailsDialog';
 import LotDrawer, { type LotDrawerMode } from './LotDrawer';
 import NewActivityDrawer from './NewActivityDrawer';
 import NewCampaignDrawer from './NewCampaignDrawer';
@@ -26,6 +29,8 @@ import SurfaceCard from './SurfaceCard';
 import TeamCard from './TeamCard';
 
 type Panel = 'activity' | 'campaign' | 'invite' | null;
+
+const NO_PERIMETER: GeoPoint[] = [];
 
 interface FarmDashboardScreenProps {
   dashboard: FarmDashboard;
@@ -50,6 +55,7 @@ export default function FarmDashboardScreen({
   const pathname = usePathname();
   const [panel, setPanel] = useState<Panel>(null);
   const [lotMode, setLotMode] = useState<LotDrawerMode | null>(null);
+  const [viewedLot, setViewedLot] = useState<Lot | null>(null);
   const [pendingActivity, setPendingActivity] = useState<string | null>(null);
 
   const { workspace } = dashboard;
@@ -110,6 +116,7 @@ export default function FarmDashboardScreen({
         <SurfaceCard
           dashboard={dashboard}
           canManage={canManage}
+          canAddLots={dashboard.canEditLots}
           archived={archived}
           producerContact={workspace.producerContact}
           onSelectCampaign={selectCampaign}
@@ -118,6 +125,7 @@ export default function FarmDashboardScreen({
           onNewCampaign={() => setPanel('campaign')}
           onNewLot={() => setLotMode({ kind: 'new' })}
           onAddCrop={canManage && campaign ? (lot) => setLotMode({ kind: 'crop', lot }) : undefined}
+          onViewLot={setViewedLot}
         />
         <KpiTilesCard dashboard={dashboard} />
         <div className="min-w-0 md:col-span-2 xl:col-span-1">
@@ -184,6 +192,32 @@ export default function FarmDashboardScreen({
         }}
       />
 
+      <LotDetailsDialog
+        lot={viewedLot}
+        lots={dashboard.lots}
+        perimeter={workspace.locationCoordinates ?? NO_PERIMETER}
+        campaignId={dashboard.selectedCampaignId}
+        onClose={() => setViewedLot(null)}
+      />
+
+      {dashboard.canEditLots && (
+        <LotDrawer
+          mode={lotMode}
+          farmId={workspace.farmId}
+          campaign={campaign}
+          perimeter={workspace.locationCoordinates ?? NO_PERIMETER}
+          lots={dashboard.lots}
+          farmHectares={workspace.totalHectares}
+          canManageCrops={canManage}
+          onClose={() => setLotMode(null)}
+          onSaved={(message) => {
+            setLotMode(null);
+            toast.success(message);
+            router.refresh();
+          }}
+        />
+      )}
+
       {isOwner && (
         <>
           <NewCampaignDrawer
@@ -194,17 +228,6 @@ export default function FarmDashboardScreen({
               close();
               toast.success(`Creaste la campaña ${created.name}`);
               selectCampaign(created.id);
-              router.refresh();
-            }}
-          />
-          <LotDrawer
-            mode={lotMode}
-            farmId={workspace.farmId}
-            campaign={campaign}
-            onClose={() => setLotMode(null)}
-            onSaved={(message) => {
-              setLotMode(null);
-              toast.success(message);
               router.refresh();
             }}
           />

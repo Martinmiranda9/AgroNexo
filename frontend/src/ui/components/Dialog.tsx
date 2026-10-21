@@ -37,13 +37,21 @@ function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) 
   );
 }
 
+/** Ancho del popup. `xl`: grande, para contenido con mapa o tablas; con scroll propio si no entra en la pantalla. */
+const DIALOG_SIZE = {
+  default: 'sm:max-w-lg',
+  xl: 'max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-5xl',
+} as const;
+
 function DialogContent({
   className,
   children,
   showCloseButton = true,
+  size = 'default',
   ...props
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
+  size?: keyof typeof DIALOG_SIZE;
 }) {
   return (
     <DialogPortal>
@@ -51,7 +59,8 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          'bg-popover text-popover-foreground border-border fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl border p-6 text-sm [box-shadow:var(--shadow-l)] transition-[opacity,scale] duration-200 outline-none data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 sm:max-w-lg',
+          'bg-popover text-popover-foreground border-border fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl border p-6 text-sm [box-shadow:var(--shadow-l)] transition-[opacity,scale] duration-200 outline-none data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0',
+          DIALOG_SIZE[size],
           className
         )}
         {...props}

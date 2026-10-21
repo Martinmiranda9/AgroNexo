@@ -1,5 +1,5 @@
 import type { ProfessionalRole } from './identity.model';
-import type { Workspace } from './farm.model';
+import type { GeoPoint, Workspace } from './farm.model';
 
 /** Cultivos del backend (`CropType`). */
 export type CropType =
@@ -48,11 +48,24 @@ export interface LotLastLabor {
   date: IsoDate;
 }
 
+/** Quién creó o corrigió un lote: `role` es `null` si fue el productor. */
+export interface LotEditor {
+  name: string;
+  role: ProfessionalRole | null;
+}
+
 export interface Lot {
   id: string;
   name: string;
+  /** Las declaradas al cargar el lote; el dibujo no las cambia. */
   hectares: number;
   crops: LotCrop[];
+  /** Ubicación dibujada en el mapa (anillo cerrado), solo referencia. Vacía si no se dibujó. */
+  boundaryCoordinates: GeoPoint[];
+  createdBy: LotEditor;
+  /** Quién dibujó o corrigió la forma por última vez; `null` si no tiene forma. */
+  boundaryEditedBy: LotEditor | null;
+  boundaryEditedAt: string | null;
   /** Solo en el tablero: última labor de campo de la campaña. */
   lastLabor: LotLastLabor | null;
 }
@@ -135,6 +148,8 @@ export interface FarmDashboard {
   };
   cropSurfaces: CropSurface[];
   lots: Lot[];
+  /** Quien mira crea lotes y dibuja su forma: el productor dueño o el ingeniero agrónomo del equipo. */
+  canEditLots: boolean;
   laborProgress: LaborProgress[];
   timeline: CampaignTimeline | null;
   recentActivities: FarmActivity[];
@@ -165,9 +180,11 @@ export interface CampaignInput {
   endsOn: IsoDate;
 }
 
+/** Un lote con sus hectáreas declaradas y, si se dibujó, su ubicación en el mapa (solo referencia). */
 export interface LotInput {
   name: string;
   hectares: number;
+  boundaryCoordinates?: GeoPoint[];
 }
 
 export interface LotCropInput {
